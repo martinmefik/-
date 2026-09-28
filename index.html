@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>АварКом — аварийный комиссар онлайн</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -20,12 +21,14 @@ body {
   padding:20px; background:radial-gradient(ellipse at top, #1a1f2e 0%, #0a0c10 70%);
 }
 .auth-card {
-  width:100%; max-width:420px; background:#12151c;
+  width:100%; max-width:440px; background:#12151c;
   border:1px solid #1f232c; border-radius:20px; padding:32px;
   box-shadow:0 20px 60px rgba(0,0,0,0.5);
 }
-.auth-logo { font-size:28px; font-weight:800; color:#f59e0b; text-align:center; margin-bottom:8px; }
-.auth-sub { text-align:center; color:#6b7280; font-size:13px; margin-bottom:28px; }
+.auth-logo-wrap { text-align:center; margin-bottom:20px; }
+.auth-logo-icon { font-size:44px; margin-bottom:6px; }
+.auth-logo { font-size:26px; font-weight:800; color:#f59e0b; }
+.auth-sub { text-align:center; color:#6b7280; font-size:13px; margin-bottom:24px; }
 .auth-tabs { display:flex; gap:8px; margin-bottom:24px; background:#0a0c10; border-radius:10px; padding:4px; }
 .auth-tab {
   flex:1; padding:10px; text-align:center; font-size:14px; cursor:pointer;
@@ -35,10 +38,11 @@ body {
 .auth-form { display:none; }
 .auth-form.active { display:block; }
 .field { margin-bottom:14px; }
-.field label { display:block; font-size:12px; color:#6b7280; margin-bottom:6px; }
+.field label { display:block; font-size:12px; color:#6b7280; margin-bottom:6px; font-weight:600; }
 .field input, .field textarea, .field select {
   width:100%; background:#0a0c10; border:1px solid #1f232c; color:#e8eaed;
   padding:12px 14px; border-radius:10px; font-size:14px; font-family:inherit; outline:none;
+  transition:0.15s;
 }
 .field input:focus, .field textarea:focus, .field select:focus { border-color:#f59e0b; }
 .field textarea { resize:vertical; min-height:80px; }
@@ -55,6 +59,8 @@ body {
 .btn-lg { padding:16px; font-size:15px; }
 .btn-danger { background:#ef4444; color:#fff; }
 .btn-danger:hover { background:#dc2626; }
+.btn-outline { background:transparent; border:1px solid #2f3440; }
+.btn-outline:hover { background:#1f232c; border-color:#4b5563; }
 
 /* ============ HEADER ============ */
 .header {
@@ -62,11 +68,11 @@ body {
   display:flex; align-items:center; padding:0 20px; gap:16px;
   position:sticky; top:0; z-index:100;
 }
-.logo { font-weight:800; font-size:17px; color:#f59e0b; }
+.logo { font-weight:800; font-size:17px; color:#f59e0b; display:flex; align-items:center; gap:8px; cursor:pointer; }
 .header-nav { display:flex; gap:4px; margin-left:20px; }
 .nav-item {
   padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer;
-  color:#6b7280; transition:0.15s;
+  color:#6b7280; transition:0.15s; font-weight:500;
 }
 .nav-item:hover, .nav-item.active { background:#1f232c; color:#e8eaed; }
 
@@ -93,6 +99,22 @@ body {
   font-size:14px; font-weight:700; color:#0a0c10;
 }
 
+/* Lang dropdown */
+.lang-dropdown {
+  position:absolute; top:100%; right:0; margin-top:8px;
+  background:#12151c; border:1px solid #1f232c; border-radius:12px;
+  min-width:200px; max-height:400px; overflow-y:auto;
+  z-index:200; display:none; box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+.lang-dropdown.active { display:block; }
+.lang-option {
+  padding:12px 16px; font-size:13px; cursor:pointer; transition:0.15s;
+  display:flex; align-items:center; gap:10px;
+}
+.lang-option:hover { background:#1f232c; }
+.lang-option.active { background:rgba(245,158,11,0.1); color:#f59e0b; }
+.lang-flag { font-size:18px; }
+
 /* ============ MAIN ============ */
 .main { flex:1; padding:40px 20px; max-width:900px; margin:0 auto; width:100%; }
 .hero { text-align:center; margin-bottom:40px; }
@@ -100,24 +122,34 @@ body {
 .hero p { color:#6b7280; font-size:15px; }
 
 /* ============ ACTION CARDS ============ */
-.actions { display:grid; grid-template-columns:1fr; gap:16px; }
+.actions { display:grid; grid-template-columns:1fr; gap:14px; }
 .action-card {
-  display:flex; align-items:center; gap:20px; padding:24px;
+  display:flex; align-items:center; gap:20px; padding:22px;
   background:#12151c; border:1px solid #1f232c; border-radius:16px;
   cursor:pointer; transition:0.2s; text-align:left;
 }
 .action-card:hover { border-color:#f59e0b; transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+.action-card.highlight {
+  background:linear-gradient(135deg,#12151c 0%,#1a1f2e 100%);
+  border-color:rgba(245,158,11,0.4);
+}
 .action-icon {
-  width:64px; height:64px; border-radius:16px; display:flex;
-  align-items:center; justify-content:center; font-size:30px; flex-shrink:0;
+  width:60px; height:60px; border-radius:16px; display:flex;
+  align-items:center; justify-content:center; font-size:28px; flex-shrink:0;
 }
 .action-icon.red { background:rgba(239,68,68,0.15); }
 .action-icon.orange { background:rgba(245,158,11,0.15); }
 .action-icon.blue { background:rgba(59,130,246,0.15); }
 .action-icon.green { background:rgba(74,222,128,0.15); }
-.action-info h3 { font-size:17px; margin-bottom:4px; }
+.action-icon.purple { background:rgba(168,85,247,0.15); }
+.action-info { flex:1; }
+.action-info h3 { font-size:16px; margin-bottom:4px; }
 .action-info p { font-size:13px; color:#6b7280; }
-.action-arrow { margin-left:auto; color:#4b5563; font-size:20px; }
+.action-arrow { color:#4b5563; font-size:20px; }
+.action-price {
+  font-size:13px; font-weight:700; color:#f59e0b;
+  background:rgba(245,158,11,0.1); padding:4px 10px; border-radius:8px;
+}
 
 /* ============ РЕКОМЕНДАЦИИ ============ */
 .rec-item {
@@ -137,13 +169,13 @@ body {
 }
 
 /* ============ ЛК ============ */
-.lk-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px; }
+.lk-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px; }
 .lk-card {
   background:#12151c; border:1px solid #1f232c; border-radius:14px; padding:20px;
 }
 .lk-card h4 { font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
-.lk-value { font-size:26px; font-weight:800; color:#f59e0b; }
-.lk-list { background:#12151c; border:1px solid #1f232c; border-radius:14px; overflow:hidden; }
+.lk-value { font-size:24px; font-weight:800; color:#f59e0b; }
+.lk-list { background:#12151c; border:1px solid #1f232c; border-radius:14px; overflow:hidden; margin-bottom:20px; }
 .lk-row {
   display:flex; align-items:center; gap:14px; padding:16px 20px;
   border-bottom:1px solid #1a1e26; cursor:pointer; transition:0.15s;
@@ -155,10 +187,17 @@ body {
 .lk-row-title { font-size:14px; font-weight:600; }
 .lk-row-sub { font-size:12px; color:#6b7280; margin-top:2px; }
 .lk-row-arrow { color:#4b5563; }
+.lk-empty { text-align:center; padding:36px 20px; color:#4b5563; font-size:14px; }
 
-.lk-empty {
-  text-align:center; padding:40px 20px; color:#4b5563; font-size:14px;
+.doc-card {
+  background:#12151c; border:1px solid #1f232c; border-radius:14px;
+  padding:18px; margin-bottom:12px; display:flex; gap:14px; align-items:center;
 }
+.doc-icon { font-size:32px; }
+.doc-info { flex:1; }
+.doc-title { font-size:14px; font-weight:600; }
+.doc-meta { font-size:12px; color:#6b7280; margin-top:2px; }
+.doc-actions { display:flex; gap:6px; }
 
 /* ============ CALL SCREEN ============ */
 .call-wrap {
@@ -170,16 +209,11 @@ body {
   background:#12151c; border:1px solid #1f232c; border-radius:20px;
   padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
 }
-
-/* Progress bar */
-.progress-bar {
-  height:4px; background:#1f232c; border-radius:2px; overflow:hidden; margin-bottom:24px;
-}
+.progress-bar { height:4px; background:#1f232c; border-radius:2px; overflow:hidden; margin-bottom:24px; }
 .progress-fill {
   height:100%; background:linear-gradient(90deg,#f59e0b,#4ade80);
   width:0%; transition:width 1s ease;
 }
-
 .call-status-icon {
   width:80px; height:80px; border-radius:50%;
   background:rgba(245,158,11,0.15); color:#f59e0b;
@@ -192,33 +226,22 @@ body {
   70% { box-shadow:0 0 0 20px rgba(245,158,11,0); }
   100% { box-shadow:0 0 0 0 rgba(245,158,11,0); }
 }
-
 .call-title { text-align:center; font-size:22px; font-weight:800; margin-bottom:8px; }
 .call-sub { text-align:center; color:#8b92a0; font-size:14px; margin-bottom:6px; }
-.call-timer {
-  text-align:center; color:#f59e0b; font-size:13px;
-  font-weight:600; margin-bottom:28px;
-}
-
+.call-timer { text-align:center; color:#f59e0b; font-size:13px; font-weight:600; margin-bottom:28px; }
 .call-info-block {
   background:#0a0c10; border-radius:12px; padding:16px;
   margin-bottom:16px; font-size:13px; line-height:1.8; color:#8b92a0;
 }
 .call-info-block b { color:#e8eaed; }
-
-.call-actions {
-  display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;
-}
+.call-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; }
 .call-actions .btn { padding:14px; font-size:13px; }
-
 .emergency-btn {
   background:linear-gradient(135deg,#ef4444,#dc2626);
   color:#fff; grid-column:1 / -1;
   box-shadow:0 4px 20px rgba(239,68,68,0.3);
 }
 .emergency-btn:hover { background:linear-gradient(135deg,#dc2626,#b91c1c); }
-
-/* Заметки */
 .notes-block {
   background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2);
   border-radius:12px; padding:16px; margin-top:20px;
@@ -226,43 +249,90 @@ body {
 }
 .notes-block b { color:#f59e0b; }
 
-/* Фото-превью */
-.photo-upload {
-  display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;
-}
+/* ============ ФОТО ============ */
+.photo-upload { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 .photo-item {
   width:64px; height:64px; border-radius:10px;
   background:#0a0c10; border:1px dashed #2f3440;
   display:flex; align-items:center; justify-content:center;
   font-size:20px; color:#4b5563; cursor:pointer;
-  transition:0.15s; position:relative;
+  transition:0.15s; position:relative; overflow:hidden;
 }
 .photo-item:hover { border-color:#f59e0b; color:#f59e0b; }
 .photo-item.filled {
   border-style:solid; border-color:#1f232c;
   background:linear-gradient(135deg,#1f232c,#2a2f3a);
-  color:#f59e0b; font-size:24px;
 }
-.photo-item.filled .remove {
-  position:absolute; top:-6px; right:-6px;
+.photo-item img { width:100%; height:100%; object-fit:cover; }
+.photo-item .remove {
+  position:absolute; top:-2px; right:-2px;
   width:20px; height:20px; border-radius:50%;
   background:#ef4444; color:#fff; font-size:12px;
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer;
+  cursor:pointer; z-index:2;
 }
 
 /* GPS button */
+.field-wrap { position:relative; }
 .gps-btn {
-  position:absolute; right:12px; top:12px;
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
   background:#1f232c; border:none; color:#f59e0b;
-  width:36px; height:36px; border-radius:10px;
+  width:36px; height:36px; border-radius:8px;
   cursor:pointer; font-size:16px;
   display:flex; align-items:center; justify-content:center;
+  transition:0.15s;
 }
 .gps-btn:hover { background:#2a2f3a; }
-.field-wrap { position:relative; }
+.gps-btn:disabled { opacity:0.5; cursor:wait; }
+.field-wrap input { padding-right:52px; }
 
-/* ============ ПОДДЕРЖКА ============ */
+/* ============ ЕВРОПРОТОКОЛ ============ */
+.euro-doc {
+  background:#fff; color:#000; padding:30px; border-radius:8px;
+  font-family: 'Times New Roman', serif; line-height:1.4;
+}
+.euro-doc h2 { text-align:center; font-size:18px; margin-bottom:4px; text-transform:uppercase; }
+.euro-doc .euro-sub { text-align:center; font-size:12px; margin-bottom:20px; color:#444; }
+.euro-doc .euro-header {
+  display:flex; justify-content:space-between; border-bottom:2px solid #000;
+  padding-bottom:12px; margin-bottom:20px; font-size:11px; align-items:center;
+}
+.euro-doc .euro-logo { font-weight:800; font-size:14px; color:#d97706; }
+.euro-section { margin-bottom:20px; border:1px solid #000; padding:12px; }
+.euro-section h3 {
+  font-size:12px; text-transform:uppercase; background:#f0f0f0;
+  padding:6px 10px; margin:-12px -12px 12px -12px; border-bottom:1px solid #000;
+}
+.euro-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:10px; }
+.euro-row.three { grid-template-columns:1fr 1fr 1fr; }
+.euro-field { font-size:11px; }
+.euro-field-label { font-weight:700; margin-bottom:2px; text-transform:uppercase; font-size:9px; }
+.euro-field-value { border-bottom:1px solid #999; padding:4px 0; min-height:20px; font-size:12px; }
+.euro-signatures { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px; }
+.euro-sign { border-top:1px solid #000; padding-top:6px; font-size:10px; text-align:center; }
+.euro-footer { font-size:9px; color:#666; text-align:center; margin-top:20px; border-top:1px dashed #999; padding-top:10px; }
+
+/* ============ MODAL ============ */
+.modal-bg {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85);
+  z-index:2000; align-items:center; justify-content:center; padding:20px;
+  overflow-y:auto;
+}
+.modal-bg.active { display:flex; }
+.modal {
+  background:#12151c; border:1px solid #1f232c; border-radius:18px;
+  padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto;
+}
+.modal.wide { max-width:900px; }
+.modal h2 { font-size:18px; margin-bottom:20px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; flex-wrap:wrap; }
+
+/* ============ STAR RATING ============ */
+.stars { display:flex; gap:6px; justify-content:center; font-size:36px; margin:16px 0; cursor:pointer; user-select:none; }
+.stars span { color:#3a3f4a; transition:0.15s; }
+.stars span.active { color:#facc15; }
+
+/* ============ SUPPORT ============ */
 .support-card {
   background:#12151c; border:1px solid #1f232c; border-radius:14px;
   padding:24px; margin-bottom:16px;
@@ -276,42 +346,18 @@ body {
   cursor:pointer; transition:0.15s; margin-bottom:12px;
 }
 .support-email:hover { background:#141820; }
-.support-email .copy-icon { margin-left:auto; color:#4b5563; font-size:14px; }
+.support-email .copy-icon { margin-left:auto; color:#4b5563; font-size:12px; }
 
-.faq-item {
-  border-bottom:1px solid #1a1e26; padding:14px 0; cursor:pointer;
-}
+.faq-item { border-bottom:1px solid #1a1e26; padding:14px 0; cursor:pointer; }
 .faq-item:last-child { border-bottom:none; }
-.faq-q {
-  display:flex; justify-content:space-between; align-items:center;
-  font-size:14px; font-weight:600;
-}
+.faq-q { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; }
 .faq-q .arrow { color:#6b7280; transition:0.2s; }
 .faq-item.open .faq-q .arrow { transform:rotate(90deg); }
 .faq-a {
   font-size:13px; color:#8b92a0; line-height:1.6;
-  max-height:0; overflow:hidden; transition:max-height 0.3s, margin 0.3s;
-  margin-top:0;
+  max-height:0; overflow:hidden; transition:max-height 0.3s, margin 0.3s; margin-top:0;
 }
 .faq-item.open .faq-a { max-height:300px; margin-top:10px; }
-
-/* ============ MODAL ============ */
-.modal-bg {
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85);
-  z-index:2000; align-items:center; justify-content:center; padding:20px;
-}
-.modal-bg.active { display:flex; }
-.modal {
-  background:#12151c; border:1px solid #1f232c; border-radius:18px;
-  padding:28px; width:100%; max-width:440px; max-height:85vh; overflow-y:auto;
-}
-.modal h2 { font-size:18px; margin-bottom:20px; }
-.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
-
-/* ============ STAR RATING ============ */
-.stars { display:flex; gap:6px; justify-content:center; font-size:36px; margin:16px 0; cursor:pointer; user-select:none; }
-.stars span { color:#3a3f4a; transition:0.15s; }
-.stars span.active { color:#facc15; }
 
 /* ============ PAYMENT ============ */
 .pay-methods { display:flex; gap:10px; margin-bottom:20px; }
@@ -323,17 +369,13 @@ body {
 .pay-method.selected { border-color:#f59e0b; background:rgba(245,158,11,0.08); }
 .pay-method-icon { font-size:24px; margin-bottom:6px; }
 .pay-method-label { font-size:12px; color:#8b92a0; }
-.pay-summary {
-  background:#0a0c10; border-radius:12px; padding:16px; margin-bottom:20px;
-}
+.pay-summary { background:#0a0c10; border-radius:12px; padding:16px; margin-bottom:20px; }
 .pay-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
 .pay-row.total { border-top:1px solid #1f232c; margin-top:10px; padding-top:14px; font-weight:800; font-size:17px; color:#f59e0b; }
 
 /* ============ NOTIFICATIONS ============ */
 .notif-list { max-height:400px; overflow-y:auto; }
-.notif-item {
-  display:flex; gap:12px; padding:14px; border-bottom:1px solid #1a1e26;
-}
+.notif-item { display:flex; gap:12px; padding:14px; border-bottom:1px solid #1a1e26; }
 .notif-item:last-child { border-bottom:none; }
 .notif-icon { font-size:20px; }
 .notif-content { flex:1; }
@@ -351,51 +393,60 @@ body {
 }
 .toast.active { transform:translateX(-50%) translateY(0); }
 
+/* ============ PRINT ============ */
+@media print {
+  body * { visibility:hidden; }
+  .euro-doc, .euro-doc * { visibility:visible; }
+  .euro-doc { position:absolute; left:0; top:0; width:100%; background:#fff; color:#000; }
+}
+
 @media (max-width:768px) {
   .hero h1 { font-size:24px; }
   .header-nav { display:none; }
   .call-actions { grid-template-columns:1fr; }
-  .action-card { padding:18px; gap:14px; }
-  .action-icon { width:52px; height:52px; font-size:24px; }
+  .action-card { padding:16px; gap:12px; }
+  .action-icon { width:48px; height:48px; font-size:22px; }
+  .euro-row, .euro-row.three { grid-template-columns:1fr; }
+  .modal { padding:20px; }
 }
 </style>
 </head>
 <body>
 
 <!-- ============ ЭКРАН: ВХОД / РЕГИСТРАЦИЯ ============ -->
-<div class="screen active" id="screenAuth">
+<div class="screen" id="screenAuth">
   <div class="auth-wrap">
     <div class="auth-card">
-      <div class="auth-logo">🚨 АварКом</div>
-      <div class="auth-sub">Аварийный комиссар онлайн</div>
+      <div class="auth-logo-wrap">
+        <div class="auth-logo-icon">🚨</div>
+        <div class="auth-logo">АварКом</div>
+      </div>
+      <div class="auth-sub" data-i18n="auth_sub">Аварийный комиссар онлайн</div>
 
       <div class="auth-tabs">
-        <div class="auth-tab active" onclick="switchAuth('login')">Вход</div>
-        <div class="auth-tab" onclick="switchAuth('register')">Регистрация</div>
+        <div class="auth-tab active" onclick="switchAuth('login')" data-i18n="tab_login">Вход</div>
+        <div class="auth-tab" onclick="switchAuth('register')" data-i18n="tab_register">Регистрация</div>
       </div>
 
       <div class="auth-form active" id="formLogin">
         <div class="field">
-          <label>Телефон</label>
+          <label data-i18n="field_phone">Телефон</label>
           <input type="tel" id="loginPhone" placeholder="+7 (___) ___-__-__">
         </div>
         <div class="field">
-          <label>Пароль</label>
+          <label data-i18n="field_pass">Пароль</label>
           <input type="password" id="loginPass" placeholder="••••••••">
         </div>
-        <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()">Войти</button>
-        <div style="text-align:center; margin-top:14px; font-size:13px; color:#6b7280;">
-          Нет аккаунта? <span style="color:#f59e0b; cursor:pointer;" onclick="switchAuth('register')">Зарегистрируйтесь</span>
-        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()" data-i18n="btn_login">Войти</button>
       </div>
 
       <div class="auth-form" id="formRegister">
         <div class="field">
-          <label>Имя</label>
+          <label data-i18n="field_name">Имя</label>
           <input type="text" id="regName" placeholder="Как к вам обращаться">
         </div>
         <div class="field">
-          <label>Телефон</label>
+          <label data-i18n="field_phone">Телефон</label>
           <input type="tel" id="regPhone" placeholder="+7 (___) ___-__-__">
         </div>
         <div class="field">
@@ -403,13 +454,10 @@ body {
           <input type="email" id="regEmail" placeholder="you@example.com">
         </div>
         <div class="field">
-          <label>Пароль</label>
+          <label data-i18n="field_pass">Пароль</label>
           <input type="password" id="regPass" placeholder="Минимум 6 символов">
         </div>
-        <button class="btn btn-primary btn-block btn-lg" onclick="doRegister()">Создать аккаунт</button>
-        <div style="text-align:center; margin-top:14px; font-size:11px; color:#4b5563;">
-          Регистрируясь, вы принимаете условия оферты и политику конфиденциальности
-        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doRegister()" data-i18n="btn_register">Создать аккаунт</button>
       </div>
     </div>
   </div>
@@ -418,17 +466,20 @@ body {
 <!-- ============ ЭКРАН: ГЛАВНАЯ ============ -->
 <div class="screen" id="screenHome">
   <div class="header">
-    <div class="logo">🚨 АварКом</div>
+    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
     <div class="header-nav">
-      <div class="nav-item active" onclick="showScreen('screenHome')">Главная</div>
-      <div class="nav-item" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item" onclick="showScreen('screenSupport')">Поддержка</div>
+      <div class="nav-item active" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
+      <div class="nav-item" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
+      <div class="nav-item" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
       <button class="icon-btn" onclick="openNotifications()" title="Уведомления">
         🔔 <span class="badge" id="notifBadge">2</span>
       </button>
-      <button class="icon-btn" onclick="toast('Смена языка (в разработке)')" title="Язык">🌐</button>
+      <div style="position:relative;">
+        <button class="icon-btn" onclick="toggleLangDropdown(event)" title="Язык">🌐</button>
+        <div class="lang-dropdown" id="langDropdown"></div>
+      </div>
       <div class="header-user" onclick="showScreen('screenLK')">
         <div class="user-avatar" id="headerAvatar">А</div>
         <span style="font-size:13px;" id="headerName">Александр</span>
@@ -438,25 +489,34 @@ body {
 
   <div class="main">
     <div class="hero">
-      <h1>Что случилось?</h1>
-      <p>Выберите действие — мы поможем</p>
+      <h1 data-i18n="home_title">Что случилось?</h1>
+      <p data-i18n="home_sub">Выберите действие — мы поможем</p>
     </div>
 
     <div class="actions">
       <div class="action-card" onclick="startCall()">
         <div class="action-icon orange">🚗</div>
         <div class="action-info">
-          <h3>Вызвать комиссара</h3>
-          <p>Приедет на место ДТП, оформит документы, поможет со страховой</p>
+          <h3 data-i18n="act_call_title">Вызвать комиссара</h3>
+          <p data-i18n="act_call_desc">Приедет на место ДТП, оформит документы, поможет со страховой</p>
         </div>
         <div class="action-arrow">→</div>
+      </div>
+
+      <div class="action-card highlight" onclick="openEuroProtocol()">
+        <div class="action-icon green">📋</div>
+        <div class="action-info">
+          <h3 data-i18n="act_euro_title">Европротокол без комиссара</h3>
+          <p data-i18n="act_euro_desc">Оформите ДТП самостоятельно с нашей помощью</p>
+        </div>
+        <div class="action-price">1000 ₽</div>
       </div>
 
       <div class="action-card" onclick="call112()">
         <div class="action-icon red">📞</div>
         <div class="action-info">
-          <h3>Вызвать спец. службы</h3>
-          <p>Единый номер экстренных служб — 112</p>
+          <h3 data-i18n="act_112_title">Вызвать спец. службы</h3>
+          <p data-i18n="act_112_desc">Единый номер экстренных служб — 112</p>
         </div>
         <div class="action-arrow">→</div>
       </div>
@@ -464,24 +524,24 @@ body {
       <div class="action-card" onclick="showScreen('screenRecommendations')">
         <div class="action-icon blue">📖</div>
         <div class="action-info">
-          <h3>Рекомендации при ДТП</h3>
-          <p>Пошаговая инструкция, что делать на месте аварии</p>
+          <h3 data-i18n="act_recs_title">Рекомендации при ДТП</h3>
+          <p data-i18n="act_recs_desc">Пошаговая инструкция, что делать на месте аварии</p>
         </div>
         <div class="action-arrow">→</div>
       </div>
 
       <div class="action-card" onclick="showScreen('screenSupport')">
-        <div class="action-icon green">💬</div>
+        <div class="action-icon purple">💬</div>
         <div class="action-info">
-          <h3>Поддержка</h3>
-          <p>Свяжитесь с нами — ответим на любые вопросы</p>
+          <h3 data-i18n="act_support_title">Поддержка и жалобы</h3>
+          <p data-i18n="act_support_desc">Свяжитесь с нами или пожалуйтесь на комиссара</p>
         </div>
         <div class="action-arrow">→</div>
       </div>
     </div>
 
     <div style="margin-top:32px; padding:20px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:14px; font-size:13px; color:#8b92a0; line-height:1.7;">
-      <b style="color:#f59e0b;">⚡ Совет:</b> с 2025 года лимит европротокола с разногласиями — <b style="color:#e8eaed;">200 000 ₽</b>, без разногласий с фотофиксацией — <b style="color:#e8eaed;">400 000 ₽</b>. Если ущерб меньше — можно оформить без ГИБДД.
+      <b style="color:#f59e0b;" data-i18n="tip_title">⚡ Совет:</b> <span data-i18n="tip_text">с 2025 года лимит европротокола с разногласиями — 200 000 ₽, без разногласий с фотофиксацией — 400 000 ₽.</span>
     </div>
   </div>
 </div>
@@ -489,14 +549,18 @@ body {
 <!-- ============ ЭКРАН: РЕКОМЕНДАЦИИ ============ -->
 <div class="screen" id="screenRecommendations">
   <div class="header">
-    <div class="logo">🚨 АварКом</div>
+    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
     <div class="header-nav">
-      <div class="nav-item" onclick="showScreen('screenHome')">Главная</div>
-      <div class="nav-item active" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item" onclick="showScreen('screenSupport')">Поддержка</div>
+      <div class="nav-item" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
+      <div class="nav-item active" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
+      <div class="nav-item" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
       <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge2">2</span></button>
+      <div style="position:relative;">
+        <button class="icon-btn" onclick="toggleLangDropdown(event)">🌐</button>
+        <div class="lang-dropdown" id="langDropdown2"></div>
+      </div>
       <div class="header-user" onclick="showScreen('screenLK')">
         <div class="user-avatar" id="headerAvatar2">А</div>
         <span style="font-size:13px;" id="headerName2">Александр</span>
@@ -506,95 +570,84 @@ body {
 
   <div class="main">
     <div class="hero" style="margin-bottom:30px;">
-      <h1>Что делать при ДТП</h1>
-      <p>Пошаговая инструкция</p>
+      <h1 data-i18n="recs_title">Что делать при ДТП</h1>
+      <p data-i18n="recs_sub">Пошаговая инструкция</p>
     </div>
 
     <div class="rec-item">
       <div class="rec-num">1</div>
       <div class="rec-content">
-        <h4>Остановитесь и не трогайте машину с места</h4>
-        <p>Немедленно остановитесь, заглушите двигатель, включите аварийку. Не перемещайте предметы, имеющие отношение к ДТП.</p>
+        <h4 data-i18n="rec1_t">Остановитесь и не трогайте машину с места</h4>
+        <p data-i18n="rec1_d">Немедленно остановитесь, заглушите двигатель, включите аварийку.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">2</div>
       <div class="rec-content">
-        <h4>Выставьте знак аварийной остановки</h4>
-        <p>В населённом пункте — не менее 15 метров, вне населённого пункта — не менее 30 метров от машины.</p>
+        <h4 data-i18n="rec2_t">Выставьте знак аварийной остановки</h4>
+        <p data-i18n="rec2_d">В населённом пункте — 15 м, вне — 30 м от машины.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">3</div>
       <div class="rec-content">
-        <h4>Проверьте, есть ли пострадавшие</h4>
-        <p>Если есть раненые — немедленно вызовите скорую (103) и полицию (102). Окажите первую помощь, если умеете. В экстренном случае отправьте пострадавшего на попутной машине и сообщите свои данные.</p>
+        <h4 data-i18n="rec3_t">Проверьте, есть ли пострадавшие</h4>
+        <p data-i18n="rec3_d">Если есть раненые — вызовите скорую (103) и полицию (102).</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">4</div>
       <div class="rec-content">
-        <h4>Вызовите ГИБДД, если это необходимо</h4>
-        <p>ГИБДД обязательна, если: есть пострадавшие, 3+ участника, наезд на препятствие или третье имущество, разногласия, ущерб больше лимита. В остальных случаях можно оформить европротокол.</p>
+        <h4 data-i18n="rec4_t">Вызовите ГИБДД, если это необходимо</h4>
+        <p data-i18n="rec4_d">ГИБДД обязательна: пострадавшие, 3+ участника, разногласия, ущерб больше лимита.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">5</div>
       <div class="rec-content">
-        <h4>Зафиксируйте всё на фото и видео</h4>
-        <p>До того, как убрать машины с проезжей части, сфотографируйте: общий план, положение машин относительно друг друга и дорожных объектов, следы торможения, повреждения крупным планом, номера.</p>
+        <h4 data-i18n="rec5_t">Зафиксируйте всё на фото и видео</h4>
+        <p data-i18n="rec5_d">Общий план, положение машин, следы торможения, повреждения, номера.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">6</div>
       <div class="rec-content">
-        <h4>Запишите свидетелей</h4>
-        <p>Если есть очевидцы — запишите их ФИО и контакты. Это поможет, если вторая сторона начнёт менять показания.</p>
+        <h4 data-i18n="rec6_t">Запишите свидетелей</h4>
+        <p data-i18n="rec6_d">ФИО и контакты очевидцев — на случай спора.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">7</div>
       <div class="rec-content">
-        <h4>Оформите европротокол или дождитесь ГИБДД</h4>
-        <p>Если нет разногласий и ущерб в пределах лимита — заполните извещение о ДТП (бумажное или электронное через «Госуслуги Авто»). Оба водителя подписывают оба бланка. Срок передачи в страховую — до 5 рабочих дней.</p>
+        <h4 data-i18n="rec7_t">Оформите европротокол или дождитесь ГИБДД</h4>
+        <p data-i18n="rec7_d">Срок передачи в страховую — до 5 рабочих дней.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">8</div>
       <div class="rec-content">
-        <h4>Не покидайте место ДТП</h4>
-        <p>Оставление места ДТП — лишение прав от 1 до 1.5 лет или арест до 15 суток.</p>
+        <h4 data-i18n="rec8_t">Не покидайте место ДТП</h4>
+        <p data-i18n="rec8_d">Оставление места — лишение прав от 1 до 1.5 лет.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">9</div>
       <div class="rec-content">
-        <h4>Сообщите в страховую</h4>
-        <p>Уведомите страховую в установленный срок. При европротоколе — до 5 рабочих дней. Сохраните все документы и фото.</p>
+        <h4 data-i18n="rec9_t">Сообщите в страховую</h4>
+        <p data-i18n="rec9_d">При европротоколе — до 5 рабочих дней.</p>
       </div>
     </div>
-
     <div class="rec-item">
       <div class="rec-num">10</div>
       <div class="rec-content">
-        <h4>Не ремонтируйте машину до осмотра</h4>
-        <p>Не приступайте к ремонту или утилизации в течение 15 календарных дней после ДТП, пока страховая не проведёт осмотр или экспертизу.</p>
+        <h4 data-i18n="rec10_t">Не ремонтируйте машину до осмотра</h4>
+        <p data-i18n="rec10_d">15 календарных дней — до осмотра или экспертизы.</p>
       </div>
     </div>
 
     <div class="rec-warn">
-      <b style="color:#f87171;">🚫 Категорически нельзя:</b><br>
-      • Употреблять алкоголь или наркотики после ДТП до освидетельствования<br>
-      • Покидать место происшествия даже «на минутку»<br>
-      • Подписывать пустые бланки или документы, которые не читали
+      <b style="color:#f87171;" data-i18n="rec_warn_t">🚫 Категорически нельзя:</b><br>
+      <span data-i18n="rec_warn_d">• Употреблять алкоголь после ДТП<br>• Покидать место происшествия<br>• Подписывать пустые бланки</span>
     </div>
   </div>
 </div>
@@ -602,14 +655,18 @@ body {
 <!-- ============ ЭКРАН: ПОДДЕРЖКА ============ -->
 <div class="screen" id="screenSupport">
   <div class="header">
-    <div class="logo">🚨 АварКом</div>
+    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
     <div class="header-nav">
-      <div class="nav-item" onclick="showScreen('screenHome')">Главная</div>
-      <div class="nav-item" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item active" onclick="showScreen('screenSupport')">Поддержка</div>
+      <div class="nav-item" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
+      <div class="nav-item" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
+      <div class="nav-item active" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
       <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge3">2</span></button>
+      <div style="position:relative;">
+        <button class="icon-btn" onclick="toggleLangDropdown(event)">🌐</button>
+        <div class="lang-dropdown" id="langDropdown3"></div>
+      </div>
       <div class="header-user" onclick="showScreen('screenLK')">
         <div class="user-avatar" id="headerAvatar3">А</div>
         <span style="font-size:13px;" id="headerName3">Александр</span>
@@ -619,86 +676,58 @@ body {
 
   <div class="main">
     <div class="hero" style="text-align:left; margin-bottom:28px;">
-      <h1 style="font-size:24px;">Поддержка</h1>
-      <p>Свяжитесь с нами или найдите ответ в FAQ</p>
+      <h1 style="font-size:24px;" data-i18n="support_title">Поддержка</h1>
+      <p data-i18n="support_sub">Свяжитесь с нами или найдите ответ в FAQ</p>
     </div>
 
     <div class="support-card">
-      <h3>📧 Написать нам</h3>
-      <p>Ответим в течение 24 часов в рабочие дни</p>
-      <div class="support-email" onclick="copyEmail()">
+      <h3 data-i18n="sup_write">📧 Написать нам</h3>
+      <p data-i18n="sup_write_sub">Ответим в течение 24 часов в рабочие дни</p>
+      <div class="support-email" onclick="copyText('support@avarkom.ru')">
         <span>support@avarkom.ru</span>
-        <span class="copy-icon">📋 Копировать</span>
+        <span class="copy-icon" data-i18n="copy">📋 Копировать</span>
       </div>
-      <div class="support-email" onclick="copyEmail2()">
+      <div class="support-email" onclick="copyText('help@avarkom.ru')">
         <span>help@avarkom.ru</span>
-        <span class="copy-icon">📋 Копировать</span>
-      </div>
-      <div style="font-size:11px; color:#4b5563; margin-top:8px;">
-        ⚠️ Это временные адреса. После запуска будут рабочие.
+        <span class="copy-icon" data-i18n="copy">📋 Копировать</span>
       </div>
     </div>
 
     <div class="support-card">
-      <h3>💬 Частые вопросы</h3>
+      <h3 data-i18n="sup_complaint">🚨 Жалоба на комиссара</h3>
+      <p data-i18n="sup_complaint_sub">Если что-то пошло не так — расскажите. Разберёмся в течение 48 часов.</p>
+      <button class="btn btn-danger btn-block" onclick="openComplaint()" data-i18n="btn_complaint">Подать жалобу</button>
+    </div>
+
+    <div class="support-card">
+      <h3 data-i18n="sup_faq">💬 Частые вопросы</h3>
 
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q">
-          <span>Сколько стоит вызов комиссара?</span>
-          <span class="arrow">›</span>
-        </div>
-        <div class="faq-a">Стоимость фиксирована и зависит от типа ДТП. Точная цена показывается перед подтверждением вызова — никаких скрытых доплат.</div>
+        <div class="faq-q"><span data-i18n="faq1_q">Сколько стоит вызов комиссара?</span><span class="arrow">›</span></div>
+        <div class="faq-a" data-i18n="faq1_a">Стоимость фиксирована — от 2 500 ₽. Точная цена показывается перед подтверждением вызова.</div>
       </div>
-
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q">
-          <span>Что делать, если комиссар не приехал?</span>
-          <span class="arrow">›</span>
-        </div>
-        <div class="faq-a">Напишите в поддержку через форму выше. Мы вернём деньги в полном объёме и поможем оформить ДТП альтернативным способом.</div>
+        <div class="faq-q"><span data-i18n="faq2_q">Можно ли оформить без ГИБДД?</span><span class="arrow">›</span></div>
+        <div class="faq-a" data-i18n="faq2_a">Да, если нет пострадавших, участников не больше двух и ущерб в пределах лимита европротокола.</div>
       </div>
-
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q">
-          <span>Можно ли оформить ДТП без ГИБДД?</span>
-          <span class="arrow">›</span>
-        </div>
-        <div class="faq-a">Да, если нет пострадавших, участников не больше двух, нет разногласий и ущерб не превышает лимит европротокола. Комиссар поможет правильно всё заполнить.</div>
+        <div class="faq-q"><span data-i18n="faq3_q">Как оплатить?</span><span class="arrow">›</span></div>
+        <div class="faq-a" data-i18n="faq3_a">Картой, через СБП или ЮMoney. Если вызов отменён до принятия — деньги вернутся автоматически.</div>
       </div>
-
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q">
-          <span>Как оплатить вызов?</span>
-          <span class="arrow">›</span>
-        </div>
-        <div class="faq-a">Картой, через СБП или ЮMoney. Оплата проходит до прибытия комиссара. Если вызов отменён до принятия — деньги вернутся автоматически.</div>
-      </div>
-
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q">
-          <span>Храните ли вы мои данные?</span>
-          <span class="arrow">›</span>
-        </div>
-        <div class="faq-a">Все персональные данные обрабатываются в соответствии с 152-ФЗ. Документы по ДТП хранятся в вашем личном кабинете и доступны только вам.</div>
-      </div>
-
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q">
-          <span>Работаете ли вы в моём городе?</span>
-          <span class="arrow">›</span>
-        </div>
-        <div class="faq-a">На старте — только Москва и Санкт-Петербург. О других городах сообщим в уведомлениях.</div>
+        <div class="faq-q"><span data-i18n="faq4_q">Что с моими данными?</span><span class="arrow">›</span></div>
+        <div class="faq-a" data-i18n="faq4_a">Всё по 152-ФЗ. Документы хранятся в вашем ЛК и доступны только вам.</div>
       </div>
     </div>
 
     <div class="support-card">
-      <h3>🆘 Экстренные службы</h3>
-      <p>Если ситуация угрожает жизни — звоните напрямую</p>
+      <h3 data-i18n="sup_emergency">🆘 Экстренные службы</h3>
+      <p data-i18n="sup_emergency_sub">Если ситуация угрожает жизни — звоните напрямую</p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
-        <button class="btn" onclick="window.location.href='tel:112'" style="padding:14px;">📞 112 — Единый</button>
-        <button class="btn" onclick="window.location.href='tel:102'" style="padding:14px;">🚔 102 — Полиция</button>
-        <button class="btn" onclick="window.location.href='tel:103'" style="padding:14px;">🚑 103 — Скорая</button>
-        <button class="btn" onclick="window.location.href='tel:101'" style="padding:14px;">🚒 101 — Пожарная</button>
+        <button class="btn" onclick="window.location.href='tel:112'" style="padding:14px;">📞 112</button>
+        <button class="btn" onclick="window.location.href='tel:102'" style="padding:14px;">🚔 102</button>
+        <button class="btn" onclick="window.location.href='tel:103'" style="padding:14px;">🚑 103</button>
+        <button class="btn" onclick="window.location.href='tel:101'" style="padding:14px;">🚒 101</button>
       </div>
     </div>
   </div>
@@ -707,14 +736,18 @@ body {
 <!-- ============ ЭКРАН: ЛИЧНЫЙ КАБИНЕТ ============ -->
 <div class="screen" id="screenLK">
   <div class="header">
-    <div class="logo">🚨 АварКом</div>
+    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
     <div class="header-nav">
-      <div class="nav-item" onclick="showScreen('screenHome')">Главная</div>
-      <div class="nav-item" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item" onclick="showScreen('screenSupport')">Поддержка</div>
+      <div class="nav-item" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
+      <div class="nav-item" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
+      <div class="nav-item" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
       <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge4">2</span></button>
+      <div style="position:relative;">
+        <button class="icon-btn" onclick="toggleLangDropdown(event)">🌐</button>
+        <div class="lang-dropdown" id="langDropdown4"></div>
+      </div>
       <div class="header-user">
         <div class="user-avatar" id="headerAvatar4">А</div>
         <span style="font-size:13px;" id="headerName4">Александр</span>
@@ -724,22 +757,22 @@ body {
 
   <div class="main">
     <div class="hero" style="text-align:left; margin-bottom:28px;">
-      <h1 style="font-size:24px;">Личный кабинет</h1>
-      <p id="lkGreeting">Добро пожаловать!</p>
+      <h1 style="font-size:24px;" data-i18n="lk_title">Личный кабинет</h1>
+      <p id="lkGreeting" data-i18n="lk_greeting">Добро пожаловать!</p>
     </div>
 
     <div class="lk-grid">
       <div class="lk-card">
-        <h4>Всего вызовов</h4>
+        <h4 data-i18n="lk_calls">Всего вызовов</h4>
         <div class="lk-value" id="statCalls">0</div>
       </div>
       <div class="lk-card">
-        <h4>Потрачено</h4>
-        <div class="lk-value">0 ₽</div>
+        <h4 data-i18n="lk_spent">Потрачено</h4>
+        <div class="lk-value" id="statSpent">0 ₽</div>
       </div>
       <div class="lk-card">
-        <h4>Баланс</h4>
-        <div class="lk-value" style="color:#4ade80;">0 ₽</div>
+        <h4 data-i18n="lk_balance">Баланс</h4>
+        <div class="lk-value" style="color:#4ade80;" id="statBalance">0 ₽</div>
       </div>
     </div>
 
@@ -747,83 +780,80 @@ body {
       <div class="lk-row" onclick="openPayment()">
         <div class="lk-row-icon">💳</div>
         <div class="lk-row-info">
-          <div class="lk-row-title">Пополнить баланс</div>
-          <div class="lk-row-sub">Оплата картой или СБП</div>
+          <div class="lk-row-title" data-i18n="lk_topup">Пополнить баланс</div>
+          <div class="lk-row-sub" data-i18n="lk_topup_sub">Оплата картой или СБП</div>
         </div>
         <div class="lk-row-arrow">→</div>
       </div>
-      <div class="lk-row" onclick="toast('Документов пока нет')">
-        <div class="lk-row-icon">📄</div>
+      <div class="lk-row" onclick="openComplaint()">
+        <div class="lk-row-icon">🚨</div>
         <div class="lk-row-info">
-          <div class="lk-row-title">Мои документы</div>
-          <div class="lk-row-sub">Появятся после первого оформления</div>
+          <div class="lk-row-title" data-i18n="lk_complaint">Подать жалобу</div>
+          <div class="lk-row-sub" data-i18n="lk_complaint_sub">На комиссара или сервис</div>
         </div>
         <div class="lk-row-arrow">→</div>
       </div>
-      <div class="lk-row" onclick="toast('Настройки (в разработке)')">
+      <div class="lk-row" onclick="openSettings()">
         <div class="lk-row-icon">⚙️</div>
         <div class="lk-row-info">
-          <div class="lk-row-title">Настройки</div>
-          <div class="lk-row-sub">Профиль, уведомления</div>
+          <div class="lk-row-title" data-i18n="lk_settings">Настройки</div>
+          <div class="lk-row-sub" data-i18n="lk_settings_sub">Профиль, язык, уведомления</div>
+        </div>
+        <div class="lk-row-arrow">→</div>
+      </div>
+      <div class="lk-row" onclick="showScreen('screenSupport')">
+        <div class="lk-row-icon">💬</div>
+        <div class="lk-row-info">
+          <div class="lk-row-title" data-i18n="lk_support">Поддержка</div>
+          <div class="lk-row-sub" data-i18n="lk_support_sub">FAQ и контакты</div>
         </div>
         <div class="lk-row-arrow">→</div>
       </div>
     </div>
 
-    <h3 style="font-size:13px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">История вызовов</h3>
-    <div class="lk-list">
-      <div class="lk-empty">
-        📭 У вас пока нет вызовов<br>
-        <span style="font-size:12px; color:#4b5563; margin-top:6px; display:block;">История появится после первого заказа</span>
-      </div>
+    <h3 style="font-size:13px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;" data-i18n="lk_docs">Мои документы</h3>
+    <div id="docsContainer">
+      <div class="lk-empty" data-i18n="lk_docs_empty">📭 Документов пока нет<br><span style="font-size:12px; color:#4b5563; margin-top:6px; display:block;">Появятся после оформления европротокола</span></div>
     </div>
 
-    <button class="btn btn-block" style="margin-top:24px; color:#f87171;" onclick="doLogout()">Выйти из аккаунта</button>
+    <button class="btn btn-block" style="margin-top:24px; color:#f87171;" onclick="doLogout()" data-i18n="btn_logout">Выйти из аккаунта</button>
   </div>
 </div>
 
 <!-- ============ ЭКРАН: ВЫЗОВ ============ -->
 <div class="screen" id="screenCall">
   <div class="header">
-    <div class="logo">🚨 АварКом</div>
-    <div style="font-size:13px; color:#8b92a0;">Вызов комиссара</div>
-    <button class="btn" style="margin-left:auto; padding:8px 16px; font-size:13px;" onclick="cancelCall()">Отменить</button>
+    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
+    <div style="font-size:13px; color:#8b92a0;" data-i18n="call_header">Вызов комиссара</div>
+    <button class="btn" style="margin-left:auto; padding:8px 16px; font-size:13px;" onclick="cancelCall()" data-i18n="btn_cancel">Отменить</button>
   </div>
 
   <div class="call-wrap">
     <div class="call-container">
-
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       <div class="call-status-icon" id="callIcon">🔍</div>
-      <div class="call-title" id="callTitle">Ищем комиссара...</div>
-      <div class="call-sub" id="callSub">Обычно занимает 1–2 минуты</div>
+      <div class="call-title" id="callTitle" data-i18n="call_searching">Ищем комиссара...</div>
+      <div class="call-sub" id="callSub" data-i18n="call_searching_sub">Обычно занимает 1–2 минуты</div>
       <div class="call-timer" id="callTimer">00:00</div>
 
       <div class="call-info-block">
-        <div>Тип ДТП: <b id="callType">—</b></div>
-        <div>Адрес: <b id="callAddress">—</b></div>
-        <div id="callCommentRow" style="display:none;">Комментарий: <b id="callComment">—</b></div>
+        <div><span data-i18n="call_type">Тип ДТП:</span> <b id="callType">—</b></div>
+        <div><span data-i18n="call_addr">Адрес:</span> <b id="callAddress">—</b></div>
+        <div id="callCommentRow" style="display:none;"><span data-i18n="call_comment">Комментарий:</span> <b id="callComment">—</b></div>
       </div>
 
       <div class="call-actions">
         <button class="btn btn-danger emergency-btn" onclick="window.location.href='tel:112'">
-          🆘 Экстренная помощь — 112
+          🆘 <span data-i18n="btn_emergency">Экстренная помощь — 112</span>
         </button>
-        <button class="btn" onclick="toast('Чат (в разработке)')">💬 Чат</button>
-        <button class="btn" onclick="toast('Связь со поддержкой')">📞 Поддержка</button>
+        <button class="btn" onclick="toast(t('chat_dev'))" data-i18n="btn_chat">💬 Чат</button>
+        <button class="btn" onclick="showScreen('screenSupport')" data-i18n="btn_support">📞 Поддержка</button>
       </div>
 
       <div class="notes-block">
-        <b>📋 Что дальше:</b><br>
-        • Не покидайте место ДТП<br>
-        • Сфотографируйте повреждения и общий план<br>
-        • Запишите контакты свидетелей, если есть<br>
-        • Комиссар поможет заполнить все документы
+        <b data-i18n="notes_title">📋 Что дальше:</b><br>
+        <span data-i18n="notes_text">• Не покидайте место ДТП<br>• Сфотографируйте повреждения<br>• Запишите свидетелей<br>• Комиссар поможет с документами</span>
       </div>
-
     </div>
   </div>
 </div>
@@ -831,33 +861,33 @@ body {
 <!-- ============ МОДАЛКА: ВЫЗОВ ============ -->
 <div class="modal-bg" id="confirmCallModal">
   <div class="modal">
-    <h2>Вызов комиссара</h2>
+    <h2 data-i18n="modal_call_title">Вызов комиссара</h2>
 
     <div class="field">
-      <label>Тип ДТП</label>
+      <label data-i18n="field_dtp_type">Тип ДТП</label>
       <select id="modalAccidentType">
-        <option>2 машины, без пострадавших</option>
-        <option>Сложное (3+ участника / разногласия)</option>
-        <option>Один участник (наезд на препятствие)</option>
-        <option>Парковка / двор</option>
+        <option data-i18n="dtp_simple">2 машины, без пострадавших</option>
+        <option data-i18n="dtp_complex">Сложное (3+ участника / разногласия)</option>
+        <option data-i18n="dtp_solo">Один участник (наезд на препятствие)</option>
+        <option data-i18n="dtp_parking">Парковка / двор</option>
       </select>
     </div>
 
     <div class="field">
-      <label>Адрес</label>
+      <label data-i18n="field_address">Адрес</label>
       <div class="field-wrap">
-        <input type="text" id="modalAddress" placeholder="Введите адрес или нажмите GPS" value="">
-        <button class="gps-btn" onclick="detectLocation()" title="Определить автоматически">📍</button>
+        <input type="text" id="modalAddress" placeholder="Введите адрес или нажмите GPS">
+        <button class="gps-btn" id="gpsBtn" onclick="detectLocation()" title="Определить автоматически">📍</button>
       </div>
     </div>
 
     <div class="field">
-      <label>Комментарий (необязательно)</label>
-      <textarea id="modalComment" placeholder="Например: перекрыта одна полоса, второй участник уехал за документами, машина не заводится..."></textarea>
+      <label data-i18n="field_comment">Комментарий (необязательно)</label>
+      <textarea id="modalComment" placeholder="Например: перекрыта одна полоса, второй участник уехал за документами..."></textarea>
     </div>
 
     <div class="field">
-      <label>Фото с места (до 5 штук, необязательно)</label>
+      <label data-i18n="field_photos">Фото с места (до 5 штук, необязательно)</label>
       <div class="photo-upload" id="photoUpload">
         <div class="photo-item" onclick="addPhoto(this)">+</div>
         <div class="photo-item" onclick="addPhoto(this)">+</div>
@@ -868,14 +898,185 @@ body {
     </div>
 
     <div style="background:#0a0c10; border-radius:12px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0; margin-top:16px;">
-      <div>Стоимость: <span style="color:#f59e0b; font-weight:700;">2 500 ₽</span></div>
-      <div>Оплата: <span style="color:#e8eaed;">до прибытия комиссара</span></div>
-      <div>Прибытие: <span style="color:#e8eaed;">15–25 минут</span></div>
+      <div><span data-i18n="cost">Стоимость:</span> <span style="color:#f59e0b; font-weight:700;">2 500 ₽</span></div>
+      <div><span data-i18n="payment_before">Оплата:</span> <span style="color:#e8eaed;" data-i18n="payment_before_val">до прибытия комиссара</span></div>
+      <div><span data-i18n="arrival">Прибытие:</span> <span style="color:#e8eaed;">15–25 <span data-i18n="minutes">минут</span></span></div>
     </div>
 
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('confirmCallModal')">Отмена</button>
-      <button class="btn btn-primary" onclick="confirmCallSubmit()">Вызвать</button>
+      <button class="btn" onclick="closeModal('confirmCallModal')" data-i18n="btn_cancel">Отмена</button>
+      <button class="btn btn-primary" onclick="confirmCallSubmit()" data-i18n="btn_call">Вызвать</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ МОДАЛКА: ЕВРОПРОТОКОЛ ============ -->
+<div class="modal-bg" id="euroModal">
+  <div class="modal wide">
+    <h2 data-i18n="euro_title">📋 Европротокол</h2>
+    <p style="font-size:13px; color:#8b92a0; margin-bottom:16px;" data-i18n="euro_sub">Заполните поля — мы сформируем документ. Можно сохранить в PDF и распечатать.</p>
+
+    <div style="display:flex; gap:8px; margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="generateEuroDoc()" style="flex:1;" data-i18n="euro_generate">Сформировать документ</button>
+      <button class="btn" onclick="loadDemoData()" data-i18n="euro_demo">Демо-данные</button>
+    </div>
+
+    <div id="euroFormFields">
+      <div class="field">
+        <label data-i18n="euro_date">Дата и время ДТП</label>
+        <input type="datetime-local" id="euroDate">
+      </div>
+      <div class="field">
+        <label data-i18n="euro_location">Место ДТП</label>
+        <input type="text" id="euroLocation" placeholder="Город, улица, дом">
+      </div>
+      <div class="field">
+        <label data-i18n="euro_count">Количество участников</label>
+        <select id="euroCount">
+          <option value="2">2</option>
+          <option value="1">1</option>
+        </select>
+      </div>
+
+      <h3 style="font-size:14px; color:#f59e0b; margin:20px 0 12px;" data-i18n="euro_driver_a">Водитель A (вы)</h3>
+      <div class="field">
+        <label data-i18n="field_fio">ФИО</label>
+        <input type="text" id="driverAName" placeholder="Иванов Иван Иванович">
+      </div>
+      <div class="field">
+        <label data-i18n="field_phone">Телефон</label>
+        <input type="tel" id="driverAPhone" placeholder="+7 (___) ___-__-__">
+      </div>
+      <div class="field">
+        <label data-i18n="field_license">Водительское удостоверение</label>
+        <input type="text" id="driverALicense" placeholder="77 АА 123456">
+      </div>
+      <div class="field">
+        <label data-i18n="field_sts">СТС (свидетельство о регистрации ТС)</label>
+        <input type="text" id="driverASTS" placeholder="77 АА 123456">
+      </div>
+      <div class="field">
+        <label data-i18n="field_car">Марка и модель авто</label>
+        <input type="text" id="driverACar" placeholder="Lada Vesta, 2020">
+      </div>
+      <div class="field">
+        <label data-i18n="field_gosnomer">Гос. номер</label>
+        <input type="text" id="driverAPlate" placeholder="А123БВ 77">
+      </div>
+      <div class="field">
+        <label data-i18n="field_osago">Полис ОСАГО (серия и номер)</label>
+        <input type="text" id="driverAOsago" placeholder="ХХХ 0123456789">
+      </div>
+      <div class="field">
+        <label data-i18n="field_damage_a">Повреждения вашего авто</label>
+        <textarea id="driverADamage" placeholder="Передний бампер, левая фара, капот..."></textarea>
+      </div>
+
+      <h3 style="font-size:14px; color:#f59e0b; margin:20px 0 12px;" data-i18n="euro_driver_b">Водитель B (второй участник)</h3>
+      <div class="field">
+        <label data-i18n="field_fio">ФИО</label>
+        <input type="text" id="driverBName" placeholder="Петров Пётр Петрович">
+      </div>
+      <div class="field">
+        <label data-i18n="field_phone">Телефон</label>
+        <input type="tel" id="driverBPhone" placeholder="+7 (___) ___-__-__">
+      </div>
+      <div class="field">
+        <label data-i18n="field_license">Водительское удостоверение</label>
+        <input type="text" id="driverBLicense" placeholder="77 ВВ 654321">
+      </div>
+      <div class="field">
+        <label data-i18n="field_sts">СТС</label>
+        <input type="text" id="driverBSTS" placeholder="77 ВВ 654321">
+      </div>
+      <div class="field">
+        <label data-i18n="field_car">Марка и модель авто</label>
+        <input type="text" id="driverBCar" placeholder="Kia Rio, 2019">
+      </div>
+      <div class="field">
+        <label data-i18n="field_gosnomer">Гос. номер</label>
+        <input type="text" id="driverBPlate" placeholder="В456ГД 77">
+      </div>
+      <div class="field">
+        <label data-i18n="field_osago">Полис ОСАГО</label>
+        <input type="text" id="driverBOsago" placeholder="ХХХ 9876543210">
+      </div>
+      <div class="field">
+        <label data-i18n="field_damage_b">Повреждения авто B</label>
+        <textarea id="driverBDamage" placeholder="Задний бампер, крышка багажника..."></textarea>
+      </div>
+
+      <div class="field">
+        <label data-i18n="euro_circumstances">Обстоятельства ДТП</label>
+        <textarea id="euroCirc" placeholder="Опишите ситуацию: кто двигался, как произошло столкновение..." style="min-height:100px;"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="btn" onclick="closeModal('euroModal')" data-i18n="btn_close">Закрыть</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="printEuro()" data-i18n="btn_print">🖨 Печать</button>
+        <button class="btn btn-primary" onclick="downloadEuroPDF()" data-i18n="btn_pdf">📄 Скачать PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ МОДАЛКА: ДОКУМЕНТ ЕВРОПРОТОКОЛА (для печати/PDF) ============ -->
+<div class="modal-bg" id="euroDocModal">
+  <div class="modal wide" style="background:#2a2a2a; padding:12px;">
+    <div id="euroDocContent"></div>
+    <div class="modal-actions" style="background:#12151c; padding:16px; border-radius:12px; margin-top:12px;">
+      <button class="btn" onclick="closeModal('euroDocModal')" data-i18n="btn_close">Закрыть</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="printEuro()" data-i18n="btn_print">🖨 Печать</button>
+        <button class="btn btn-primary" onclick="downloadEuroPDF()" data-i18n="btn_pdf">📄 Скачать PDF</button>
+        <button class="btn btn-primary" onclick="saveEuroToLK()" data-i18n="btn_save">💾 Сохранить в ЛК</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ МОДАЛКА: ЖАЛОБА ============ -->
+<div class="modal-bg" id="complaintModal">
+  <div class="modal">
+    <h2 data-i18n="complaint_title">🚨 Жалоба на комиссара</h2>
+    <p style="font-size:13px; color:#8b92a0; margin-bottom:16px;" data-i18n="complaint_sub">Расскажите, что произошло. Разберёмся в течение 48 часов.</p>
+
+    <div class="field">
+      <label data-i18n="field_name">Ваше имя</label>
+      <input type="text" id="complaintName" placeholder="Как к вам обращаться">
+    </div>
+    <div class="field">
+      <label data-i18n="field_phone">Телефон</label>
+      <input type="tel" id="complaintPhone" placeholder="+7 (___) ___-__-__">
+    </div>
+    <div class="field">
+      <label data-i18n="complaint_comm_name">Имя комиссара (если известно)</label>
+      <input type="text" id="complaintCommName" placeholder="Алексей М.">
+    </div>
+    <div class="field">
+      <label data-i18n="complaint_date">Дата вызова</label>
+      <input type="date" id="complaintDate">
+    </div>
+    <div class="field">
+      <label data-i18n="complaint_type">Тип проблемы</label>
+      <select id="complaintType">
+        <option data-i18n="complaint_t1">Опоздал / не приехал</option>
+        <option data-i18n="complaint_t2">Грубое общение</option>
+        <option data-i18n="complaint_t3">Ошибки в документах</option>
+        <option data-i18n="complaint_t4">Пытался навязать услуги</option>
+        <option data-i18n="complaint_t5">Другое</option>
+      </select>
+    </div>
+    <div class="field">
+      <label data-i18n="complaint_desc">Подробности</label>
+      <textarea id="complaintText" placeholder="Опишите ситуацию как можно подробнее..." style="min-height:120px;"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('complaintModal')" data-i18n="btn_cancel">Отмена</button>
+      <button class="btn btn-danger" onclick="submitComplaint()" data-i18n="btn_send">Отправить жалобу</button>
     </div>
   </div>
 </div>
@@ -883,41 +1084,59 @@ body {
 <!-- ============ МОДАЛКА: ОПЛАТА ============ -->
 <div class="modal-bg" id="paymentModal">
   <div class="modal">
-    <h2>💳 Пополнение баланса</h2>
-
+    <h2 data-i18n="payment_title">💳 Пополнение баланса</h2>
     <div class="field">
-      <label>Сумма</label>
+      <label data-i18n="payment_amount">Сумма</label>
       <input type="number" id="payAmount" value="2500" style="font-size:20px; font-weight:700; text-align:center;">
     </div>
-
     <div class="field">
-      <label>Способ оплаты</label>
+      <label data-i18n="payment_method">Способ оплаты</label>
     </div>
-
     <div class="pay-methods">
       <div class="pay-method selected" onclick="selectPayMethod(this)">
         <div class="pay-method-icon">💳</div>
-        <div class="pay-method-label">Карта</div>
+        <div class="pay-method-label" data-i18n="pay_card">Карта</div>
       </div>
       <div class="pay-method" onclick="selectPayMethod(this)">
         <div class="pay-method-icon">📱</div>
-        <div class="pay-method-label">СБП</div>
+        <div class="pay-method-label" data-i18n="pay_sbp">СБП</div>
       </div>
       <div class="pay-method" onclick="selectPayMethod(this)">
         <div class="pay-method-icon">🟡</div>
         <div class="pay-method-label">ЮMoney</div>
       </div>
     </div>
-
     <div class="pay-summary">
-      <div class="pay-row"><span>Сумма</span><span id="paySum">2 500 ₽</span></div>
-      <div class="pay-row"><span>Комиссия</span><span>0 ₽</span></div>
-      <div class="pay-row total"><span>Итого</span><span id="payTotal">2 500 ₽</span></div>
+      <div class="pay-row"><span data-i18n="payment_amount">Сумма</span><span id="paySum">2 500 ₽</span></div>
+      <div class="pay-row"><span data-i18n="payment_commission">Комиссия</span><span>0 ₽</span></div>
+      <div class="pay-row total"><span data-i18n="payment_total">Итого</span><span id="payTotal">2 500 ₽</span></div>
     </div>
-
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('paymentModal')">Отмена</button>
-      <button class="btn btn-primary" onclick="processPayment()">Оплатить</button>
+      <button class="btn" onclick="closeModal('paymentModal')" data-i18n="btn_cancel">Отмена</button>
+      <button class="btn btn-primary" onclick="processPayment()" data-i18n="btn_pay">Оплатить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ МОДАЛКА: НАСТРОЙКИ ============ -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h2 data-i18n="settings_title">⚙️ Настройки</h2>
+    <div class="field">
+      <label data-i18n="settings_lang">Язык интерфейса</label>
+      <select id="settingsLang" onchange="changeLang(this.value)">
+      </select>
+    </div>
+    <div class="field">
+      <label data-i18n="settings_notif">Уведомления</label>
+      <select>
+        <option data-i18n="settings_notif_all">Все</option>
+        <option data-i18n="settings_notif_imp">Только важные</option>
+        <option data-i18n="settings_notif_none">Отключить</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('settingsModal')" data-i18n="btn_done">Готово</button>
     </div>
   </div>
 </div>
@@ -925,27 +1144,27 @@ body {
 <!-- ============ МОДАЛКА: УВЕДОМЛЕНИЯ ============ -->
 <div class="modal-bg" id="notifModal">
   <div class="modal">
-    <h2>🔔 Уведомления</h2>
+    <h2 data-i18n="notif_title">🔔 Уведомления</h2>
     <div class="notif-list">
       <div class="notif-item">
         <div class="notif-icon">⚡</div>
         <div class="notif-content">
-          <div class="notif-title">Обновление лимитов европротокола</div>
-          <div class="notif-text">С 2025 года лимит с разногласиями — 200 000 ₽, без разногласий — 400 000 ₽</div>
-          <div class="notif-time">2 дня назад</div>
+          <div class="notif-title" data-i18n="notif1_t">Обновление лимитов европротокола</div>
+          <div class="notif-text" data-i18n="notif1_d">С 2025 года лимиты увеличены: до 200 000 ₽ с разногласиями, до 400 000 ₽ без.</div>
+          <div class="notif-time" data-i18n="notif1_time">2 дня назад</div>
         </div>
       </div>
       <div class="notif-item">
         <div class="notif-icon">🆕</div>
         <div class="notif-content">
-          <div class="notif-title">Добро пожаловать в АварКом</div>
-          <div class="notif-text">Спасибо, что выбрали наш сервис. Если что-то не работает — пишите в поддержку.</div>
-          <div class="notif-time">только что</div>
+          <div class="notif-title" data-i18n="notif2_t">Добро пожаловать в АварКом</div>
+          <div class="notif-text" data-i18n="notif2_d">Спасибо, что выбрали нас. Если что-то не работает — пишите в поддержку.</div>
+          <div class="notif-time" data-i18n="notif2_time">только что</div>
         </div>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="closeModal('notifModal')">Понятно</button>
+      <button class="btn btn-primary" onclick="closeModal('notifModal')" data-i18n="btn_ok">Понятно</button>
     </div>
   </div>
 </div>
@@ -953,8 +1172,8 @@ body {
 <!-- ============ МОДАЛКА: ОЦЕНКА ============ -->
 <div class="modal-bg" id="ratingModal">
   <div class="modal">
-    <h2>Оцените комиссара</h2>
-    <p style="font-size:13px; color:#8b92a0; text-align:center;">Как всё прошло?</p>
+    <h2 data-i18n="rating_title">Оцените комиссара</h2>
+    <p style="font-size:13px; color:#8b92a0; text-align:center;" data-i18n="rating_sub">Как всё прошло?</p>
     <div class="stars" id="ratingStars">
       <span data-v="1">★</span>
       <span data-v="2">★</span>
@@ -966,36 +1185,925 @@ body {
       <textarea id="ratingComment" placeholder="Оставьте отзыв (необязательно)" style="min-height:70px;"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('ratingModal')">Пропустить</button>
-      <button class="btn btn-primary" onclick="submitRating()">Отправить</button>
+      <button class="btn" onclick="closeModal('ratingModal')" data-i18n="btn_skip">Пропустить</button>
+      <button class="btn btn-primary" onclick="submitRating()" data-i18n="btn_send">Отправить</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast">Готово!</div>
 
 <script>
 (function() {
   'use strict';
 
-  let currentScreen = 'screenAuth';
-  let userName = 'Александр';
-  let callTimer = null;
-  let callSeconds = 0;
-  let currentRating = 0;
+  // ============================================
+  // ПЕРЕВОДЫ
+  // ============================================
+  const TRANSLATIONS = {
+    ru: {
+      app_name: "АварКом", auth_sub: "Аварийный комиссар онлайн",
+      tab_login: "Вход", tab_register: "Регистрация",
+      field_phone: "Телефон", field_pass: "Пароль", field_name: "Имя",
+      btn_login: "Войти", btn_register: "Создать аккаунт",
+      nav_home: "Главная", nav_recs: "Рекомендации", nav_support: "Поддержка",
+      home_title: "Что случилось?", home_sub: "Выберите действие — мы поможем",
+      act_call_title: "Вызвать комиссара", act_call_desc: "Приедет на место ДТП, оформит документы, поможет со страховой",
+      act_euro_title: "Европротокол без комиссара", act_euro_desc: "Оформите ДТП самостоятельно с нашей помощью",
+      act_112_title: "Вызвать спец. службы", act_112_desc: "Единый номер экстренных служб — 112",
+      act_recs_title: "Рекомендации при ДТП", act_recs_desc: "Пошаговая инструкция, что делать на месте аварии",
+      act_support_title: "Поддержка и жалобы", act_support_desc: "Свяжитесь с нами или пожалуйтесь на комиссара",
+      tip_title: "⚡ Совет:", tip_text: "с 2025 года лимит европротокола с разногласиями — 200 000 ₽, без разногласий с фотофиксацией — 400 000 ₽.",
+      recs_title: "Что делать при ДТП", recs_sub: "Пошаговая инструкция",
+      rec1_t: "Остановитесь и не трогайте машину с места", rec1_d: "Немедленно остановитесь, заглушите двигатель, включите аварийку.",
+      rec2_t: "Выставьте знак аварийной остановки", rec2_d: "В населённом пункте — 15 м, вне — 30 м от машины.",
+      rec3_t: "Проверьте, есть ли пострадавшие", rec3_d: "Если есть раненые — вызовите скорую (103) и полицию (102).",
+      rec4_t: "Вызовите ГИБДД, если это необходимо", rec4_d: "ГИБДД обязательна: пострадавшие, 3+ участника, разногласия, ущерб больше лимита.",
+      rec5_t: "Зафиксируйте всё на фото и видео", rec5_d: "Общий план, положение машин, следы торможения, повреждения, номера.",
+      rec6_t: "Запишите свидетелей", rec6_d: "ФИО и контакты очевидцев — на случай спора.",
+      rec7_t: "Оформите европротокол или дождитесь ГИБДД", rec7_d: "Срок передачи в страховую — до 5 рабочих дней.",
+      rec8_t: "Не покидайте место ДТП", rec8_d: "Оставление места — лишение прав от 1 до 1.5 лет.",
+      rec9_t: "Сообщите в страховую", rec9_d: "При европротоколе — до 5 рабочих дней.",
+      rec10_t: "Не ремонтируйте машину до осмотра", rec10_d: "15 календарных дней — до осмотра или экспертизы.",
+      rec_warn_t: "🚫 Категорически нельзя:", rec_warn_d: "• Употреблять алкоголь после ДТП<br>• Покидать место происшествия<br>• Подписывать пустые бланки",
+      support_title: "Поддержка", support_sub: "Свяжитесь с нами или найдите ответ в FAQ",
+      sup_write: "📧 Написать нам", sup_write_sub: "Ответим в течение 24 часов в рабочие дни",
+      sup_complaint: "🚨 Жалоба на комиссара", sup_complaint_sub: "Если что-то пошло не так — расскажите. Разберёмся в течение 48 часов.",
+      btn_complaint: "Подать жалобу", sup_faq: "💬 Частые вопросы",
+      faq1_q: "Сколько стоит вызов комиссара?", faq1_a: "Стоимость фиксирована — от 2 500 ₽. Точная цена показывается перед подтверждением вызова.",
+      faq2_q: "Можно ли оформить без ГИБДД?", faq2_a: "Да, если нет пострадавших, участников не больше двух и ущерб в пределах лимита европротокола.",
+      faq3_q: "Как оплатить?", faq3_a: "Картой, через СБП или ЮMoney. Если вызов отменён до принятия — деньги вернутся автоматически.",
+      faq4_q: "Что с моими данными?", faq4_a: "Всё по 152-ФЗ. Документы хранятся в вашем ЛК и доступны только вам.",
+      sup_emergency: "🆘 Экстренные службы", sup_emergency_sub: "Если ситуация угрожает жизни — звоните напрямую",
+      copy: "📋 Копировать",
+      lk_title: "Личный кабинет", lk_greeting: "Добро пожаловать!",
+      lk_calls: "Всего вызовов", lk_spent: "Потрачено", lk_balance: "Баланс",
+      lk_topup: "Пополнить баланс", lk_topup_sub: "Оплата картой или СБП",
+      lk_complaint: "Подать жалобу", lk_complaint_sub: "На комиссара или сервис",
+      lk_settings: "Настройки", lk_settings_sub: "Профиль, язык, уведомления",
+      lk_support: "Поддержка", lk_support_sub: "FAQ и контакты",
+      lk_docs: "Мои документы", lk_docs_empty: "📭 Документов пока нет<br><span style='font-size:12px;color:#4b5563;margin-top:6px;display:block;'>Появятся после оформления европротокола</span>",
+      btn_logout: "Выйти из аккаунта",
+      call_header: "Вызов комиссара", btn_cancel: "Отмена",
+      call_searching: "Ищем комиссара...", call_searching_sub: "Обычно занимает 1–2 минуты",
+      call_type: "Тип ДТП:", call_addr: "Адрес:", call_comment: "Комментарий:",
+      btn_emergency: "Экстренная помощь — 112", btn_chat: "💬 Чат", btn_support: "📞 Поддержка",
+      notes_title: "📋 Что дальше:", notes_text: "• Не покидайте место ДТП<br>• Сфотографируйте повреждения<br>• Запишите свидетелей<br>• Комиссар поможет с документами",
+      modal_call_title: "Вызов комиссара",
+      field_dtp_type: "Тип ДТП", field_address: "Адрес", field_comment: "Комментарий (необязательно)",
+      field_photos: "Фото с места (до 5 штук, необязательно)",
+      dtp_simple: "2 машины, без пострадавших", dtp_complex: "Сложное (3+ участника / разногласия)",
+      dtp_solo: "Один участник (наезд на препятствие)", dtp_parking: "Парковка / двор",
+      cost: "Стоимость:", payment_before: "Оплата:", payment_before_val: "до прибытия комиссара",
+      arrival: "Прибытие:", minutes: "минут", btn_call: "Вызвать",
+      euro_title: "📋 Европротокол", euro_sub: "Заполните поля — мы сформируем документ. Можно сохранить в PDF и распечатать.",
+      euro_generate: "Сформировать документ", euro_demo: "Демо-данные",
+      euro_date: "Дата и время ДТП", euro_location: "Место ДТП", euro_count: "Количество участников",
+      euro_driver_a: "Водитель A (вы)", euro_driver_b: "Водитель B (второй участник)",
+      field_fio: "ФИО", field_license: "Водительское удостоверение", field_sts: "СТС",
+      field_car: "Марка и модель авто", field_gosnomer: "Гос. номер", field_osago: "Полис ОСАГО",
+      field_damage_a: "Повреждения вашего авто", field_damage_b: "Повреждения авто B",
+      euro_circumstances: "Обстоятельства ДТП",
+      btn_close: "Закрыть", btn_print: "🖨 Печать", btn_pdf: "📄 Скачать PDF", btn_save: "💾 Сохранить в ЛК",
+      complaint_title: "🚨 Жалоба на комиссара", complaint_sub: "Расскажите, что произошло. Разберёмся в течение 48 часов.",
+      complaint_comm_name: "Имя комиссара (если известно)", complaint_date: "Дата вызова",
+      complaint_type: "Тип проблемы",
+      complaint_t1: "Опоздал / не приехал", complaint_t2: "Грубое общение",
+      complaint_t3: "Ошибки в документах", complaint_t4: "Пытался навязать услуги", complaint_t5: "Другое",
+      complaint_desc: "Подробности", btn_send: "Отправить",
+      payment_title: "💳 Пополнение баланса", payment_amount: "Сумма", payment_method: "Способ оплаты",
+      pay_card: "Карта", pay_sbp: "СБП", payment_commission: "Комиссия", payment_total: "Итого", btn_pay: "Оплатить",
+      settings_title: "⚙️ Настройки", settings_lang: "Язык интерфейса", settings_notif: "Уведомления",
+      settings_notif_all: "Все", settings_notif_imp: "Только важные", settings_notif_none: "Отключить", btn_done: "Готово",
+      notif_title: "🔔 Уведомления",
+      notif1_t: "Обновление лимитов европротокола", notif1_d: "С 2025 года лимиты увеличены: до 200 000 ₽ с разногласиями, до 400 000 ₽ без.", notif1_time: "2 дня назад",
+      notif2_t: "Добро пожаловать в АварКом", notif2_d: "Спасибо, что выбрали нас. Если что-то не работает — пишите в поддержку.", notif2_time: "только что",
+      btn_ok: "Понятно",
+      rating_title: "Оцените комиссара", rating_sub: "Как всё прошло?", btn_skip: "Пропустить",
+      chat_dev: "Чат (в разработке)"
+    },
+    en: {
+      app_name: "AvarKom", auth_sub: "Road accident commissioner online",
+      tab_login: "Sign In", tab_register: "Sign Up",
+      field_phone: "Phone", field_pass: "Password", field_name: "Name",
+      btn_login: "Sign In", btn_register: "Create account",
+      nav_home: "Home", nav_recs: "Guidelines", nav_support: "Support",
+      home_title: "What happened?", home_sub: "Choose an action — we'll help",
+      act_call_title: "Call a commissioner", act_call_desc: "Comes to the accident scene, fills in documents, helps with insurance",
+      act_euro_title: "Euro protocol without commissioner", act_euro_desc: "Fill in the accident yourself with our help",
+      act_112_title: "Call emergency services", act_112_desc: "Single emergency number — 112",
+      act_recs_title: "Accident guidelines", act_recs_desc: "Step-by-step instructions on what to do at the scene",
+      act_support_title: "Support and complaints", act_support_desc: "Contact us or complain about a commissioner",
+      tip_title: "⚡ Tip:", tip_text: "since 2025 the euro protocol limit with disagreements is 200,000 ₽, without — 400,000 ₽.",
+      recs_title: "What to do in an accident", recs_sub: "Step-by-step instructions",
+      rec1_t: "Stop and don't move the car", rec1_d: "Stop immediately, turn off the engine, turn on hazard lights.",
+      rec2_t: "Place the warning triangle", rec2_d: "In town — 15 m, outside — 30 m from the car.",
+      rec3_t: "Check for injured people", rec3_d: "If someone is hurt — call ambulance (103) and police (102).",
+      rec4_t: "Call traffic police if needed", rec4_d: "Required if: injured, 3+ participants, disagreements, damage above limit.",
+      rec5_t: "Take photos and videos", rec5_d: "General view, car positions, skid marks, damage, plates.",
+      rec6_t: "Record witnesses", rec6_d: "Names and contacts of witnesses — in case of dispute.",
+      rec7_t: "Fill in euro protocol or wait for police", rec7_d: "Submit to insurance within 5 business days.",
+      rec8_t: "Don't leave the scene", rec8_d: "Leaving the scene — license suspension from 1 to 1.5 years.",
+      rec9_t: "Notify your insurance", rec9_d: "With euro protocol — within 5 business days.",
+      rec10_t: "Don't repair the car before inspection", rec10_d: "15 calendar days before inspection or expertise.",
+      rec_warn_t: "🚫 Never:", rec_warn_d: "• Drink alcohol after accident<br>• Leave the scene<br>• Sign blank documents",
+      support_title: "Support", support_sub: "Contact us or check the FAQ",
+      sup_write: "📧 Write to us", sup_write_sub: "We respond within 24 hours on business days",
+      sup_complaint: "🚨 Complaint about a commissioner", sup_complaint_sub: "If something went wrong — tell us. We'll investigate within 48 hours.",
+      btn_complaint: "File a complaint", sup_faq: "💬 FAQ",
+      faq1_q: "How much does a commissioner cost?", faq1_a: "Fixed price — from 2,500 ₽. Exact price is shown before confirming the call.",
+      faq2_q: "Can I file without traffic police?", faq2_a: "Yes, if no one is injured, no more than two participants and damage within the euro protocol limit.",
+      faq3_q: "How to pay?", faq3_a: "Card, SBP or YuMoney. If cancelled before acceptance — money returns automatically.",
+      faq4_q: "What about my data?", faq4_a: "All per 152-FZ. Documents are stored in your account and available only to you.",
+      sup_emergency: "🆘 Emergency services", sup_emergency_sub: "If life is at risk — call directly",
+      copy: "📋 Copy",
+      lk_title: "Dashboard", lk_greeting: "Welcome!",
+      lk_calls: "Total calls", lk_spent: "Spent", lk_balance: "Balance",
+      lk_topup: "Top up balance", lk_topup_sub: "Card or SBP payment",
+      lk_complaint: "File a complaint", lk_complaint_sub: "About commissioner or service",
+      lk_settings: "Settings", lk_settings_sub: "Profile, language, notifications",
+      lk_support: "Support", lk_support_sub: "FAQ and contacts",
+      lk_docs: "My documents", lk_docs_empty: "📭 No documents yet<br><span style='font-size:12px;color:#4b5563;margin-top:6px;display:block;'>Will appear after filing a euro protocol</span>",
+      btn_logout: "Log out",
+      call_header: "Commissioner call", btn_cancel: "Cancel",
+      call_searching: "Searching for commissioner...", call_searching_sub: "Usually takes 1–2 minutes",
+      call_type: "Accident type:", call_addr: "Address:", call_comment: "Comment:",
+      btn_emergency: "Emergency — 112", btn_chat: "💬 Chat", btn_support: "📞 Support",
+      notes_title: "📋 What's next:", notes_text: "• Don't leave the scene<br>• Take photos of damage<br>• Record witnesses<br>• Commissioner will help with documents",
+      modal_call_title: "Call a commissioner",
+      field_dtp_type: "Accident type", field_address: "Address", field_comment: "Comment (optional)",
+      field_photos: "Photos from scene (up to 5, optional)",
+      dtp_simple: "2 cars, no injuries", dtp_complex: "Complex (3+ participants / disagreements)",
+      dtp_solo: "Single participant (hit obstacle)", dtp_parking: "Parking / yard",
+      cost: "Cost:", payment_before: "Payment:", payment_before_val: "before commissioner arrival",
+      arrival: "Arrival:", minutes: "minutes", btn_call: "Call",
+      euro_title: "📋 Euro protocol", euro_sub: "Fill in the fields — we'll generate the document. Can save as PDF and print.",
+      euro_generate: "Generate document", euro_demo: "Demo data",
+      euro_date: "Date and time of accident", euro_location: "Accident location", euro_count: "Number of participants",
+      euro_driver_a: "Driver A (you)", euro_driver_b: "Driver B (second participant)",
+      field_fio: "Full name", field_license: "Driver's license", field_sts: "Vehicle registration",
+      field_car: "Make and model", field_gosnomer: "License plate", field_osago: "OSAGO policy",
+      field_damage_a: "Damage to your car", field_damage_b: "Damage to car B",
+      euro_circumstances: "Accident circumstances",
+      btn_close: "Close", btn_print: "🖨 Print", btn_pdf: "📄 Download PDF", btn_save: "💾 Save to dashboard",
+      complaint_title: "🚨 Commissioner complaint", complaint_sub: "Tell us what happened. We'll investigate within 48 hours.",
+      complaint_comm_name: "Commissioner name (if known)", complaint_date: "Call date",
+      complaint_type: "Problem type",
+      complaint_t1: "Late / didn't arrive", complaint_t2: "Rude communication",
+      complaint_t3: "Errors in documents", complaint_t4: "Tried to push services", complaint_t5: "Other",
+      complaint_desc: "Details", btn_send: "Send",
+      payment_title: "💳 Top up balance", payment_amount: "Amount", payment_method: "Payment method",
+      pay_card: "Card", pay_sbp: "SBP", payment_commission: "Commission", payment_total: "Total", btn_pay: "Pay",
+      settings_title: "⚙️ Settings", settings_lang: "Interface language", settings_notif: "Notifications",
+      settings_notif_all: "All", settings_notif_imp: "Important only", settings_notif_none: "Disable", btn_done: "Done",
+      notif_title: "🔔 Notifications",
+      notif1_t: "Euro protocol limits update", notif1_d: "Since 2025 limits increased: up to 200,000 ₽ with disagreements, up to 400,000 ₽ without.", notif1_time: "2 days ago",
+      notif2_t: "Welcome to AvarKom", notif2_d: "Thanks for choosing us. If something doesn't work — write to support.", notif2_time: "just now",
+      btn_ok: "Got it",
+      rating_title: "Rate the commissioner", rating_sub: "How did it go?", btn_skip: "Skip",
+      chat_dev: "Chat (in development)"
+    },
+    be: {
+      app_name: "АварКом", auth_sub: "Аварыйны камісар анлайн",
+      tab_login: "Уваход", tab_register: "Рэгістрацыя",
+      field_phone: "Тэлефон", field_pass: "Пароль", field_name: "Імя",
+      btn_login: "Увайсці", btn_register: "Стварыць акаўнт",
+      nav_home: "Галоўная", nav_recs: "Рэкамендацыі", nav_support: "Падтрымка",
+      home_title: "Што здарылася?", home_sub: "Выберыце дзеянне — мы дапаможам",
+      act_call_title: "Выклікаць камісара", act_call_desc: "Прыедзе на месца ДТЗ, аформіць дакументы",
+      act_euro_title: "Еўрапратакол без камісара", act_euro_desc: "Аформіце ДТЗ самастойна з нашай дапамогай",
+      act_112_title: "Выклікаць спецслужбы", act_112_desc: "Адзіны нумар экстраных службаў — 112",
+      act_recs_title: "Рэкамендацыі пры ДТЗ", act_recs_desc: "Пакрокавая інструкцыя",
+      act_support_title: "Падтрымка і скаргі", act_support_desc: "Звяжыцеся з намі",
+      tip_title: "⚡ Парада:", tip_text: "з 2025 года ліміт еўрапратакола з рознагалоссямі — 200 000 ₽.",
+      recs_title: "Што рабіць пры ДТЗ", recs_sub: "Пакрокавая інструкцыя",
+      rec1_t: "Спыніцеся і не рухайце машыну", rec1_d: "Неадкладна спыніцеся, выключыце рухавік.",
+      rec2_t: "Пастаўце знак аварыйнай прыпынку", rec2_d: "У населеным пункце — 15 м, звонку — 30 м.",
+      rec3_t: "Праверце, ці ёсць пацярпелыя", rec3_d: "Калі ёсць параненыя — выклічце хуткую (103).",
+      rec4_t: "Выклічце ДАІ", rec4_d: "ДАІ абавязкова пры пацярпелых і рознагалоссях.",
+      rec5_t: "Зрабіце фота і відэа", rec5_d: "Агульны план, пашкоджанні, нумары.",
+      rec6_t: "Запішыце сведкаў", rec6_d: "ПІБ і кантакты.",
+      rec7_t: "Аформіце еўрапратакол", rec7_d: "Тэрмін перадачы ў страхавую — 5 дзён.",
+      rec8_t: "Не пакідайце месца ДТЗ", rec8_d: "Пакіданне — пазбаўленне правоў.",
+      rec9_t: "Паведаміце страхавой", rec9_d: "Пры еўрапратаколе — 5 дзён.",
+      rec10_t: "Не рамантуйце да агляду", rec10_d: "15 каляндарных дзён.",
+      rec_warn_t: "🚫 Катэгарычна нельга:", rec_warn_d: "• Ужываць алкаголь<br>• Пакідаць месца<br>• Падпісваць пустыя бланкі",
+      support_title: "Падтрымка", support_sub: "Звяжыцеся з намі",
+      sup_write: "📧 Напісаць нам", sup_write_sub: "Адказваем на працягу 24 гадзін",
+      sup_complaint: "🚨 Скарга на камісара", sup_complaint_sub: "Раскажыце, што здарылася.",
+      btn_complaint: "Падаць скаргу", sup_faq: "💬 Частыя пытанні",
+      faq1_q: "Колькі каштуе выклік?", faq1_a: "Ад 2 500 ₽. Дакладная цана — перад пацверджаннем.",
+      faq2_q: "Ці можна без ДАІ?", faq2_a: "Так, калі няма пацярпелых і ўдзельнікаў не больш за двух.",
+      faq3_q: "Як аплаціць?", faq3_a: "Картай, праз СБП або ЮMoney.",
+      faq4_q: "Што з маімі дадзенымі?", faq4_a: "Усё па 152-ФЗ.",
+      sup_emergency: "🆘 Экстраныя службы", sup_emergency_sub: "Калі пагражае жыццю — тэлефануйце",
+      copy: "📋 Капіяваць",
+      lk_title: "Асабісты кабінет", lk_greeting: "Сардэчна запрашаем!",
+      lk_calls: "Усяго выклікаў", lk_spent: "Патрачана", lk_balance: "Баланс",
+      lk_topup: "Папоўніць баланс", lk_topup_sub: "Аплата картай або СБП",
+      lk_complaint: "Падаць скаргу", lk_complaint_sub: "На камісара або сэрвіс",
+      lk_settings: "Налады", lk_settings_sub: "Профіль, мова, апавяшчэнні",
+      lk_support: "Падтрымка", lk_support_sub: "FAQ і кантакты",
+      lk_docs: "Мае дакументы", lk_docs_empty: "📭 Дакументаў пакуль няма",
+      btn_logout: "Выйсці",
+      call_header: "Выклік камісара", btn_cancel: "Адмена",
+      call_searching: "Шукаем камісара...", call_searching_sub: "Звычайна 1–2 хвіліны",
+      call_type: "Тып ДТЗ:", call_addr: "Адрас:", call_comment: "Каментар:",
+      btn_emergency: "Экстраная дапамога — 112", btn_chat: "💬 Чат", btn_support: "📞 Падтрымка",
+      notes_title: "📋 Што далей:", notes_text: "• Не пакідайце месца<br>• Сфатаграфуйце<br>• Запішыце сведкаў",
+      modal_call_title: "Выклік камісара",
+      field_dtp_type: "Тып ДТЗ", field_address: "Адрас", field_comment: "Каментар (неабавязкова)",
+      field_photos: "Фота (да 5 штук, неабавязкова)",
+      dtp_simple: "2 машыны, без пацярпелых", dtp_complex: "Складанае (3+ удзельнікі)",
+      dtp_solo: "Адзін удзельнік", dtp_parking: "Паркоўка / двор",
+      cost: "Кошт:", payment_before: "Аплата:", payment_before_val: "да прыезду",
+      arrival: "Прыбыццё:", minutes: "хвілін", btn_call: "Выклікаць",
+      euro_title: "📋 Еўрапратакол", euro_sub: "Запоўніце палі — сфарміруем дакумент.",
+      euro_generate: "Сфарміраваць дакумент", euro_demo: "Дэма-дадзеныя",
+      euro_date: "Дата і час ДТЗ", euro_location: "Месца ДТЗ", euro_count: "Колькасць удзельнікаў",
+      euro_driver_a: "Кіроўца A (вы)", euro_driver_b: "Кіроўца B (другі ўдзельнік)",
+      field_fio: "ПІБ", field_license: "Пасведчанне кіроўцы", field_sts: "СТС",
+      field_car: "Марка і мадэль", field_gosnomer: "Дзярж. нумар", field_osago: "Поліс АСАГА",
+      field_damage_a: "Пашкоджанні вашага аўто", field_damage_b: "Пашкоджанні аўто B",
+      euro_circumstances: "Абставіны ДТЗ",
+      btn_close: "Зачыніць", btn_print: "🖨 Друк", btn_pdf: "📄 Спампаваць PDF", btn_save: "💾 Захаваць",
+      complaint_title: "🚨 Скарга на камісара", complaint_sub: "Раскажыце, што здарылася.",
+      complaint_comm_name: "Імя камісара", complaint_date: "Дата выкліку",
+      complaint_type: "Тып праблемы",
+      complaint_t1: "Спазніўся / не прыехаў", complaint_t2: "Грубасць",
+      complaint_t3: "Памылкі ў дакументах", complaint_t4: "Навязваў паслугі", complaint_t5: "Іншае",
+      complaint_desc: "Падрабязнасці", btn_send: "Адправіць",
+      payment_title: "💳 Папаўненне балансу", payment_amount: "Сума", payment_method: "Спосаб аплаты",
+      pay_card: "Карта", pay_sbp: "СБП", payment_commission: "Камісія", payment_total: "Разам", btn_pay: "Аплаціць",
+      settings_title: "⚙️ Налады", settings_lang: "Мова інтэрфейсу", settings_notif: "Апавяшчэнні",
+      settings_notif_all: "Усе", settings_notif_imp: "Толькі важныя", settings_notif_none: "Адключыць", btn_done: "Гатова",
+      notif_title: "🔔 Апавяшчэнні",
+      notif1_t: "Абнаўленне лімітаў", notif1_d: "З 2025 года ліміты павялічаны.", notif1_time: "2 дні таму",
+      notif2_t: "Сардэчна запрашаем", notif2_d: "Дзякуй, што выбралі нас.", notif2_time: "толькі што",
+      btn_ok: "Зразумела",
+      rating_title: "Ацаніце камісара", rating_sub: "Як усё прайшло?", btn_skip: "Прапусціць",
+      chat_dev: "Чат (у распрацоўцы)"
+    },
+    uz: {
+      app_name: "AvarKom", auth_sub: "Onlayn avariya komissari",
+      tab_login: "Kirish", tab_register: "Ro'yxatdan o'tish",
+      field_phone: "Telefon", field_pass: "Parol", field_name: "Ism",
+      btn_login: "Kirish", btn_register: "Hisob yaratish",
+      nav_home: "Asosiy", nav_recs: "Tavsiyalar", nav_support: "Yordam",
+      home_title: "Nima bo'ldi?", home_sub: "Amalni tanlang — biz yordam beramiz",
+      act_call_title: "Komissarni chaqirish", act_call_desc: "Hodisa joyiga keladi, hujjatlarni to'ldiradi",
+      act_euro_title: "Komissarsiz yevroprotokol", act_euro_desc: "O'zingiz hujjat to'ldiring",
+      act_112_title: "Tezkor xizmatlarni chaqirish", act_112_desc: "Yagona raqam — 112",
+      act_recs_title: "Avariya bo'yicha tavsiyalar", act_recs_desc: "Qadam-baqadam ko'rsatmalar",
+      act_support_title: "Yordam va shikoyatlar", act_support_desc: "Biz bilan bog'laning",
+      tip_title: "⚡ Maslahat:", tip_text: "2025 yildan boshlab yevroprotokol limiti 200 000 ₽.",
+      recs_title: "Avariyada nima qilish kerak", recs_sub: "Qadam-baqadam",
+      rec1_t: "To'xtang va mashinani qo'zg'atmang", rec1_d: "Darhol to'xtang, dvigatelni o'chiring.",
+      rec2_t: "Ogohlantirish belgisini qo'ying", rec2_d: "Shahar ichida — 15 m, tashqarida — 30 m.",
+      rec3_t: "Jabrlanganlar borligini tekshiring", rec3_d: "Agar yaralangan bo'lsa — 103 va 102 ga qo'ng'iroq qiling.",
+      rec4_t: "Yo'l politsiyasini chaqiring", rec4_d: "Jabrlanganlar, 3+ ishtirokchi bo'lsa majburiy.",
+      rec5_t: "Foto va video oling", rec5_d: "Umumiy ko'rinish, zarar, raqamlar.",
+      rec6_t: "Guvohlarni yozib oling", rec6_d: "Ism va kontaktlar.",
+      rec7_t: "Yevroprotokolni to'ldiring", rec7_d: "Sug'urtaga 5 ish kuni ichida.",
+      rec8_t: "Hodisa joyidan ketmang", rec8_d: "Ketish — huquqdan mahrum qilish.",
+      rec9_t: "Sug'urtangizga xabar bering", rec9_d: "5 ish kuni ichida.",
+      rec10_t: "Ko'rikdan oldin ta'mirlamang", rec10_d: "15 kalendar kuni.",
+      rec_warn_t: "🚫 Hech qachon:", rec_warn_d: "• Spirtli ichimlik<br>• Joydan ketish<br>• Bo'sh blankalarga imzo",
+      support_title: "Yordam", support_sub: "Biz bilan bog'laning",
+      sup_write: "📧 Bizga yozing", sup_write_sub: "24 soat ichida javob beramiz",
+      sup_complaint: "🚨 Komissarga shikoyat", sup_complaint_sub: "Nima bo'lganini aytib bering.",
+      btn_complaint: "Shikoyat yuborish", sup_faq: "💬 Ko'p so'raladigan savollar",
+      faq1_q: "Komissar narxi qancha?", faq1_a: "2 500 ₽ dan. Aniq narx tasdiqlashdan oldin ko'rsatiladi.",
+      faq2_q: "Politsiyasiz mumkinmi?", faq2_a: "Ha, agar jabrlanganlar bo'lmasa.",
+      faq3_q: "Qanday to'lash?", faq3_a: "Karta, SBP yoki YuMoney.",
+      faq4_q: "Ma'lumotlarim haqida?", faq4_a: "152-FZ bo'yicha.",
+      sup_emergency: "🆘 Tezkor xizmatlar", sup_emergency_sub: "Hayot xavf ostida bo'lsa — qo'ng'iroq qiling",
+      copy: "📋 Nusxalash",
+      lk_title: "Shaxsiy kabinet", lk_greeting: "Xush kelibsiz!",
+      lk_calls: "Jami qo'ng'iroqlar", lk_spent: "Sarflangan", lk_balance: "Balans",
+      lk_topup: "Balansni to'ldirish", lk_topup_sub: "Karta yoki SBP",
+      lk_complaint: "Shikoyat yuborish", lk_complaint_sub: "Komissar yoki xizmat haqida",
+      lk_settings: "Sozlamalar", lk_settings_sub: "Profil, til, bildirishnomalar",
+      lk_support: "Yordam", lk_support_sub: "FAQ va kontaktlar",
+      lk_docs: "Mening hujjatlarim", lk_docs_empty: "📭 Hujjatlar yo'q",
+      btn_logout: "Chiqish",
+      call_header: "Komissar chaqirish", btn_cancel: "Bekor qilish",
+      call_searching: "Komissar qidirilmoqda...", call_searching_sub: "Odatda 1–2 daqiqa",
+      call_type: "Avariya turi:", call_addr: "Manzil:", call_comment: "Izoh:",
+      btn_emergency: "Tezkor yordam — 112", btn_chat: "💬 Chat", btn_support: "📞 Yordam",
+      notes_title: "📋 Keyingi qadamlar:", notes_text: "• Joydan ketmang<br>• Zararni suratga oling<br>• Guvohlarni yozib oling",
+      modal_call_title: "Komissar chaqirish",
+      field_dtp_type: "Avariya turi", field_address: "Manzil", field_comment: "Izoh (majburiy emas)",
+      field_photos: "Suratlar (5 tagacha, majburiy emas)",
+      dtp_simple: "2 mashina, jabrlanganlar yo'q", dtp_complex: "Murakkab (3+ ishtirokchi)",
+      dtp_solo: "Bitta ishtirokchi", dtp_parking: "To'xtash joyi / hovli",
+      cost: "Narx:", payment_before: "To'lov:", payment_before_val: "komissar kelishidan oldin",
+      arrival: "Kelish:", minutes: "daqiqa", btn_call: "Chaqirish",
+      euro_title: "📋 Yevroprotokol", euro_sub: "Maydonlarni to'ldiring — hujjatni shakllantiramiz.",
+      euro_generate: "Hujjatni shakllantirish", euro_demo: "Demo ma'lumotlar",
+      euro_date: "Avariya sanasi va vaqti", euro_location: "Avariya joyi", euro_count: "Ishtirokchilar soni",
+      euro_driver_a: "Haydovchi A (siz)", euro_driver_b: "Haydovchi B (ikkinchi ishtirokchi)",
+      field_fio: "To'liq ism", field_license: "Haydovchilik guvohnomasi", field_sts: "STS",
+      field_car: "Marka va model", field_gosnomer: "Davlat raqami", field_osago: "OSAGO polisi",
+      field_damage_a: "Sizning mashinangiz zarari", field_damage_b: "B mashinasi zarari",
+      euro_circumstances: "Avariya sharoitlari",
+      btn_close: "Yopish", btn_print: "🖨 Chop etish", btn_pdf: "📄 PDF yuklab olish", btn_save: "💾 Saqlash",
+      complaint_title: "🚨 Komissarga shikoyat", complaint_sub: "Nima bo'lganini aytib bering.",
+      complaint_comm_name: "Komissar ismi", complaint_date: "Chaqiruv sanasi",
+      complaint_type: "Muammo turi",
+      complaint_t1: "Kechikdi / kelmadi", complaint_t2: "Qo'pol muomala",
+      complaint_t3: "Hujjatlardagi xatolar", complaint_t4: "Xizmatlarni majburlash", complaint_t5: "Boshqa",
+      complaint_desc: "Tafsilotlar", btn_send: "Yuborish",
+      payment_title: "💳 Balansni to'ldirish", payment_amount: "Summa", payment_method: "To'lov usuli",
+      pay_card: "Karta", pay_sbp: "SBP", payment_commission: "Komissiya", payment_total: "Jami", btn_pay: "To'lash",
+      settings_title: "⚙️ Sozlamalar", settings_lang: "Interfeys tili", settings_notif: "Bildirishnomalar",
+      settings_notif_all: "Hammasi", settings_notif_imp: "Faqat muhim", settings_notif_none: "O'chirish", btn_done: "Tayyor",
+      notif_title: "🔔 Bildirishnomalar",
+      notif1_t: "Yevroprotokol limitlari yangilandi", notif1_d: "2025 yildan limitlar oshirildi.", notif1_time: "2 kun oldin",
+      notif2_t: "AvarKomga xush kelibsiz", notif2_d: "Bizni tanlaganingiz uchun rahmat.", notif2_time: "hozir",
+      btn_ok: "Tushunarli",
+      rating_title: "Komissarni baholang", rating_sub: "Qanday o'tdi?", btn_skip: "O'tkazib yuborish",
+      chat_dev: "Chat (ishlab chiqilmoqda)"
+    },
+    kk: {
+      app_name: "АварКом", auth_sub: "Онлайн апат комиссары",
+      tab_login: "Кіру", tab_register: "Тіркелу",
+      field_phone: "Телефон", field_pass: "Құпия сөз", field_name: "Аты",
+      btn_login: "Кіру", btn_register: "Аккаунт жасау",
+      nav_home: "Басты", nav_recs: "Ұсыныстар", nav_support: "Қолдау",
+      home_title: "Не болды?", home_sub: "Әрекетті таңдаңыз — біз көмектесеміз",
+      act_call_title: "Комиссарды шақыру", act_call_desc: "Оқиға орнына келеді, құжаттарды толтырады",
+      act_euro_title: "Комиссарсыз еуропротокол", act_euro_desc: "Өзіңіз құжат толтырыңыз",
+      act_112_title: "Жедел қызметтерді шақыру", act_112_desc: "Бірыңғай нөмір — 112",
+      act_recs_title: "Апат бойынша ұсыныстар", act_recs_desc: "Қадамдық нұсқаулық",
+      act_support_title: "Қолдау және шағымдар", act_support_desc: "Бізбен байланысыңыз",
+      tip_title: "⚡ Кеңес:", tip_text: "2025 жылдан бастап еуропротокол лимиті 200 000 ₽.",
+      recs_title: "Апат кезінде не істеу керек", recs_sub: "Қадамдық нұсқаулық",
+      rec1_t: "Тоқтаңыз және көлікті жылжытпаңыз", rec1_d: "Дереу тоқтаңыз, қозғалтқышты өшіріңіз.",
+      rec2_t: "Авариялық тоқтау белгісін қойыңыз", rec2_d: "Қалада — 15 м, сыртында — 30 м.",
+      rec3_t: "Жарақат алғандарды тексеріңіз", rec3_d: "Жаралы болса — 103 және 102 шақырыңыз.",
+      rec4_t: "Жол полициясын шақырыңыз", rec4_d: "Жарақат, 3+ қатысушы болса міндетті.",
+      rec5_t: "Фото және видео түсіріңіз", rec5_d: "Жалпы көрініс, зақым, нөмірлер.",
+      rec6_t: "Куәгерлерді жазыңыз", rec6_d: "Аты-жөні және байланыс.",
+      rec7_t: "Еуропротоколды толтырыңыз", rec7_d: "Сақтандыруға 5 жұмыс күні ішінде.",
+      rec8_t: "Оқиға орнынан кетпеңіз", rec8_d: "Кету — құқықтан айыру.",
+      rec9_t: "Сақтандыруға хабарлаңыз", rec9_d: "5 жұмыс күні ішінде.",
+      rec10_t: "Тексеруге дейін жөндеуге болмайды", rec10_d: "15 күнтізбелік күн.",
+      rec_warn_t: "🚫 Мүлдем болмайды:", rec_warn_d: "• Алкоголь ішу<br>• Орыннан кету<br>• Бос бланкілерге қол қою",
+      support_title: "Қолдау", support_sub: "Бізбен байланысыңыз",
+      sup_write: "📧 Бізге жазыңыз", sup_write_sub: "24 сағат ішінде жауап береміз",
+      sup_complaint: "🚨 Комиссарға шағым", sup_complaint_sub: "Не болғанын айтыңыз.",
+      btn_complaint: "Шағым жіберу", sup_faq: "💬 Жиі қойылатын сұрақтар",
+      faq1_q: "Комиссар қанша тұрады?", faq1_a: "2 500 ₽ бастап. Нақты баға растау алдында көрсетіледі.",
+      faq2_q: "Полициясыз бола ма?", faq2_a: "Иә, егер жарақат алғандар болмаса.",
+      faq3_q: "Қалай төлеу керек?", faq3_a: "Карта, СБП немесе ЮMoney.",
+      faq4_q: "Деректерім туралы?", faq4_a: "152-ФЗ бойынша.",
+      sup_emergency: "🆘 Жедел қызметтер", sup_emergency_sub: "Өмірге қауіп төнсе — қоңырау шалыңыз",
+      copy: "📋 Көшіру",
+      lk_title: "Жеке кабинет", lk_greeting: "Қош келдіңіз!",
+      lk_calls: "Барлық шақырулар", lk_spent: "Жұмсалған", lk_balance: "Баланс",
+      lk_topup: "Балансты толтыру", lk_topup_sub: "Карта немесе СБП",
+      lk_complaint: "Шағым жіберу", lk_complaint_sub: "Комиссар немесе қызмет туралы",
+      lk_settings: "Параметрлер", lk_settings_sub: "Профиль, тіл, хабарламалар",
+      lk_support: "Қолдау", lk_support_sub: "FAQ және байланыстар",
+      lk_docs: "Менің құжаттарым", lk_docs_empty: "📭 Құжаттар жоқ",
+      btn_logout: "Шығу",
+      call_header: "Комиссар шақыру", btn_cancel: "Болдырмау",
+      call_searching: "Комиссар ізделуде...", call_searching_sub: "Әдетте 1–2 минут",
+      call_type: "Апат түрі:", call_addr: "Мекенжай:", call_comment: "Түсініктеме:",
+      btn_emergency: "Жедел көмек — 112", btn_chat: "💬 Чат", btn_support: "📞 Қолдау",
+      notes_title: "📋 Келесі қадамдар:", notes_text: "• Орыннан кетпеңіз<br>• Зақымды түсіріңіз<br>• Куәгерлерді жазыңыз",
+      modal_call_title: "Комиссар шақыру",
+      field_dtp_type: "Апат түрі", field_address: "Мекенжай", field_comment: "Түсініктеме (міндетті емес)",
+      field_photos: "Фотосуреттер (5-ке дейін, міндетті емес)",
+      dtp_simple: "2 көлік, жарақатсыз", dtp_complex: "Күрделі (3+ қатысушы)",
+      dtp_solo: "Бір қатысушы", dtp_parking: "Тұрақ / аула",
+      cost: "Құны:", payment_before: "Төлем:", payment_before_val: "комиссар келгенге дейін",
+      arrival: "Келу:", minutes: "минут", btn_call: "Шақыру",
+      euro_title: "📋 Еуропротокол", euro_sub: "Өрістерді толтырыңыз — құжатты жасаймыз.",
+      euro_generate: "Құжатты жасау", euro_demo: "Демо-деректер",
+      euro_date: "Апат күні мен уақыты", euro_location: "Апат орны", euro_count: "Қатысушылар саны",
+      euro_driver_a: "Жүргізуші A (сіз)", euro_driver_b: "Жүргізуші B (екінші қатысушы)",
+      field_fio: "Аты-жөні", field_license: "Жүргізуші куәлігі", field_sts: "СТС",
+      field_car: "Маркасы мен моделі", field_gosnomer: "Мемлекеттік нөмір", field_osago: "ОСАГО полисі",
+      field_damage_a: "Сіздің көлігіңіздің зақымы", field_damage_b: "B көлігінің зақымы",
+      euro_circumstances: "Апат жағдайлары",
+      btn_close: "Жабу", btn_print: "🖨 Басып шығару", btn_pdf: "📄 PDF жүктеу", btn_save: "💾 Сақтау",
+      complaint_title: "🚨 Комиссарға шағым", complaint_sub: "Не болғанын айтыңыз.",
+      complaint_comm_name: "Комиссар аты", complaint_date: "Шақыру күні",
+      complaint_type: "Мәселе түрі",
+      complaint_t1: "Кешікті / келмеді", complaint_t2: "Дөрекі қарым-қатынас",
+      complaint_t3: "Құжаттардағы қателер", complaint_t4: "Қызметтерді таңу", complaint_t5: "Басқа",
+      complaint_desc: "Толықтықтар", btn_send: "Жіберу",
+      payment_title: "💳 Балансты толтыру", payment_amount: "Сома", payment_method: "Төлем әдісі",
+      pay_card: "Карта", pay_sbp: "СБП", payment_commission: "Комиссия", payment_total: "Барлығы", btn_pay: "Төлеу",
+      settings_title: "⚙️ Параметрлер", settings_lang: "Интерфейс тілі", settings_notif: "Хабарламалар",
+      settings_notif_all: "Барлығы", settings_notif_imp: "Тек маңызды", settings_notif_none: "Өшіру", btn_done: "Дайын",
+      notif_title: "🔔 Хабарламалар",
+      notif1_t: "Еуропротокол лимиттері жаңартылды", notif1_d: "2025 жылдан лимиттер өсті.", notif1_time: "2 күн бұрын",
+      notif2_t: "АварКомға қош келдіңіз", notif2_d: "Бізді таңдағаныңызға рахмет.", notif2_time: "жаңа ғана",
+      btn_ok: "Түсінікті",
+      rating_title: "Комиссарды бағалаңыз", rating_sub: "Қалай өтті?", btn_skip: "Өткізіп жіберу",
+      chat_dev: "Чат (әзірленуде)"
+    },
+    uk: {
+      app_name: "АварКом", auth_sub: "Аварійний комісар онлайн",
+      tab_login: "Вхід", tab_register: "Реєстрація",
+      field_phone: "Телефон", field_pass: "Пароль", field_name: "Ім'я",
+      btn_login: "Увійти", btn_register: "Створити акаунт",
+      nav_home: "Головна", nav_recs: "Рекомендації", nav_support: "Підтримка",
+      home_title: "Що сталося?", home_sub: "Оберіть дію — ми допоможемо",
+      act_call_title: "Викликати комісара", act_call_desc: "Приїде на місце ДТП, оформить документи",
+      act_euro_title: "Європротокол без комісара", act_euro_desc: "Оформіть ДТП самостійно",
+      act_112_title: "Викликати спецслужби", act_112_desc: "Єдиний номер — 112",
+      act_recs_title: "Рекомендації при ДТП", act_recs_desc: "Покрокова інструкція",
+      act_support_title: "Підтримка та скарги", act_support_desc: "Зв'яжіться з нами",
+      tip_title: "⚡ Порада:", tip_text: "з 2025 року ліміт європротоколу — 200 000 ₽.",
+      recs_title: "Що робити при ДТП", recs_sub: "Покрокова інструкція",
+      rec1_t: "Зупиніться і не рухайте авто", rec1_d: "Негайно зупиніться, вимкніть двигун.",
+      rec2_t: "Виставте знак аварійної зупинки", rec2_d: "У населеному пункті — 15 м, поза — 30 м.",
+      rec3_t: "Перевірте, чи є постраждалі", rec3_d: "Якщо є поранені — викличте 103 та 102.",
+      rec4_t: "Викличте ДАІ", rec4_d: "Обов'язково при постраждалих і розбіжностях.",
+      rec5_t: "Зафіксуйте фото та відео", rec5_d: "Загальний план, пошкодження, номери.",
+      rec6_t: "Запишіть свідків", rec6_d: "ПІБ і контакти.",
+      rec7_t: "Оформіть європротокол", rec7_d: "До страхової — 5 робочих днів.",
+      rec8_t: "Не залишайте місце ДТП", rec8_d: "Залишення — позбавлення прав.",
+      rec9_t: "Повідомте страхову", rec9_d: "5 робочих днів.",
+      rec10_t: "Не ремонтуйте до огляду", rec10_d: "15 календарних днів.",
+      rec_warn_t: "🚫 Категорично не можна:", rec_warn_d: "• Вживати алкоголь<br>• Залишати місце<br>• Підписувати пусті бланки",
+      support_title: "Підтримка", support_sub: "Зв'яжіться з нами",
+      sup_write: "📧 Написати нам", sup_write_sub: "Відповідаємо протягом 24 годин",
+      sup_complaint: "🚨 Скарга на комісара", sup_complaint_sub: "Розкажіть, що сталося.",
+      btn_complaint: "Подати скаргу", sup_faq: "💬 Часті питання",
+      faq1_q: "Скільки коштує виклик?", faq1_a: "Від 2 500 ₽.",
+      faq2_q: "Чи можна без ДАІ?", faq2_a: "Так, якщо немає постраждалих.",
+      faq3_q: "Як оплатити?", faq3_a: "Карткою, СБП або ЮMoney.",
+      faq4_q: "Що з моїми даними?", faq4_a: "Все за 152-ФЗ.",
+      sup_emergency: "🆘 Екстрені служби", sup_emergency_sub: "Якщо загрожує життю — телефонуйте",
+      copy: "📋 Копіювати",
+      lk_title: "Особистий кабінет", lk_greeting: "Ласкаво просимо!",
+      lk_calls: "Всього викликів", lk_spent: "Витрачено", lk_balance: "Баланс",
+      lk_topup: "Поповнити баланс", lk_topup_sub: "Картка або СБП",
+      lk_complaint: "Подати скаргу", lk_complaint_sub: "На комісара або сервіс",
+      lk_settings: "Налаштування", lk_settings_sub: "Профіль, мова, сповіщення",
+      lk_support: "Підтримка", lk_support_sub: "FAQ і контакти",
+      lk_docs: "Мої документи", lk_docs_empty: "📭 Документів немає",
+      btn_logout: "Вийти",
+      call_header: "Виклик комісара", btn_cancel: "Скасувати",
+      call_searching: "Шукаємо комісара...", call_searching_sub: "Зазвичай 1–2 хвилини",
+      call_type: "Тип ДТП:", call_addr: "Адреса:", call_comment: "Коментар:",
+      btn_emergency: "Екстрена допомога — 112", btn_chat: "💬 Чат", btn_support: "📞 Підтримка",
+      notes_title: "📋 Що далі:", notes_text: "• Не залишайте місце<br>• Сфотографуйте<br>• Запишіть свідків",
+      modal_call_title: "Виклик комісара",
+      field_dtp_type: "Тип ДТП", field_address: "Адреса", field_comment: "Коментар (необов'язково)",
+      field_photos: "Фото (до 5 штук, необов'язково)",
+      dtp_simple: "2 авто, без постраждалих", dtp_complex: "Складне (3+ учасники)",
+      dtp_solo: "Один учасник", dtp_parking: "Парковка / двір",
+      cost: "Вартість:", payment_before: "Оплата:", payment_before_val: "до прибуття",
+      arrival: "Прибуття:", minutes: "хвилин", btn_call: "Викликати",
+      euro_title: "📋 Європротокол", euro_sub: "Заповніть поля — сформуємо документ.",
+      euro_generate: "Сформувати документ", euro_demo: "Демо-дані",
+      euro_date: "Дата і час ДТП", euro_location: "Місце ДТП", euro_count: "Кількість учасників",
+      euro_driver_a: "Водій A (ви)", euro_driver_b: "Водій B (другий учасник)",
+      field_fio: "ПІБ", field_license: "Посвідчення водія", field_sts: "СТС",
+      field_car: "Марка і модель", field_gosnomer: "Держ. номер", field_osago: "Поліс ОСЦПВ",
+      field_damage_a: "Пошкодження вашого авто", field_damage_b: "Пошкодження авто B",
+      euro_circumstances: "Обставини ДТП",
+      btn_close: "Закрити", btn_print: "🖨 Друк", btn_pdf: "📄 Завантажити PDF", btn_save: "💾 Зберегти",
+      complaint_title: "🚨 Скарга на комісара", complaint_sub: "Розкажіть, що сталося.",
+      complaint_comm_name: "Ім'я комісара", complaint_date: "Дата виклику",
+      complaint_type: "Тип проблеми",
+      complaint_t1: "Запізнився / не приїхав", complaint_t2: "Грубощі",
+      complaint_t3: "Помилки в документах", complaint_t4: "Нав'язував послуги", complaint_t5: "Інше",
+      complaint_desc: "Деталі", btn_send: "Надіслати",
+      payment_title: "💳 Поповнення балансу", payment_amount: "Сума", payment_method: "Спосіб оплати",
+      pay_card: "Картка", pay_sbp: "СБП", payment_commission: "Комісія", payment_total: "Разом", btn_pay: "Оплатити",
+      settings_title: "⚙️ Налаштування", settings_lang: "Мова інтерфейсу", settings_notif: "Сповіщення",
+      settings_notif_all: "Всі", settings_notif_imp: "Тільки важливі", settings_notif_none: "Вимкнути", btn_done: "Готово",
+      notif_title: "🔔 Сповіщення",
+      notif1_t: "Оновлення лімітів", notif1_d: "З 2025 року ліміти збільшено.", notif1_time: "2 дні тому",
+      notif2_t: "Ласкаво просимо", notif2_d: "Дякуємо, що обрали нас.", notif2_time: "щойно",
+      btn_ok: "Зрозуміло",
+      rating_title: "Оцініть комісара", rating_sub: "Як все пройшло?", btn_skip: "Пропустити",
+      chat_dev: "Чат (у розробці)"
+    },
+    de: {
+      app_name: "AvarKom", auth_sub: "Unfall-Kommissar online",
+      tab_login: "Anmelden", tab_register: "Registrieren",
+      field_phone: "Telefon", field_pass: "Passwort", field_name: "Name",
+      btn_login: "Anmelden", btn_register: "Konto erstellen",
+      nav_home: "Startseite", nav_recs: "Empfehlungen", nav_support: "Support",
+      home_title: "Was ist passiert?", home_sub: "Wählen Sie eine Aktion — wir helfen",
+      act_call_title: "Kommissar rufen", act_call_desc: "Kommt zum Unfallort, füllt Dokumente aus",
+      act_euro_title: "Europrotokoll ohne Kommissar", act_euro_desc: "Füllen Sie den Unfall selbst aus",
+      act_112_title: "Notdienste rufen", act_112_desc: "Einheitliche Notrufnummer — 112",
+      act_recs_title: "Unfall-Empfehlungen", act_recs_desc: "Schritt-für-Schritt-Anleitung",
+      act_support_title: "Support und Beschwerden", act_support_desc: "Kontaktieren Sie uns",
+      tip_title: "⚡ Tipp:", tip_text: "seit 2025 beträgt das Europrotokoll-Limit 200.000 ₽.",
+      recs_title: "Was bei einem Unfall zu tun ist", recs_sub: "Schritt-für-Schritt-Anleitung",
+      rec1_t: "Anhalten und das Auto nicht bewegen", rec1_d: "Sofort anhalten, Motor aus, Warnblinker an.",
+      rec2_t: "Warndreieck aufstellen", rec2_d: "In der Stadt — 15 m, außerorts — 30 m.",
+      rec3_t: "Verletzte prüfen", rec3_d: "Bei Verletzten — 103 und 102 rufen.",
+      rec4_t: "Polizei rufen, wenn nötig", rec4_d: "Pflicht bei Verletzten, 3+ Beteiligten, Streit.",
+      rec5_t: "Fotos und Videos machen", rec5_d: "Gesamtansicht, Schäden, Kennzeichen.",
+      rec6_t: "Zeugen notieren", rec6_d: "Namen und Kontakte.",
+      rec7_t: "Europrotokoll ausfüllen", rec7_d: "Innerhalb von 5 Werktagen an die Versicherung.",
+      rec8_t: "Unfallort nicht verlassen", rec8_d: "Verlassen — Führerscheinentzug.",
+      rec9_t: "Versicherung informieren", rec9_d: "Innerhalb von 5 Werktagen.",
+      rec10_t: "Nicht vor der Inspektion reparieren", rec10_d: "15 Kalendertage.",
+      rec_warn_t: "🚫 Niemals:", rec_warn_d: "• Alkohol trinken<br>• Ort verlassen<br>• Leere Formulare unterschreiben",
+      support_title: "Support", support_sub: "Kontaktieren Sie uns",
+      sup_write: "📧 Schreiben Sie uns", sup_write_sub: "Wir antworten innerhalb von 24 Stunden",
+      sup_complaint: "🚨 Beschwerde über Kommissar", sup_complaint_sub: "Erzählen Sie uns, was passiert ist.",
+      btn_complaint: "Beschwerde einreichen", sup_faq: "💬 FAQ",
+      faq1_q: "Wie viel kostet ein Kommissar?", faq1_a: "Ab 2.500 ₽.",
+      faq2_q: "Kann ich ohne Polizei?", faq2_a: "Ja, wenn niemand verletzt ist.",
+      faq3_q: "Wie bezahlen?", faq3_a: "Karte, SBP oder YuMoney.",
+      faq4_q: "Was ist mit meinen Daten?", faq4_a: "Alles nach 152-FZ.",
+      sup_emergency: "🆘 Notdienste", sup_emergency_sub: "Bei Lebensgefahr — direkt anrufen",
+      copy: "📋 Kopieren",
+      lk_title: "Dashboard", lk_greeting: "Willkommen!",
+      lk_calls: "Anrufe insgesamt", lk_spent: "Ausgegeben", lk_balance: "Guthaben",
+      lk_topup: "Guthaben aufladen", lk_topup_sub: "Karte oder SBP",
+      lk_complaint: "Beschwerde einreichen", lk_complaint_sub: "Über Kommissar oder Service",
+      lk_settings: "Einstellungen", lk_settings_sub: "Profil, Sprache, Benachrichtigungen",
+      lk_support: "Support", lk_support_sub: "FAQ und Kontakte",
+      lk_docs: "Meine Dokumente", lk_docs_empty: "📭 Noch keine Dokumente",
+      btn_logout: "Abmelden",
+      call_header: "Kommissar rufen", btn_cancel: "Abbrechen",
+      call_searching: "Kommissar wird gesucht...", call_searching_sub: "Dauert normalerweise 1–2 Minuten",
+      call_type: "Unfalltyp:", call_addr: "Adresse:", call_comment: "Kommentar:",
+      btn_emergency: "Notfall — 112", btn_chat: "💬 Chat", btn_support: "📞 Support",
+      notes_title: "📋 Was kommt als Nächstes:", notes_text: "• Unfallort nicht verlassen<br>• Fotos machen<br>• Zeugen notieren",
+      modal_call_title: "Kommissar rufen",
+      field_dtp_type: "Unfalltyp", field_address: "Adresse", field_comment: "Kommentar (optional)",
+      field_photos: "Fotos (bis zu 5, optional)",
+      dtp_simple: "2 Autos, keine Verletzten", dtp_complex: "Komplex (3+ Beteiligte)",
+      dtp_solo: "Ein Beteiligter", dtp_parking: "Parkplatz / Hof",
+      cost: "Kosten:", payment_before: "Zahlung:", payment_before_val: "vor Ankunft",
+      arrival: "Ankunft:", minutes: "Minuten", btn_call: "Rufen",
+      euro_title: "📋 Europrotokoll", euro_sub: "Füllen Sie die Felder aus — wir erstellen das Dokument.",
+      euro_generate: "Dokument erstellen", euro_demo: "Demo-Daten",
+      euro_date: "Datum und Uhrzeit", euro_location: "Unfallort", euro_count: "Anzahl der Beteiligten",
+      euro_driver_a: "Fahrer A (Sie)", euro_driver_b: "Fahrer B (zweiter Beteiligter)",
+      field_fio: "Vollständiger Name", field_license: "Führerschein", field_sts: "Fahrzeugschein",
+      field_car: "Marke und Modell", field_gosnomer: "Kennzeichen", field_osago: "OSAGO-Police",
+      field_damage_a: "Schaden an Ihrem Auto", field_damage_b: "Schaden an Auto B",
+      euro_circumstances: "Unfallumstände",
+      btn_close: "Schließen", btn_print: "🖨 Drucken", btn_pdf: "📄 PDF herunterladen", btn_save: "💾 Speichern",
+      complaint_title: "🚨 Beschwerde über Kommissar", complaint_sub: "Erzählen Sie uns, was passiert ist.",
+      complaint_comm_name: "Name des Kommissars", complaint_date: "Anrufdatum",
+      complaint_type: "Problemtyp",
+      complaint_t1: "Verspätet / nicht gekommen", complaint_t2: "Unhöflichkeit",
+      complaint_t3: "Fehler in Dokumenten", complaint_t4: "Aufgedrängte Dienste", complaint_t5: "Andere",
+      complaint_desc: "Details", btn_send: "Senden",
+      payment_title: "💳 Guthaben aufladen", payment_amount: "Betrag", payment_method: "Zahlungsmethode",
+      pay_card: "Karte", pay_sbp: "SBP", payment_commission: "Provision", payment_total: "Gesamt", btn_pay: "Bezahlen",
+      settings_title: "⚙️ Einstellungen", settings_lang: "Sprache", settings_notif: "Benachrichtigungen",
+      settings_notif_all: "Alle", settings_notif_imp: "Nur wichtige", settings_notif_none: "Deaktivieren", btn_done: "Fertig",
+      notif_title: "🔔 Benachrichtigungen",
+      notif1_t: "Limits aktualisiert", notif1_d: "Seit 2025 wurden die Limits erhöht.", notif1_time: "vor 2 Tagen",
+      notif2_t: "Willkommen bei AvarKom", notif2_d: "Danke, dass Sie uns gewählt haben.", notif2_time: "gerade jetzt",
+      btn_ok: "Verstanden",
+      rating_title: "Kommissar bewerten", rating_sub: "Wie lief es?", btn_skip: "Überspringen",
+      chat_dev: "Chat (in Entwicklung)"
+    },
+    fr: {
+      app_name: "AvarKom", auth_sub: "Commissaire d'accident en ligne",
+      tab_login: "Connexion", tab_register: "Inscription",
+      field_phone: "Téléphone", field_pass: "Mot de passe", field_name: "Nom",
+      btn_login: "Se connecter", btn_register: "Créer un compte",
+      nav_home: "Accueil", nav_recs: "Recommandations", nav_support: "Support",
+      home_title: "Que s'est-il passé ?", home_sub: "Choisissez une action — nous vous aiderons",
+      act_call_title: "Appeler un commissaire", act_call_desc: "Vient sur les lieux, remplit les documents",
+      act_euro_title: "Europrotocole sans commissaire", act_euro_desc: "Remplissez l'accident vous-même",
+      act_112_title: "Appeler les services d'urgence", act_112_desc: "Numéro d'urgence unique — 112",
+      act_recs_title: "Recommandations en cas d'accident", act_recs_desc: "Instructions étape par étape",
+      act_support_title: "Support et plaintes", act_support_desc: "Contactez-nous",
+      tip_title: "⚡ Astuce :", tip_text: "depuis 2025, la limite de l'europrotocole est de 200 000 ₽.",
+      recs_title: "Que faire en cas d'accident", recs_sub: "Instructions étape par étape",
+      rec1_t: "Arrêtez-vous et ne bougez pas la voiture", rec1_d: "Arrêtez immédiatement, coupez le moteur.",
+      rec2_t: "Placez le triangle de signalisation", rec2_d: "En ville — 15 m, hors — 30 m.",
+      rec3_t: "Vérifiez s'il y a des blessés", rec3_d: "Si blessés — appelez 103 et 102.",
+      rec4_t: "Appelez la police si nécessaire", rec4_d: "Obligatoire en cas de blessés, 3+ participants, désaccords.",
+      rec5_t: "Prenez des photos et vidéos", rec5_d: "Vue générale, dégâts, plaques.",
+      rec6_t: "Notez les témoins", rec6_d: "Noms et contacts.",
+      rec7_t: "Remplissez l'europrotocole", rec7_d: "À l'assurance sous 5 jours ouvrables.",
+      rec8_t: "Ne quittez pas les lieux", rec8_d: "Quitter — suspension du permis.",
+      rec9_t: "Informez votre assurance", rec9_d: "Sous 5 jours ouvrables.",
+      rec10_t: "Ne réparez pas avant l'inspection", rec10_d: "15 jours calendaires.",
+      rec_warn_t: "🚫 Jamais :", rec_warn_d: "• Boire de l'alcool<br>• Quitter les lieux<br>• Signer des documents vierges",
+      support_title: "Support", support_sub: "Contactez-nous",
+      sup_write: "📧 Écrivez-nous", sup_write_sub: "Nous répondons sous 24 heures",
+      sup_complaint: "🚨 Plainte contre un commissaire", sup_complaint_sub: "Dites-nous ce qui s'est passé.",
+      btn_complaint: "Déposer une plainte", sup_faq: "💬 FAQ",
+      faq1_q: "Combien coûte un commissaire ?", faq1_a: "À partir de 2 500 ₽.",
+      faq2_q: "Puis-je le faire sans police ?", faq2_a: "Oui, s'il n'y a pas de blessés.",
+      faq3_q: "Comment payer ?", faq3_a: "Carte, SBP ou YuMoney.",
+      faq4_q: "Et mes données ?", faq4_a: "Tout selon 152-FZ.",
+      sup_emergency: "🆘 Services d'urgence", sup_emergency_sub: "Si la vie est en danger — appelez directement",
+      copy: "📋 Copier",
+      lk_title: "Tableau de bord", lk_greeting: "Bienvenue !",
+      lk_calls: "Total des appels", lk_spent: "Dépensé", lk_balance: "Solde",
+      lk_topup: "Recharger le solde", lk_topup_sub: "Carte ou SBP",
+      lk_complaint: "Déposer une plainte", lk_complaint_sub: "Contre un commissaire ou le service",
+      lk_settings: "Paramètres", lk_settings_sub: "Profil, langue, notifications",
+      lk_support: "Support", lk_support_sub: "FAQ et contacts",
+      lk_docs: "Mes documents", lk_docs_empty: "📭 Aucun document",
+      btn_logout: "Se déconnecter",
+      call_header: "Appel du commissaire", btn_cancel: "Annuler",
+      call_searching: "Recherche d'un commissaire...", call_searching_sub: "Prend généralement 1 à 2 minutes",
+      call_type: "Type d'accident :", call_addr: "Adresse :", call_comment: "Commentaire :",
+      btn_emergency: "Urgence — 112", btn_chat: "💬 Chat", btn_support: "📞 Support",
+      notes_title: "📋 Et ensuite :", notes_text: "• Ne quittez pas les lieux<br>• Photographiez<br>• Notez les témoins",
+      modal_call_title: "Appeler un commissaire",
+      field_dtp_type: "Type d'accident", field_address: "Adresse", field_comment: "Commentaire (facultatif)",
+      field_photos: "Photos (jusqu'à 5, facultatif)",
+      dtp_simple: "2 voitures, sans blessés", dtp_complex: "Complexe (3+ participants)",
+      dtp_solo: "Un participant", dtp_parking: "Parking / cour",
+      cost: "Coût :", payment_before: "Paiement :", payment_before_val: "avant l'arrivée",
+      arrival: "Arrivée :", minutes: "minutes", btn_call: "Appeler",
+      euro_title: "📋 Europrotocole", euro_sub: "Remplissez les champs — nous générerons le document.",
+      euro_generate: "Générer le document", euro_demo: "Données démo",
+      euro_date: "Date et heure", euro_location: "Lieu de l'accident", euro_count: "Nombre de participants",
+      euro_driver_a: "Conducteur A (vous)", euro_driver_b: "Conducteur B (deuxième participant)",
+      field_fio: "Nom complet", field_license: "Permis de conduire", field_sts: "Carte grise",
+      field_car: "Marque et modèle", field_gosnomer: "Plaque d'immatriculation", field_osago: "Police OSAGO",
+      field_damage_a: "Dégâts sur votre voiture", field_damage_b: "Dégâts sur la voiture B",
+      euro_circumstances: "Circonstances de l'accident",
+      btn_close: "Fermer", btn_print: "🖨 Imprimer", btn_pdf: "📄 Télécharger PDF", btn_save: "💾 Enregistrer",
+      complaint_title: "🚨 Plainte contre un commissaire", complaint_sub: "Dites-nous ce qui s'est passé.",
+      complaint_comm_name: "Nom du commissaire", complaint_date: "Date de l'appel",
+      complaint_type: "Type de problème",
+      complaint_t1: "En retard / pas venu", complaint_t2: "Communication grossière",
+      complaint_t3: "Erreurs dans les documents", complaint_t4: "Services imposés", complaint_t5: "Autre",
+      complaint_desc: "Détails", btn_send: "Envoyer",
+      payment_title: "💳 Recharger le solde", payment_amount: "Montant", payment_method: "Mode de paiement",
+      pay_card: "Carte", pay_sbp: "SBP", payment_commission: "Commission", payment_total: "Total", btn_pay: "Payer",
+      settings_title: "⚙️ Paramètres", settings_lang: "Langue", settings_notif: "Notifications",
+      settings_notif_all: "Toutes", settings_notif_imp: "Importantes uniquement", settings_notif_none: "Désactiver", btn_done: "Terminé",
+      notif_title: "🔔 Notifications",
+      notif1_t: "Mise à jour des limites", notif1_d: "Depuis 2025, les limites ont été augmentées.", notif1_time: "il y a 2 jours",
+      notif2_t: "Bienvenue chez AvarKom", notif2_d: "Merci de nous avoir choisis.", notif2_time: "à l'instant",
+      btn_ok: "Compris",
+      rating_title: "Évaluer le commissaire", rating_sub: "Comment cela s'est-il passé ?", btn_skip: "Passer",
+      chat_dev: "Chat (en développement)"
+    },
+    es: {
+      app_name: "AvarKom", auth_sub: "Comisario de accidentes en línea",
+      tab_login: "Iniciar sesión", tab_register: "Registrarse",
+      field_phone: "Teléfono", field_pass: "Contraseña", field_name: "Nombre",
+      btn_login: "Entrar", btn_register: "Crear cuenta",
+      nav_home: "Inicio", nav_recs: "Recomendaciones", nav_support: "Soporte",
+      home_title: "¿Qué pasó?", home_sub: "Elija una acción — le ayudaremos",
+      act_call_title: "Llamar a un comisario", act_call_desc: "Llega al lugar, rellena documentos",
+      act_euro_title: "Europrotocolo sin comisario", act_euro_desc: "Rellene el accidente usted mismo",
+      act_112_title: "Llamar a servicios de emergencia", act_112_desc: "Número único — 112",
+      act_recs_title: "Recomendaciones en accidente", act_recs_desc: "Instrucciones paso a paso",
+      act_support_title: "Soporte y quejas", act_support_desc: "Contáctenos",
+      tip_title: "⚡ Consejo:", tip_text: "desde 2025 el límite del europrotocolo es 200 000 ₽.",
+      recs_title: "Qué hacer en un accidente", recs_sub: "Instrucciones paso a paso",
+      rec1_t: "Deténgase y no mueva el coche", rec1_d: "Deténgase inmediatamente, apague el motor.",
+      rec2_t: "Coloque el triángulo de advertencia", rec2_d: "En ciudad — 15 m, fuera — 30 m.",
+      rec3_t: "Compruebe si hay heridos", rec3_d: "Si hay heridos — llame al 103 y 102.",
+      rec4_t: "Llame a la policía si es necesario", rec4_d: "Obligatorio si hay heridos, 3+ participantes, desacuerdos.",
+      rec5_t: "Tome fotos y vídeos", rec5_d: "Vista general, daños, matrículas.",
+      rec6_t: "Anote testigos", rec6_d: "Nombres y contactos.",
+      rec7_t: "Rellene el europrotocolo", rec7_d: "Al seguro en 5 días laborables.",
+      rec8_t: "No abandone el lugar", rec8_d: "Abandonar — suspensión del carné.",
+      rec9_t: "Informe a su seguro", rec9_d: "En 5 días laborables.",
+      rec10_t: "No repare antes de la inspección", rec10_d: "15 días naturales.",
+      rec_warn_t: "🚫 Nunca:", rec_warn_d: "• Beber alcohol<br>• Abandonar el lugar<br>• Firmar documentos en blanco",
+      support_title: "Soporte", support_sub: "Contáctenos",
+      sup_write: "📧 Escríbanos", sup_write_sub: "Respondemos en 24 horas",
+      sup_complaint: "🚨 Queja sobre el comisario", sup_complaint_sub: "Cuéntenos qué pasó.",
+      btn_complaint: "Presentar queja", sup_faq: "💬 Preguntas frecuentes",
+      faq1_q: "¿Cuánto cuesta un comisario?", faq1_a: "Desde 2 500 ₽.",
+      faq2_q: "¿Puedo sin policía?", faq2_a: "Sí, si no hay heridos.",
+      faq3_q: "¿Cómo pagar?", faq3_a: "Tarjeta, SBP o YuMoney.",
+      faq4_q: "¿Y mis datos?", faq4_a: "Todo según 152-FZ.",
+      sup_emergency: "🆘 Servicios de emergencia", sup_emergency_sub: "Si la vida está en peligro — llame directamente",
+      copy: "📋 Copiar",
+      lk_title: "Panel", lk_greeting: "¡Bienvenido!",
+      lk_calls: "Total de llamadas", lk_spent: "Gastado", lk_balance: "Saldo",
+      lk_topup: "Recargar saldo", lk_topup_sub: "Tarjeta o SBP",
+      lk_complaint: "Presentar queja", lk_complaint_sub: "Sobre comisario o servicio",
+      lk_settings: "Ajustes", lk_settings_sub: "Perfil, idioma, notificaciones",
+      lk_support: "Soporte", lk_support_sub: "FAQ y contactos",
+      lk_docs: "Mis documentos", lk_docs_empty: "📭 Sin documentos",
+      btn_logout: "Cerrar sesión",
+      call_header: "Llamada al comisario", btn_cancel: "Cancelar",
+      call_searching: "Buscando comisario...", call_searching_sub: "Suele tardar 1–2 minutos",
+      call_type: "Tipo de accidente:", call_addr: "Dirección:", call_comment: "Comentario:",
+      btn_emergency: "Emergencia — 112", btn_chat: "💬 Chat", btn_support: "📞 Soporte",
+      notes_title: "📋 Qué sigue:", notes_text: "• No abandone el lugar<br>• Fotografíe<br>• Anote testigos",
+      modal_call_title: "Llamar al comisario",
+      field_dtp_type: "Tipo de accidente", field_address: "Dirección", field_comment: "Comentario (opcional)",
+      field_photos: "Fotos (hasta 5, opcional)",
+      dtp_simple: "2 coches, sin heridos", dtp_complex: "Complejo (3+ participantes)",
+      dtp_solo: "Un participante", dtp_parking: "Aparcamiento / patio",
+      cost: "Coste:", payment_before: "Pago:", payment_before_val: "antes de la llegada",
+      arrival: "Llegada:", minutes: "minutos", btn_call: "Llamar",
+      euro_title: "📋 Europrotocolo", euro_sub: "Rellene los campos — generaremos el documento.",
+      euro_generate: "Generar documento", euro_demo: "Datos demo",
+      euro_date: "Fecha y hora", euro_location: "Lugar del accidente", euro_count: "Número de participantes",
+      euro_driver_a: "Conductor A (usted)", euro_driver_b: "Conductor B (segundo participante)",
+      field_fio: "Nombre completo", field_license: "Permiso de conducir", field_sts: "Permiso de circulación",
+      field_car: "Marca y modelo", field_gosnomer: "Matrícula", field_osago: "Póliza OSAGO",
+      field_damage_a: "Daños en su coche", field_damage_b: "Daños en coche B",
+      euro_circumstances: "Circunstancias del accidente",
+      btn_close: "Cerrar", btn_print: "🖨 Imprimir", btn_pdf: "📄 Descargar PDF", btn_save: "💾 Guardar",
+      complaint_title: "🚨 Queja sobre el comisario", complaint_sub: "Cuéntenos qué pasó.",
+      complaint_comm_name: "Nombre del comisario", complaint_date: "Fecha de llamada",
+      complaint_type: "Tipo de problema",
+      complaint_t1: "Tarde / no vino", complaint_t2: "Trato grosero",
+      complaint_t3: "Errores en documentos", complaint_t4: "Servicios impuestos", complaint_t5: "Otro",
+      complaint_desc: "Detalles", btn_send: "Enviar",
+      payment_title: "💳 Recargar saldo", payment_amount: "Importe", payment_method: "Método de pago",
+      pay_card: "Tarjeta", pay_sbp: "SBP", payment_commission: "Comisión", payment_total: "Total", btn_pay: "Pagar",
+      settings_title: "⚙️ Ajustes", settings_lang: "Idioma", settings_notif: "Notificaciones",
+      settings_notif_all: "Todas", settings_notif_imp: "Solo importantes", settings_notif_none: "Desactivar", btn_done: "Hecho",
+      notif_title: "🔔 Notificaciones",
+      notif1_t: "Límites actualizados", notif1_d: "Desde 2025 los límites se han aumentado.", notif1_time: "hace 2 días",
+      notif2_t: "Bienvenido a AvarKom", notif2_d: "Gracias por elegirnos.", notif2_time: "ahora mismo",
+      btn_ok: "Entendido",
+      rating_title: "Evaluar al comisario", rating_sub: "¿Cómo fue?", btn_skip: "Saltar",
+      chat_dev: "Chat (en desarrollo)"
+    },
+    tr: {
+      app_name: "AvarKom", auth_sub: "Çevrimiçi kaza komiseri",
+      tab_login: "Giriş", tab_register: "Kayıt",
+      field_phone: "Telefon", field_pass: "Şifre", field_name: "Ad",
+      btn_login: "Giriş yap", btn_register: "Hesap oluştur",
+      nav_home: "Ana sayfa", nav_recs: "Tavsiyeler", nav_support: "Destek",
+      home_title: "Ne oldu?", home_sub: "Bir eylem seçin — size yardımcı olacağız",
+      act_call_title: "Komiser çağır", act_call_desc: "Olay yerine gelir, belgeleri doldurur",
+      act_euro_title: "Komisersiz avrupa protokolü", act_euro_desc: "Kazayı kendiniz doldurun",
+      act_112_title: "Acil servisleri çağır", act_112_desc: "Tek acil numara — 112",
+      act_recs_title: "Kaza tavsiyeleri", act_recs_desc: "Adım adım talimatlar",
+      act_support_title: "Destek ve şikayetler", act_support_desc: "Bize ulaşın",
+      tip_title: "⚡ İpucu:", tip_text: "2025'ten itibaren avrupa protokolü limiti 200.000 ₽.",
+      recs_title: "Kazada ne yapmalı", recs_sub: "Adım adım talimatlar",
+      rec1_t: "Durun ve arabayı hareket ettirmeyin", rec1_d: "Hemen durun, motoru kapatın.",
+      rec2_t: "Uyarı üçgenini yerleştirin", rec2_d: "Şehirde — 15 m, dışında — 30 m.",
+      rec3_t: "Yaralı olup olmadığını kontrol edin", rec3_d: "Yaralı varsa — 103 ve 102'yi arayın.",
+      rec4_t: "Gerekirse polisi arayın", rec4_d: "Yaralı, 3+ katılımcı, anlaşmazlık durumunda zorunlu.",
+      rec5_t: "Fotoğraf ve video çekin", rec5_d: "Genel görünüm, hasar, plakalar.",
+      rec6_t: "Tanıkları kaydedin", rec6_d: "İsim ve iletişim.",
+      rec7_t: "Avrupa protokolünü doldurun", rec7_d: "Sigortaya 5 iş günü içinde.",
+      rec8_t: "Olay yerini terk etmeyin", rec8_d: "Terk etme — ehliyetten men.",
+      rec9_t: "Sigortanızı bilgilendirin", rec9_d: "5 iş günü içinde.",
+      rec10_t: "Muayeneden önce tamir etmeyin", rec10_d: "15 takvim günü.",
+      rec_warn_t: "🚫 Asla:", rec_warn_d: "• Alkol almak<br>• Yeri terk etmek<br>• Boş belge imzalamak",
+      support_title: "Destek", support_sub: "Bize ulaşın",
+      sup_write: "📧 Bize yazın", sup_write_sub: "24 saat içinde yanıt veriyoruz",
+      sup_complaint: "🚨 Komiser hakkında şikayet", sup_complaint_sub: "Ne olduğunu anlatın.",
+      btn_complaint: "Şikayet gönder", sup_faq: "💬 SSS",
+      faq1_q: "Komiser ne kadar?", faq1_a: "2.500 ₽'den başlayarak.",
+      faq2_q: "Polissiz olur mu?", faq2_a: "Evet, yaralı yoksa.",
+      faq3_q: "Nasıl ödenir?", faq3_a: "Kart, SBP veya YuMoney.",
+      faq4_q: "Verilerim ne olacak?", faq4_a: "152-FZ'ye göre.",
+      sup_emergency: "🆘 Acil servisler", sup_emergency_sub: "Hayat tehlikedeyse — doğrudan arayın",
+      copy: "📋 Kopyala",
+      lk_title: "Panel", lk_greeting: "Hoş geldiniz!",
+      lk_calls: "Toplam çağrı", lk_spent: "Harcanan", lk_balance: "Bakiye",
+      lk_topup: "Bakiye yükle", lk_topup_sub: "Kart veya SBP",
+      lk_complaint: "Şikayet gönder", lk_complaint_sub: "Komiser veya hizmet hakkında",
+      lk_settings: "Ayarlar", lk_settings_sub: "Profil, dil, bildirimler",
+      lk_support: "Destek", lk_support_sub: "SSS ve iletişim",
+      lk_docs: "Belgelerim", lk_docs_empty: "📭 Belge yok",
+      btn_logout: "Çıkış yap",
+      call_header: "Komiser çağır", btn_cancel: "İptal",
+      call_searching: "Komiser aranıyor...", call_searching_sub: "Genellikle 1–2 dakika",
+      call_type: "Kaza tipi:", call_addr: "Adres:", call_comment: "Yorum:",
+      btn_emergency: "Acil — 112", btn_chat: "💬 Sohbet", btn_support: "📞 Destek",
+      notes_title: "📋 Sırada ne var:", notes_text: "• Yeri terk etmeyin<br>• Fotoğraf çekin<br>• Tanıkları kaydedin",
+      modal_call_title: "Komiser çağır",
+      field_dtp_type: "Kaza tipi", field_address: "Adres", field_comment: "Yorum (isteğe bağlı)",
+      field_photos: "Fotoğraflar (5'e kadar, isteğe bağlı)",
+      dtp_simple: "2 araba, yaralı yok", dtp_complex: "Karmaşık (3+ katılımcı)",
+      dtp_solo: "Tek katılımcı", dtp_parking: "Otopark / avlu",
+      cost: "Maliyet:", payment_before: "Ödeme:", payment_before_val: "komiser gelmeden önce",
+      arrival: "Varış:", minutes: "dakika", btn_call: "Çağır",
+      euro_title: "📋 Avrupa protokolü", euro_sub: "Alanları doldurun — belgeyi oluşturacağız.",
+      euro_generate: "Belge oluştur", euro_demo: "Demo veriler",
+      euro_date: "Tarih ve saat", euro_location: "Kaza yeri", euro_count: "Katılımcı sayısı",
+      euro_driver_a: "Sürücü A (siz)", euro_driver_b: "Sürücü B (ikinci katılımcı)",
+      field_fio: "Tam ad", field_license: "Ehliyet", field_sts: "Araç kayıt belgesi",
+      field_car: "Marka ve model", field_gosnomer: "Plaka", field_osago: "OSAGO poliçesi",
+      field_damage_a: "Aracınızdaki hasar", field_damage_b: "B aracındaki hasar",
+      euro_circumstances: "Kaza koşulları",
+      btn_close: "Kapat", btn_print: "🖨 Yazdır", btn_pdf: "📄 PDF indir", btn_save: "💾 Kaydet",
+      complaint_title: "🚨 Komiser hakkında şikayet", complaint_sub: "Ne olduğunu anlatın.",
+      complaint_comm_name: "Komiser adı", complaint_date: "Çağrı tarihi",
+      complaint_type: "Sorun türü",
+      complaint_t1: "Gecikti / gelmedi", complaint_t2: "Kaba iletişim",
+      complaint_t3: "Belgelerde hatalar", complaint_t4: "Hizmet dayatması", complaint_t5: "Diğer",
+      complaint_desc: "Ayrıntılar", btn_send: "Gönder",
+      payment_title: "💳 Bakiye yükle", payment_amount: "Tutar", payment_method: "Ödeme yöntemi",
+      pay_card: "Kart", pay_sbp: "SBP", payment_commission: "Komisyon", payment_total: "Toplam", btn_pay: "Öde",
+      settings_title: "⚙️ Ayarlar", settings_lang: "Arayüz dili", settings_notif: "Bildirimler",
+      settings_notif_all: "Tümü", settings_notif_imp: "Sadece önemli", settings_notif_none: "Kapat", btn_done: "Tamam",
+      notif_title: "🔔 Bildirimler",
+      notif1_t: "Limitler güncellendi", notif1_d: "2025'ten itibaren limitler artırıldı.", notif1_time: "2 gün önce",
+      notif2_t: "AvarKom'a hoş geldiniz", notif2_d: "Bizi seçtiğiniz için teşekkürler.", notif2_time: "az önce",
+      btn_ok: "Anladım",
+      rating_title: "Komiseri değerlendir", rating_sub: "Nasıl geçti?", btn_skip: "Atla",
+      chat_dev: "Sohbet (geliştiriliyor)"
+    }
+  };
 
-  // ============ SCREENS ============
+  const LANGS = [
+    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'be', name: 'Беларуская', flag: '🇧🇾' },
+    { code: 'uz', name: 'O\'zbekcha', flag: '🇺🇿' },
+    { code: 'kk', name: 'Қазақша', flag: '🇰🇿' },
+    { code: 'uk', name: 'Українська', flag: '🇺🇦' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'tr', name: 'Türkçe', flag: '🇹🇷' }
+  ];
+
+  let currentLang = localStorage.getItem('avarkom_lang') || 'ru';
+  let currentUser = JSON.parse(localStorage.getItem('avarkom_user') || 'null');
+
+  function t(key) {
+    return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) 
+      || (TRANSLATIONS.ru[key]) 
+      || key;
+  }
+  window.t = t;
+
+  function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const translated = t(key);
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = translated;
+      } else if (el.tagName === 'OPTION') {
+        el.textContent = translated;
+      } else {
+        el.innerHTML = translated;
+      }
+    });
+  }
+
+  window.changeLang = function(code) {
+    currentLang = code;
+    localStorage.setItem('avarkom_lang', code);
+    applyTranslations();
+    renderLangDropdowns();
+    closeAllLangDropdowns();
+    const sel = document.getElementById('settingsLang');
+    if (sel) sel.value = code;
+    toast(LANGS.find(l => l.code === code).name);
+  };
+
+  function renderLangDropdowns() {
+    ['langDropdown', 'langDropdown2', 'langDropdown3', 'langDropdown4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = LANGS.map(l => 
+        '<div class="lang-option ' + (l.code === currentLang ? 'active' : '') + '" onclick="changeLang(\'' + l.code + '\')">' +
+          '<span class="lang-flag">' + l.flag + '</span>' +
+          '<span>' + l.name + '</span>' +
+        '</div>'
+      ).join('');
+    });
+
+    // Селект в настройках
+    const sel = document.getElementById('settingsLang');
+    if (sel) {
+      sel.innerHTML = LANGS.map(l => 
+        '<option value="' + l.code + '" ' + (l.code === currentLang ? 'selected' : '') + '>' + l.flag + ' ' + l.name + '</option>'
+      ).join('');
+    }
+  }
+
+  function closeAllLangDropdowns() {
+    document.querySelectorAll('.lang-dropdown').forEach(d => d.classList.remove('active'));
+  }
+
+  window.toggleLangDropdown = function(e) {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const dropdown = btn.parentElement.querySelector('.lang-dropdown');
+    const wasActive = dropdown.classList.contains('active');
+    closeAllLangDropdowns();
+    if (!wasActive) dropdown.classList.add('active');
+  };
+
+  document.addEventListener('click', () => closeAllLangDropdowns());
+
+  // ============================================
+  // SCREENS
+  // ============================================
   window.showScreen = function(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    currentScreen = id;
     window.scrollTo(0, 0);
-
-    // Обновляем активный пункт меню
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.remove('active');
-    });
   };
 
   window.switchAuth = function(tab) {
@@ -1010,12 +2118,15 @@ body {
     }
   };
 
-  // ============ AUTH ============
+  // ============================================
+  // AUTH (с сохранением сессии)
+  // ============================================
   window.doLogin = function() {
     const phone = document.getElementById('loginPhone').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
     if (!phone || !pass) { toast('Заполните все поля'); return; }
-    userName = 'Пользователь';
+    currentUser = { name: 'Пользователь', phone };
+    localStorage.setItem('avarkom_user', JSON.stringify(currentUser));
     updateUserName();
     showScreen('screenHome');
     toast('Добро пожаловать!');
@@ -1028,7 +2139,8 @@ body {
     const pass = document.getElementById('regPass').value.trim();
     if (!name || !phone || !email || !pass) { toast('Заполните все поля'); return; }
     if (pass.length < 6) { toast('Пароль минимум 6 символов'); return; }
-    userName = name;
+    currentUser = { name, phone, email };
+    localStorage.setItem('avarkom_user', JSON.stringify(currentUser));
     updateUserName();
     showScreen('screenHome');
     toast('Аккаунт создан!');
@@ -1036,36 +2148,34 @@ body {
 
   window.doLogout = function() {
     if (!confirm('Выйти из аккаунта?')) return;
+    localStorage.removeItem('avarkom_user');
+    currentUser = null;
     showScreen('screenAuth');
     toast('Вы вышли');
   };
 
   function updateUserName() {
-    const initial = userName.charAt(0).toUpperCase();
+    const name = currentUser ? currentUser.name : 'Александр';
+    const initial = name.charAt(0).toUpperCase();
     ['headerAvatar', 'headerAvatar2', 'headerAvatar3', 'headerAvatar4'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = initial;
     });
     ['headerName', 'headerName2', 'headerName3', 'headerName4'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.textContent = userName;
+      if (el) el.textContent = name;
     });
     const greet = document.getElementById('lkGreeting');
-    if (greet) greet.textContent = 'Привет, ' + userName + '!';
+    if (greet) greet.textContent = t('lk_greeting') + ' ' + name + '!';
   }
 
-  // ============ 112 ============
-  window.call112 = function() {
-    if (confirm('Позвонить в 112?')) {
-      window.location.href = 'tel:112';
-    }
-  };
-
-  // ============ CALL ============
+  // ============================================
+  // CALL
+  // ============================================
   window.startCall = function() {
     document.getElementById('modalAddress').value = '';
     document.getElementById('modalComment').value = '';
-    document.querySelectorAll('.photo-item').forEach(p => {
+    document.querySelectorAll('#photoUpload .photo-item').forEach(p => {
       p.classList.remove('filled');
       p.innerHTML = '+';
       p.onclick = () => addPhoto(p);
@@ -1074,24 +2184,53 @@ body {
   };
 
   window.detectLocation = function() {
+    const btn = document.getElementById('gpsBtn');
     if (!navigator.geolocation) { toast('Геолокация недоступна'); return; }
+    btn.disabled = true;
+    btn.textContent = '⏳';
     toast('Определяем адрес...');
     navigator.geolocation.getCurrentPosition(
       pos => {
-        // В реальном приложении здесь будет обратное геокодирование
-        const fakeAddr = 'Москва, ул. Тверская, ' + (Math.floor(Math.random() * 30) + 1);
-        document.getElementById('modalAddress').value = fakeAddr;
-        toast('Адрес определён');
+        const { latitude, longitude } = pos.coords;
+        // Обратное геокодирование через Nominatim
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${currentLang}`)
+          .then(r => r.json())
+          .then(data => {
+            const addr = data.display_name || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            document.getElementById('modalAddress').value = addr;
+            toast('Адрес определён');
+          })
+          .catch(() => {
+            document.getElementById('modalAddress').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            toast('Координаты получены');
+          })
+          .finally(() => { btn.disabled = false; btn.textContent = '📍'; });
       },
-      () => toast('Не удалось определить. Введите вручную.')
+      () => {
+        toast('Не удалось определить. Введите вручную.');
+        btn.disabled = false; btn.textContent = '📍';
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
   window.addPhoto = function(el) {
     if (el.classList.contains('filled')) return;
-    el.classList.add('filled');
-    el.innerHTML = '📷<span class="remove" onclick="removePhoto(event, this)">×</span>';
-    el.onclick = null;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        el.classList.add('filled');
+        el.innerHTML = '<img src="' + ev.target.result + '"><span class="remove" onclick="removePhoto(event, this)">×</span>';
+        el.onclick = null;
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
   };
 
   window.removePhoto = function(e, el) {
@@ -1102,16 +2241,16 @@ body {
     parent.onclick = () => addPhoto(parent);
   };
 
+  let callTimerInterval = null;
+  let callSeconds = 0;
+
   window.confirmCallSubmit = function() {
     const addr = document.getElementById('modalAddress').value.trim();
     if (!addr) { toast('Укажите адрес'); return; }
-
     const type = document.getElementById('modalAccidentType').value;
     const comment = document.getElementById('modalComment').value.trim();
 
     closeModal('confirmCallModal');
-
-    // Обновляем данные на экране вызова
     document.getElementById('callType').textContent = type;
     document.getElementById('callAddress').textContent = addr;
     if (comment) {
@@ -1120,43 +2259,39 @@ body {
     } else {
       document.getElementById('callCommentRow').style.display = 'none';
     }
-
     showScreen('screenCall');
     startCallFlow();
   };
 
   window.cancelCall = function() {
     if (!confirm('Отменить вызов?')) return;
-    if (callTimer) { clearInterval(callTimer); callTimer = null; }
+    if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
     callSeconds = 0;
     showScreen('screenHome');
     toast('Вызов отменён');
   };
 
   function startCallFlow() {
-    // Сбрасываем
     callSeconds = 0;
     document.getElementById('callTimer').textContent = '00:00';
     document.getElementById('progressFill').style.width = '0%';
     document.getElementById('callIcon').textContent = '🔍';
-    document.getElementById('callTitle').textContent = 'Ищем комиссара...';
-    document.getElementById('callSub').textContent = 'Обычно занимает 1–2 минуты';
+    document.getElementById('callTitle').textContent = t('call_searching');
+    document.getElementById('callSub').textContent = t('call_searching_sub');
 
-    // Таймер
-    if (callTimer) clearInterval(callTimer);
-    callTimer = setInterval(() => {
+    if (callTimerInterval) clearInterval(callTimerInterval);
+    callTimerInterval = setInterval(() => {
       callSeconds++;
       const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
       const s = String(callSeconds % 60).padStart(2, '0');
       document.getElementById('callTimer').textContent = m + ':' + s;
     }, 1000);
 
-    // Этапы
     const stages = [
       { t: 1500, icon: '✅', title: 'Комиссар принял вызов', sub: 'Готовится к выезду', progress: 25 },
       { t: 4000, icon: '🚗', title: 'Комиссар выехал', sub: 'В пути к вам', progress: 50 },
       { t: 8000, icon: '📍', title: 'Комиссар рядом', sub: 'Будет через 2–3 минуты', progress: 75 },
-      { t: 13000, icon: '🎉', title: 'Комиссар прибыл', sub: 'Ищите машину с наклейкой АварКом', progress: 100 }
+      { t: 13000, icon: '🎉', title: 'Комиссар прибыл', sub: 'Ищите машину с наклейкой', progress: 100 }
     ];
 
     stages.forEach(s => {
@@ -1165,54 +2300,415 @@ body {
         document.getElementById('callTitle').textContent = s.title;
         document.getElementById('callSub').textContent = s.sub;
         document.getElementById('progressFill').style.width = s.progress + '%';
-
-        // На последнем этапе — предложить оценить через время
         if (s.progress === 100) {
-          if (callTimer) { clearInterval(callTimer); callTimer = null; }
+          if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
           setTimeout(() => {
-            if (confirm('Оформление завершено. Оценить комиссара?')) {
-              openRating();
-            }
+            if (confirm('Оформление завершено. Оценить комиссара?')) openRating();
           }, 3000);
         }
       }, s.t);
     });
   }
 
-  // ============ RATING ============
-  function openRating() {
-    currentRating = 0;
-    document.querySelectorAll('#ratingStars span').forEach(s => s.classList.remove('active'));
-    document.getElementById('ratingComment').value = '';
-    document.getElementById('ratingModal').classList.add('active');
-  }
-
-  window.submitRating = function() {
-    if (!currentRating) { toast('Поставьте оценку'); return; }
-    closeModal('ratingModal');
-    toast('Спасибо за отзыв!');
-    setTimeout(() => showScreen('screenHome'), 800);
+  // ============================================
+  // ЕВРОПРОТОКОЛ
+  // ============================================
+  window.openEuroProtocol = function() {
+    // Восстанавливаем сохранённые данные, если есть
+    const saved = JSON.parse(localStorage.getItem('avarkom_euro_draft') || '{}');
+    ['euroDate','euroLocation','euroCount','driverAName','driverAPhone','driverALicense','driverASTS','driverACar','driverAPlate','driverAOsago','driverADamage','driverBName','driverBPhone','driverBLicense','driverBSTS','driverBCar','driverBPlate','driverBOsago','driverBDamage','euroCirc'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && saved[id]) el.value = saved[id];
+    });
+    document.getElementById('euroModal').classList.add('active');
   };
 
-  // Настройка звёзд
-  document.addEventListener('DOMContentLoaded', () => {
-    const stars = document.querySelectorAll('#ratingStars span');
-    stars.forEach(star => {
-      star.addEventListener('click', () => {
-        currentRating = +star.dataset.v;
-        stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= currentRating));
-      });
-      star.addEventListener('mouseenter', () => {
-        const v = +star.dataset.v;
-        stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= v));
-      });
-    });
-    document.getElementById('ratingStars').addEventListener('mouseleave', () => {
-      stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= currentRating));
-    });
-  });
+  window.loadDemoData = function() {
+    const now = new Date();
+    const iso = now.toISOString().slice(0, 16);
+    document.getElementById('euroDate').value = iso;
+    document.getElementById('euroLocation').value = 'Москва, ул. Тверская, 12';
+    document.getElementById('euroCount').value = '2';
+    document.getElementById('driverAName').value = 'Иванов Иван Иванович';
+    document.getElementById('driverAPhone').value = '+7 (999) 123-45-67';
+    document.getElementById('driverALicense').value = '77 АА 123456';
+    document.getElementById('driverASTS').value = '77 АА 123456';
+    document.getElementById('driverACar').value = 'Lada Vesta, 2020';
+    document.getElementById('driverAPlate').value = 'А123БВ 77';
+    document.getElementById('driverAOsago').value = 'ХХХ 0123456789';
+    document.getElementById('driverADamage').value = 'Передний бампер, левая фара, капот';
+    document.getElementById('driverBName').value = 'Петров Пётр Петрович';
+    document.getElementById('driverBPhone').value = '+7 (999) 765-43-21';
+    document.getElementById('driverBLicense').value = '77 ВВ 654321';
+    document.getElementById('driverBSTS').value = '77 ВВ 654321';
+    document.getElementById('driverBCar').value = 'Kia Rio, 2019';
+    document.getElementById('driverBPlate').value = 'В456ГД 77';
+    document.getElementById('driverBOsago').value = 'ХХХ 9876543210';
+    document.getElementById('driverBDamage').value = 'Задний бампер, крышка багажника';
+    document.getElementById('euroCirc').value = 'Двигался по главной дороге, второй участник выехал со второстепенной и совершил столкновение.';
+    toast('Демо-данные заполнены');
+  };
 
-  // ============ PAYMENT ============
+  function getEuroData() {
+    return {
+      date: document.getElementById('euroDate').value,
+      location: document.getElementById('euroLocation').value,
+      count: document.getElementById('euroCount').value,
+      a: {
+        name: document.getElementById('driverAName').value,
+        phone: document.getElementById('driverAPhone').value,
+        license: document.getElementById('driverALicense').value,
+        sts: document.getElementById('driverASTS').value,
+        car: document.getElementById('driverACar').value,
+        plate: document.getElementById('driverAPlate').value,
+        osago: document.getElementById('driverAOsago').value,
+        damage: document.getElementById('driverADamage').value
+      },
+      b: {
+        name: document.getElementById('driverBName').value,
+        phone: document.getElementById('driverBPhone').value,
+        license: document.getElementById('driverBLicense').value,
+        sts: document.getElementById('driverBSTS').value,
+        car: document.getElementById('driverBCar').value,
+        plate: document.getElementById('driverBPlate').value,
+        osago: document.getElementById('driverBOsago').value,
+        damage: document.getElementById('driverBDamage').value
+      },
+      circ: document.getElementById('euroCirc').value
+    };
+  }
+
+  function renderEuroDoc(data) {
+    const now = new Date();
+    const dateStr = data.date ? new Date(data.date).toLocaleString('ru-RU') : now.toLocaleString('ru-RU');
+
+    return `
+      <div class="euro-doc" id="euroDocPrintable">
+        <div class="euro-header">
+          <div>
+            <div class="euro-logo">🚨 АварКом</div>
+            <div style="font-size:9px; color:#666;">avarkom.ru · support@avarkom.ru</div>
+          </div>
+          <div style="text-align:right; font-size:9px;">
+            <div>Документ № ${Math.floor(Math.random() * 900000) + 100000}</div>
+            <div>Сформирован: ${now.toLocaleString('ru-RU')}</div>
+          </div>
+        </div>
+
+        <h2>Извещение о дорожно-транспортном происшествии</h2>
+        <div class="euro-sub">(европротокол — заполняется без участия уполномоченных сотрудников полиции)</div>
+
+        <div class="euro-section">
+          <h3>1. Общие сведения о ДТП</h3>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Дата и время ДТП</div>
+              <div class="euro-field-value">${dateStr}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Количество ТС</div>
+              <div class="euro-field-value">${data.count}</div>
+            </div>
+          </div>
+          <div class="euro-field">
+            <div class="euro-field-label">Место ДТП</div>
+            <div class="euro-field-value">${data.location || '—'}</div>
+          </div>
+        </div>
+
+        <div class="euro-section">
+          <h3>2. Транспортное средство A (первый участник)</h3>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">ФИО водителя</div>
+              <div class="euro-field-value">${data.a.name || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Телефон</div>
+              <div class="euro-field-value">${data.a.phone || '—'}</div>
+            </div>
+          </div>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Водительское удостоверение</div>
+              <div class="euro-field-value">${data.a.license || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">СТС</div>
+              <div class="euro-field-value">${data.a.sts || '—'}</div>
+            </div>
+          </div>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Марка и модель ТС</div>
+              <div class="euro-field-value">${data.a.car || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Гос. регистрационный знак</div>
+              <div class="euro-field-value">${data.a.plate || '—'}</div>
+            </div>
+          </div>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Полис ОСАГО</div>
+              <div class="euro-field-value">${data.a.osago || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Страховщик</div>
+              <div class="euro-field-value">—</div>
+            </div>
+          </div>
+          <div class="euro-field">
+            <div class="euro-field-label">Видимые повреждения</div>
+            <div class="euro-field-value">${data.a.damage || '—'}</div>
+          </div>
+        </div>
+
+        <div class="euro-section">
+          <h3>3. Транспортное средство B (второй участник)</h3>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">ФИО водителя</div>
+              <div class="euro-field-value">${data.b.name || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Телефон</div>
+              <div class="euro-field-value">${data.b.phone || '—'}</div>
+            </div>
+          </div>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Водительское удостоверение</div>
+              <div class="euro-field-value">${data.b.license || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">СТС</div>
+              <div class="euro-field-value">${data.b.sts || '—'}</div>
+            </div>
+          </div>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Марка и модель ТС</div>
+              <div class="euro-field-value">${data.b.car || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Гос. регистрационный знак</div>
+              <div class="euro-field-value">${data.b.plate || '—'}</div>
+            </div>
+          </div>
+          <div class="euro-row">
+            <div class="euro-field">
+              <div class="euro-field-label">Полис ОСАГО</div>
+              <div class="euro-field-value">${data.b.osago || '—'}</div>
+            </div>
+            <div class="euro-field">
+              <div class="euro-field-label">Страховщик</div>
+              <div class="euro-field-value">—</div>
+            </div>
+          </div>
+          <div class="euro-field">
+            <div class="euro-field-label">Видимые повреждения</div>
+            <div class="euro-field-value">${data.b.damage || '—'}</div>
+          </div>
+        </div>
+
+        <div class="euro-section">
+          <h3>4. Обстоятельства ДТП</h3>
+          <div class="euro-field">
+            <div class="euro-field-value" style="min-height:80px;">${data.circ || '—'}</div>
+          </div>
+        </div>
+
+        <div class="euro-section">
+          <h3>5. Схема ДТП</h3>
+          <div style="height:180px; border:1px dashed #999; display:flex; align-items:center; justify-content:center; color:#999; font-size:11px;">
+            [Схема ДТП — приложите отдельно или нарисуйте от руки]
+          </div>
+        </div>
+
+        <div class="euro-section">
+          <h3>6. Подписи сторон</h3>
+          <div class="euro-signatures">
+            <div>
+              <div class="euro-sign">Водитель A: ${data.a.name || '___________'}</div>
+            </div>
+            <div>
+              <div class="euro-sign">Водитель B: ${data.b.name || '___________'}</div>
+            </div>
+          </div>
+          <div style="font-size:10px; color:#666; margin-top:20px; text-align:center;">
+            Подписывая данное извещение, оба водителя подтверждают достоверность сведений и отсутствие разногласий.
+          </div>
+        </div>
+
+        <div class="euro-footer">
+          Документ сформирован сервисом «АварКом» (avarkom.ru).<br>
+          Передайте извещение в свою страховую компанию в течение 5 рабочих дней.<br>
+          С 2025 года лимит выплаты по европротоколу: до 200 000 ₽ с разногласиями, до 400 000 ₽ без разногласий.
+        </div>
+      </div>
+    `;
+  }
+
+  window.generateEuroDoc = function() {
+    const data = getEuroData();
+    if (!data.location || !data.a.name || !data.b.name) {
+      toast('Заполните минимум: место, имена обоих водителей');
+      return;
+    }
+    document.getElementById('euroDocContent').innerHTML = renderEuroDoc(data);
+    closeModal('euroModal');
+    document.getElementById('euroDocModal').classList.add('active');
+    // Сохраняем черновик
+    localStorage.setItem('avarkom_euro_draft', JSON.stringify(data));
+  };
+
+  window.printEuro = function() {
+    const content = document.getElementById('euroDocContent').innerHTML;
+    if (!content) { toast('Сначала сформируйте документ'); return; }
+    const win = window.open('', '_blank');
+    win.document.write('<html><head><title>Европротокол</title><style>' +
+      'body { font-family: Times New Roman, serif; padding:20px; }' +
+      '.euro-doc { background:#fff; color:#000; }' +
+      '.euro-doc h2 { text-align:center; font-size:18px; margin-bottom:4px; text-transform:uppercase; }' +
+      '.euro-doc .euro-sub { text-align:center; font-size:12px; margin-bottom:20px; color:#444; }' +
+      '.euro-doc .euro-header { display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:12px; margin-bottom:20px; font-size:11px; align-items:center; }' +
+      '.euro-doc .euro-logo { font-weight:800; font-size:14px; color:#d97706; }' +
+      '.euro-section { margin-bottom:20px; border:1px solid #000; padding:12px; }' +
+      '.euro-section h3 { font-size:12px; text-transform:uppercase; background:#f0f0f0; padding:6px 10px; margin:-12px -12px 12px -12px; border-bottom:1px solid #000; }' +
+      '.euro-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:10px; }' +
+      '.euro-field { font-size:11px; }' +
+      '.euro-field-label { font-weight:700; margin-bottom:2px; text-transform:uppercase; font-size:9px; }' +
+      '.euro-field-value { border-bottom:1px solid #999; padding:4px 0; min-height:20px; font-size:12px; }' +
+      '.euro-signatures { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px; }' +
+      '.euro-sign { border-top:1px solid #000; padding-top:6px; font-size:10px; text-align:center; }' +
+      '.euro-footer { font-size:9px; color:#666; text-align:center; margin-top:20px; border-top:1px dashed #999; padding-top:10px; }' +
+      '</style></head><body>' + content + '</body></html>');
+    win.document.close();
+    setTimeout(() => { win.print(); }, 500);
+  };
+
+  window.downloadEuroPDF = function() {
+    const content = document.getElementById('euroDocContent').innerHTML;
+    if (!content) { toast('Сначала сформируйте документ'); return; }
+    const el = document.createElement('div');
+    el.innerHTML = content;
+    el.style.background = '#fff';
+    el.style.padding = '20px';
+    el.style.position = 'fixed';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+
+    html2pdf().set({
+      margin: 10,
+      filename: 'evroprotokol_' + Date.now() + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, backgroundColor: '#fff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(el.firstChild).save().then(() => {
+      document.body.removeChild(el);
+      toast('PDF сохранён');
+    }).catch(() => {
+      document.body.removeChild(el);
+      toast('Ошибка при создании PDF');
+    });
+  };
+
+  window.saveEuroToLK = function() {
+    const content = document.getElementById('euroDocContent').innerHTML;
+    if (!content) { toast('Сначала сформируйте документ'); return; }
+    const data = getEuroData();
+    const docs = JSON.parse(localStorage.getItem('avarkom_docs') || '[]');
+    docs.unshift({
+      id: Date.now(),
+      type: 'euro',
+      title: 'Европротокол от ' + new Date().toLocaleDateString('ru-RU'),
+      location: data.location,
+      date: data.date || new Date().toISOString(),
+      html: content,
+      raw: data
+    });
+    localStorage.setItem('avarkom_docs', JSON.stringify(docs));
+    closeModal('euroDocModal');
+    toast('Сохранено в личный кабинет');
+    renderDocs();
+    setTimeout(() => showScreen('screenLK'), 500);
+  };
+
+  function renderDocs() {
+    const container = document.getElementById('docsContainer');
+    if (!container) return;
+    const docs = JSON.parse(localStorage.getItem('avarkom_docs') || '[]');
+    if (!docs.length) {
+      container.innerHTML = '<div class="lk-empty">' + t('lk_docs_empty') + '</div>';
+      return;
+    }
+    container.innerHTML = docs.map(d => `
+      <div class="doc-card">
+        <div class="doc-icon">📄</div>
+        <div class="doc-info">
+          <div class="doc-title">${d.title}</div>
+          <div class="doc-meta">${d.location || ''} · ${new Date(d.date).toLocaleDateString('ru-RU')}</div>
+        </div>
+        <div class="doc-actions">
+          <button class="btn" style="padding:8px 12px; font-size:12px;" onclick="viewDoc(${d.id})">👁</button>
+          <button class="btn" style="padding:8px 12px; font-size:12px;" onclick="printDoc(${d.id})">🖨</button>
+          <button class="btn btn-danger" style="padding:8px 12px; font-size:12px;" onclick="deleteDoc(${d.id})">×</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.viewDoc = function(id) {
+    const docs = JSON.parse(localStorage.getItem('avarkom_docs') || '[]');
+    const doc = docs.find(d => d.id === id);
+    if (!doc) return;
+    document.getElementById('euroDocContent').innerHTML = doc.html;
+    document.getElementById('euroDocModal').classList.add('active');
+  };
+
+  window.printDoc = function(id) {
+    const docs = JSON.parse(localStorage.getItem('avarkom_docs') || '[]');
+    const doc = docs.find(d => d.id === id);
+    if (!doc) return;
+    document.getElementById('euroDocContent').innerHTML = doc.html;
+    printEuro();
+  };
+
+  window.deleteDoc = function(id) {
+    if (!confirm('Удалить документ?')) return;
+    let docs = JSON.parse(localStorage.getItem('avarkom_docs') || '[]');
+    docs = docs.filter(d => d.id !== id);
+    localStorage.setItem('avarkom_docs', JSON.stringify(docs));
+    renderDocs();
+    toast('Документ удалён');
+  };
+
+  // ============================================
+  // COMPLAINT
+  // ============================================
+  window.openComplaint = function() {
+    document.getElementById('complaintModal').classList.add('active');
+  };
+
+  window.submitComplaint = function() {
+    const name = document.getElementById('complaintName').value.trim();
+    const phone = document.getElementById('complaintPhone').value.trim();
+    const text = document.getElementById('complaintText').value.trim();
+    if (!name || !phone || !text) { toast('Заполните обязательные поля'); return; }
+    // В реальном приложении — отправка на сервер
+    toast('Жалоба отправлена. Ответим в течение 48 часов.');
+    closeModal('complaintModal');
+    // Очистка
+    ['complaintName','complaintPhone','complaintCommName','complaintDate','complaintText'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  };
+
+  // ============================================
+  // PAYMENT
+  // ============================================
   window.openPayment = function() {
     document.getElementById('paymentModal').classList.add('active');
   };
@@ -1229,40 +2725,34 @@ body {
     closeModal('paymentModal');
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const amountInput = document.getElementById('payAmount');
-    if (amountInput) {
-      amountInput.addEventListener('input', (e) => {
-        const v = parseInt(e.target.value) || 0;
-        document.getElementById('paySum').textContent = v.toLocaleString('ru-RU') + ' ₽';
-        document.getElementById('payTotal').textContent = v.toLocaleString('ru-RU') + ' ₽';
-      });
-    }
-  });
-
-  // ============ SUPPORT ============
-  window.copyEmail = function() {
-    navigator.clipboard.writeText('support@avarkom.ru').then(() => {
-      toast('Email скопирован');
-    }).catch(() => toast('support@avarkom.ru'));
+  // ============================================
+  // SETTINGS
+  // ============================================
+  window.openSettings = function() {
+    document.getElementById('settingsModal').classList.add('active');
   };
 
-  window.copyEmail2 = function() {
-    navigator.clipboard.writeText('help@avarkom.ru').then(() => {
-      toast('Email скопирован');
-    }).catch(() => toast('help@avarkom.ru'));
+  // ============================================
+  // SUPPORT
+  // ============================================
+  window.copyText = function(text) {
+    navigator.clipboard.writeText(text).then(() => toast('Скопировано')).catch(() => toast(text));
   };
 
   window.toggleFaq = function(el) {
     el.classList.toggle('open');
   };
 
-  // ============ NOTIFICATIONS ============
+  // ============================================
+  // NOTIFICATIONS
+  // ============================================
   window.openNotifications = function() {
     document.getElementById('notifModal').classList.add('active');
   };
 
-  // ============ MODAL ============
+  // ============================================
+  // MODAL
+  // ============================================
   window.closeModal = function(id) {
     document.getElementById(id).classList.remove('active');
   };
@@ -1273,7 +2763,9 @@ body {
     });
   });
 
-  // ============ TOAST ============
+  // ============================================
+  // TOAST
+  // ============================================
   let toastTimer;
   window.toast = function(msg) {
     const el = document.getElementById('toast');
@@ -1283,8 +2775,74 @@ body {
     toastTimer = setTimeout(() => el.classList.remove('active'), 2500);
   };
 
-  // Инициализация имени
-  updateUserName();
+  // ============================================
+  // RATING
+  // ============================================
+  let currentRating = 0;
+
+  function openRating() {
+    currentRating = 0;
+    document.querySelectorAll('#ratingStars span').forEach(s => s.classList.remove('active'));
+    document.getElementById('ratingComment').value = '';
+    document.getElementById('ratingModal').classList.add('active');
+  }
+
+  window.submitRating = function() {
+    if (!currentRating) { toast('Поставьте оценку'); return; }
+    closeModal('ratingModal');
+    toast('Спасибо за отзыв!');
+    setTimeout(() => showScreen('screenHome'), 800);
+  };
+
+  // ============================================
+  // INIT
+  // ============================================
+  function init() {
+    renderLangDropdowns();
+    applyTranslations();
+
+    // Восстанавливаем сессию
+    if (currentUser) {
+      updateUserName();
+      showScreen('screenHome');
+    } else {
+      showScreen('screenAuth');
+    }
+
+    renderDocs();
+
+    // Настройка звёзд
+    const stars = document.querySelectorAll('#ratingStars span');
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        currentRating = +star.dataset.v;
+        stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= currentRating));
+      });
+      star.addEventListener('mouseenter', () => {
+        const v = +star.dataset.v;
+        stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= v));
+      });
+    });
+    document.getElementById('ratingStars').addEventListener('mouseleave', () => {
+      stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= currentRating));
+    });
+
+    // Обновление суммы в оплате
+    const amountInput = document.getElementById('payAmount');
+    if (amountInput) {
+      amountInput.addEventListener('input', (e) => {
+        const v = parseInt(e.target.value) || 0;
+        document.getElementById('paySum').textContent = v.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('payTotal').textContent = v.toLocaleString('ru-RU') + ' ₽';
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
 })();
 </script>
