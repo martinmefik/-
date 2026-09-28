@@ -3,496 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мой район — узнай правду о районе</title>
-
+<title>АварКом — вызов аварийного комиссара</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #0f1115;
-    color: #e8eaed;
-    height: 100vh;
-    overflow: hidden;
-  }
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background:#0a0c10; color:#e8eaed; height:100vh; overflow:hidden;
+}
 
-  /* HEADER */
-  header {
-    height: 60px;
-    background: #171a21;
-    border-bottom: 1px solid #252932;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    gap: 20px;
-    z-index: 1000;
-    position: relative;
-  }
-  .logo {
-    font-size: 18px;
-    font-weight: 700;
-    color: #4ade80;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .search {
-    flex: 1;
-    max-width: 400px;
-    position: relative;
-  }
-  .search input {
-    width: 100%;
-    background: #0f1115;
-    border: 1px solid #252932;
-    color: #e8eaed;
-    padding: 9px 14px;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-  }
-  .search input:focus { border-color: #4ade80; }
-  .search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #171a21;
-    border: 1px solid #252932;
-    border-radius: 8px;
-    margin-top: 4px;
-    max-height: 300px;
-    overflow-y: auto;
-    display: none;
-  }
-  .search-results.active { display: block; }
-  .search-item {
-    padding: 10px 14px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .search-item:hover { background: #1f232c; }
+.header {
+  height:56px; background:#12151c; border-bottom:1px solid #1f232c;
+  display:flex; align-items:center; padding:0 16px; gap:12px; z-index:1000;
+}
+.logo { font-weight:700; font-size:16px; color:#f59e0b; }
+.status-badge {
+  font-size:11px; padding:4px 10px; border-radius:20px;
+  background:#1f232c; color:#8b92a0;
+}
+.status-badge.online { background:rgba(74,222,128,0.15); color:#4ade80; }
 
-  .header-actions {
-    display: flex;
-    gap: 10px;
-    margin-left: auto;
-  }
-  .btn {
-    background: #252932;
-    border: none;
-    color: #e8eaed;
-    padding: 9px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .btn:hover { background: #2f3440; }
-  .btn-primary {
-    background: #4ade80;
-    color: #0f1115;
-    font-weight: 600;
-  }
-  .btn-primary:hover { background: #22c55e; }
+.app { display:flex; height:calc(100vh - 56px); }
 
-  /* LAYOUT */
-  .app {
-    display: flex;
-    height: calc(100vh - 60px);
-  }
+.sidebar {
+  width:360px; background:#12151c; border-right:1px solid #1f232c;
+  overflow-y:auto; flex-shrink:0;
+}
+.sidebar::-webkit-scrollbar { width:5px; }
+.sidebar::-webkit-scrollbar-track { background:#12151c; }
+.sidebar::-webkit-scrollbar-thumb { background:#2f3440; border-radius:3px; }
 
-  /* SIDEBAR */
-  aside {
-    width: 340px;
-    background: #171a21;
-    border-right: 1px solid #252932;
-    overflow-y: auto;
-    flex-shrink: 0;
-  }
-  .panel {
-    padding: 18px;
-    border-bottom: 1px solid #252932;
-  }
-  .panel h3 {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #8b92a0;
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
-  .layer-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 4px;
-    transition: 0.15s;
-  }
-  .layer-toggle:hover { background: #1f232c; }
-  .layer-toggle input {
-    accent-color: #4ade80;
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-  }
+.card { padding:16px; border-bottom:1px solid #1f232c; }
+.card h3 {
+  font-size:11px; text-transform:uppercase; letter-spacing:0.5px;
+  color:#6b7280; margin-bottom:12px; font-weight:600;
+}
 
-  /* COMFORT INDEX */
-  .comfort {
-    text-align: center;
-    padding: 20px 0;
-  }
-  .comfort-circle {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    margin: 0 auto 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    font-weight: 700;
-    position: relative;
-  }
-  .comfort-circle.good { background: rgba(74,222,128,0.15); color: #4ade80; border: 3px solid #4ade80; }
-  .comfort-circle.medium { background: rgba(250,204,21,0.15); color: #facc15; border: 3px solid #facc15; }
-  .comfort-circle.bad { background: rgba(248,113,113,0.15); color: #f87171; border: 3px solid #f87171; }
-  .comfort-label { font-size: 14px; color: #8b92a0; }
+.sos-btn {
+  width:100%; padding:18px; border:none; border-radius:12px;
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff; font-size:17px; font-weight:700; cursor:pointer;
+  transition:0.2s; box-shadow:0 4px 20px rgba(239,68,68,0.3);
+  font-family:inherit;
+}
+.sos-btn:hover { transform:translateY(-1px); box-shadow:0 6px 25px rgba(239,68,68,0.45); }
+.sos-btn:active { transform:translateY(0); }
 
-  /* STATS */
-  .stat {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    font-size: 14px;
-    border-bottom: 1px solid #1f232c;
-  }
-  .stat:last-child { border-bottom: none; }
-  .stat-label { color: #8b92a0; }
-  .stat-value { font-weight: 600; }
+.form-group { margin-bottom:12px; }
+.form-group label { display:block; font-size:12px; color:#6b7280; margin-bottom:5px; }
+.form-group input, .form-group select {
+  width:100%; background:#0a0c10; border:1px solid #1f232c; color:#e8eaed;
+  padding:10px 12px; border-radius:8px; font-size:14px; font-family:inherit; outline:none;
+}
+.form-group input:focus, .form-group select:focus { border-color:#f59e0b; }
 
-  /* REVIEWS */
-  .review {
-    background: #1f232c;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 13px;
-    line-height: 1.5;
-  }
-  .review-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 12px;
-    color: #8b92a0;
-  }
-  .review-author { color: #4ade80; font-weight: 600; }
-  .review-text { color: #c8ccd4; }
-  .review-rating { color: #facc15; }
+.comm-card {
+  display:flex; align-items:center; gap:12px; padding:12px;
+  background:#0a0c10; border-radius:10px; margin-bottom:8px;
+  cursor:pointer; transition:0.15s; border:1px solid transparent;
+}
+.comm-card:hover { border-color:#1f232c; background:#141820; }
+.comm-card.selected { border-color:#f59e0b; background:rgba(245,158,11,0.08); }
+.comm-avatar {
+  width:44px; height:44px; border-radius:50%; background:#1f232c;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.comm-info { flex:1; min-width:0; }
+.comm-name { font-size:14px; font-weight:600; }
+.comm-meta { font-size:12px; color:#6b7280; margin-top:2px; }
+.comm-price { font-size:15px; font-weight:700; color:#f59e0b; white-space:nowrap; }
+.comm-rating { color:#facc15; font-size:12px; }
 
-  /* MAP */
-  #map {
-    flex: 1;
-    height: 100%;
-    z-index: 1;
-  }
-  .leaflet-container {
-    background: #0f1115;
-  }
+.tracking-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #1a1e26; }
+.tracking-item:last-child { border-bottom:none; }
+.tracking-dot {
+  width:10px; height:10px; border-radius:50%; background:#1f232c;
+  margin-top:5px; flex-shrink:0; position:relative;
+}
+.tracking-dot.done { background:#4ade80; }
+.tracking-dot.active { background:#f59e0b; box-shadow:0 0 0 4px rgba(245,158,11,0.2); }
+.tracking-dot.active::after {
+  content:''; position:absolute; inset:-3px; border-radius:50%;
+  border:1px solid #f59e0b; animation:pulse 1.5s infinite;
+}
+@keyframes pulse { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.6)} }
+.tracking-text { font-size:13px; color:#8b92a0; }
+.tracking-text.active { color:#e8eaed; }
+.tracking-time { font-size:11px; color:#4b5563; margin-top:2px; }
 
-  /* FORM */
-  .form-group { margin-bottom: 12px; }
-  .form-group label {
-    display: block;
-    font-size: 12px;
-    color: #8b92a0;
-    margin-bottom: 5px;
-  }
-  .form-group input, .form-group textarea, .form-group select {
-    width: 100%;
-    background: #0f1115;
-    border: 1px solid #252932;
-    color: #e8eaed;
-    padding: 9px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-family: inherit;
-    outline: none;
-  }
-  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-    border-color: #4ade80;
-  }
-  .form-group textarea { resize: vertical; min-height: 70px; }
-  .stars {
-    display: flex;
-    gap: 4px;
-    font-size: 22px;
-    cursor: pointer;
-  }
-  .stars span { color: #3a3f4a; transition: 0.15s; }
-  .stars span.active { color: #facc15; }
+.check-item {
+  display:flex; align-items:center; gap:10px; padding:8px 0;
+  font-size:13px; color:#8b92a0; transition:0.3s;
+}
+.check-item.done { color:#4ade80; }
+.check-item.active { color:#f59e0b; }
+.check-box {
+  width:18px; height:18px; border-radius:4px; border:2px solid #2f3440;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; flex-shrink:0; transition:0.3s;
+}
+.check-item.done .check-box { background:#4ade80; border-color:#4ade80; color:#0a0c10; }
+.check-item.active .check-box { border-color:#f59e0b; }
 
-  /* MODAL */
-  .modal-bg {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-bg.active { display: flex; }
-  .modal {
-    background: #171a21;
-    border: 1px solid #252932;
-    border-radius: 12px;
-    padding: 24px;
-    width: 90%;
-    max-width: 460px;
-  }
-  .modal h2 { font-size: 18px; margin-bottom: 16px; }
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 16px;
-  }
+#map { flex:1; height:100%; background:#0a0c10; }
+.leaflet-container { background:#0a0c10; }
 
-  /* LEGEND */
-  .legend {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: #171a21;
-    border: 1px solid #252932;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 12px;
-    z-index: 1000;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
-  .legend-item:last-child { margin-bottom: 0; }
-  .legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-  }
+.btn {
+  background:#1f232c; border:none; color:#e8eaed; padding:10px 16px;
+  border-radius:8px; font-size:13px; cursor:pointer; font-family:inherit; transition:0.15s;
+}
+.btn:hover { background:#2a2f3a; }
+.btn-primary { background:#f59e0b; color:#0a0c10; font-weight:600; }
+.btn-primary:hover { background:#d97706; }
+.btn-block { width:100%; }
 
-  /* Notifications */
-  .toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: #4ade80;
-    color: #0f1115;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 3000;
-    transition: transform 0.3s;
-  }
-  .toast.active { transform: translateX(-50%) translateY(0); }
+.legend {
+  position:absolute; bottom:16px; left:16px; background:rgba(18,21,28,0.95);
+  border:1px solid #1f232c; border-radius:8px; padding:10px 14px;
+  font-size:12px; z-index:900; backdrop-filter:blur(8px);
+}
+.legend-item { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.legend-item:last-child { margin-bottom:0; }
+.legend-dot { width:10px; height:10px; border-radius:50%; }
 
-  /* Scrollbar */
-  aside::-webkit-scrollbar { width: 6px; }
-  aside::-webkit-scrollbar-track { background: #171a21; }
-  aside::-webkit-scrollbar-thumb { background: #2f3440; border-radius: 3px; }
+.toast {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(100px);
+  background:#f59e0b; color:#0a0c10; padding:12px 24px; border-radius:8px;
+  font-size:14px; font-weight:600; z-index:3000; transition:transform 0.3s;
+  pointer-events:none; box-shadow:0 8px 30px rgba(245,158,11,0.3);
+}
+.toast.active { transform:translateX(-50%) translateY(0); }
+
+.modal-bg {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8);
+  z-index:2000; align-items:center; justify-content:center; padding:20px;
+}
+.modal-bg.active { display:flex; }
+.modal {
+  background:#12151c; border:1px solid #1f232c; border-radius:16px;
+  padding:24px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto;
+}
+.modal h2 { font-size:17px; margin-bottom:16px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+
+.empty { text-align:center; padding:30px 10px; color:#4b5563; font-size:13px; }
+
+.doc-item {
+  display:flex; align-items:center; gap:10px; padding:10px;
+  background:#0a0c10; border-radius:8px; margin-bottom:8px;
+}
+.doc-icon { font-size:20px; }
+.doc-info { flex:1; }
+.doc-name { font-size:13px; }
+.doc-meta { font-size:11px; color:#6b7280; margin-top:2px; }
+
+@media (max-width:768px) {
+  .app { flex-direction:column; }
+  .sidebar { width:100%; max-height:50%; order:2; }
+  #map { min-height:50vh; order:1; }
+  .legend { display:none; }
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🗺️ Мой район</div>
-
-  <div class="search">
-    <input type="text" id="searchInput" placeholder="Найти район или адрес..." autocomplete="off">
-    <div class="search-results" id="searchResults"></div>
-  </div>
-
-  <div class="header-actions">
-    <button class="btn" onclick="locateMe()">📍 Я здесь</button>
-    <button class="btn btn-primary" onclick="openReviewModal()">+ Отзыв о районе</button>
-  </div>
-</header>
+<div class="header">
+  <div class="logo">🚨 АварКом</div>
+  <div class="status-badge online">● Онлайн</div>
+  <div style="margin-left:auto; font-size:12px; color:#6b7280;">Клиент</div>
+</div>
 
 <div class="app">
-  <aside>
-    <!-- Индекс комфорта -->
-    <div class="panel">
-      <h3>Индекс комфорта</h3>
-      <div class="comfort">
-        <div class="comfort-circle good" id="comfortCircle">8.2</div>
-        <div class="comfort-label" id="comfortLabel">Отличный район для жизни</div>
+  <div class="sidebar">
+
+    <div class="card" id="sosCard">
+      <h3>Экстренный вызов</h3>
+      <button class="sos-btn" onclick="startCall()">🆘 ВЫЗВАТЬ КОМИССАРА</button>
+      <div style="margin-top:10px; font-size:11px; color:#6b7280; text-align:center;">
+        Среднее время прибытия: 15–25 минут
       </div>
     </div>
 
-    <!-- Слои -->
-    <div class="panel">
-      <h3>Слои на карте</h3>
-      <label class="layer-toggle">
-        <input type="checkbox" id="layerNoise" onchange="toggleLayer('noise')" checked>
-        <span>🔊 Уровень шума</span>
-      </label>
-      <label class="layer-toggle">
-        <input type="checkbox" id="layerTraffic" onchange="toggleLayer('traffic')" checked>
-        <span>🚗 Пробки / транспорт</span>
-      </label>
-      <label class="layer-toggle">
-        <input type="checkbox" id="layerGreen" onchange="toggleLayer('green')">
-        <span>🌳 Зелёные зоны</span>
-      </label>
-      <label class="layer-toggle">
-        <input type="checkbox" id="layerSchools" onchange="toggleLayer('schools')">
-        <span>🏫 Школы и садики</span>
-      </label>
-      <label class="layer-toggle">
-        <input type="checkbox" id="layerMedical" onchange="toggleLayer('medical')">
-        <span>🏥 Поликлиники</span>
-      </label>
-      <label class="layer-toggle">
-        <input type="checkbox" id="layerReviews" onchange="toggleLayer('reviews')" checked>
-        <span>💬 Отзывы жителей</span>
-      </label>
-    </div>
-
-    <!-- Статистика района -->
-    <div class="panel">
-      <h3>О районе</h3>
-      <div class="stat">
-        <span class="stat-label">Уровень шума</span>
-        <span class="stat-value" style="color:#f87171;">Высокий днём</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Парковка</span>
-        <span class="stat-value" style="color:#facc15;">Проблематично</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Транспорт</span>
-        <span class="stat-value" style="color:#4ade80;">Отличный</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Зелень</span>
-        <span class="stat-value" style="color:#4ade80;">Много парков</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Магазины</span>
-        <span class="stat-value" style="color:#4ade80;">Всё рядом</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Безопасность</span>
-        <span class="stat-value" style="color:#facc15;">Средняя</span>
-      </div>
-    </div>
-
-    <!-- Отзывы -->
-    <div class="panel">
-      <h3>Отзывы жителей (3)</h3>
-      <div id="reviewsList">
-        <div class="review">
-          <div class="review-header">
-            <span class="review-author">Анна К.</span>
-            <span>2 недели назад</span>
-          </div>
-          <div class="review-rating">★★★★★</div>
-          <div class="review-text">Живу тут 3 года. Тихий двор, но по вечерам шумно от кафе на углу. Метро в 5 минутах — золото.</div>
-        </div>
-        <div class="review">
-          <div class="review-header">
-            <span class="review-author">Дмитрий</span>
-            <span>месяц назад</span>
-          </div>
-          <div class="review-rating">★★★☆☆</div>
-          <div class="review-text">Парковки нет вообще. Если машина — забудьте. В остальном норм, но с детьми гулять особо негде.</div>
-        </div>
-        <div class="review">
-          <div class="review-header">
-            <span class="review-author">Марина</span>
-            <span>2 месяца назад</span>
-          </div>
-          <div class="review-rating">★★★★☆</div>
-          <div class="review-text">Школа рядом хорошая, поликлиника тоже. Из минусов — старый фонд, зимой холодно в квартирах.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Форма быстрого отзыва -->
-    <div class="panel">
-      <h3>Оставить отзыв</h3>
+    <div class="card" id="detailsCard" style="display:none;">
+      <h3>Детали ДТП</h3>
       <div class="form-group">
-        <label>Ваше имя</label>
-        <input type="text" id="quickName" placeholder="Аноним">
+        <label>Тип ДТП</label>
+        <select id="accidentType">
+          <option value="simple">2 машины, без пострадавших</option>
+          <option value="complex">Сложное (3+ участника / разногласия)</option>
+          <option value="solo">Один участник (наезд на препятствие)</option>
+          <option value="parking">Парковка / двор</option>
+        </select>
       </div>
       <div class="form-group">
-        <label>Оценка</label>
-        <div class="stars" id="quickStars">
-          <span data-v="1">★</span>
-          <span data-v="2">★</span>
-          <span data-v="3">★</span>
-          <span data-v="4">★</span>
-          <span data-v="5">★</span>
+        <label>Адрес</label>
+        <input type="text" id="addressInput" placeholder="Адрес или описание места" value="Москва, ул. Тверская, 12">
+      </div>
+    </div>
+
+    <div class="card" id="commissionersCard" style="display:none;">
+      <h3>Доступные комиссары</h3>
+      <div id="commissionersList">
+        <div class="comm-card selected" data-name="Алексей М." data-price="2500" data-rating="4.9" onclick="selectCommissioner(this)">
+          <div class="comm-avatar">👤</div>
+          <div class="comm-info">
+            <div class="comm-name">Алексей М.</div>
+            <div class="comm-meta">5 лет опыта · <span class="comm-rating">★ 4.9</span></div>
+            <div class="comm-meta">Прибытие ~12 мин</div>
+          </div>
+          <div class="comm-price">2 500 ₽</div>
+        </div>
+        <div class="comm-card" data-name="Игорь В." data-price="2200" data-rating="4.7" onclick="selectCommissioner(this)">
+          <div class="comm-avatar">👤</div>
+          <div class="comm-info">
+            <div class="comm-name">Игорь В.</div>
+            <div class="comm-meta">3 года опыта · <span class="comm-rating">★ 4.7</span></div>
+            <div class="comm-meta">Прибытие ~18 мин</div>
+          </div>
+          <div class="comm-price">2 200 ₽</div>
+        </div>
+        <div class="comm-card" data-name="Дмитрий С." data-price="2800" data-rating="5.0" onclick="selectCommissioner(this)">
+          <div class="comm-avatar">👤</div>
+          <div class="comm-info">
+            <div class="comm-name">Дмитрий С.</div>
+            <div class="comm-meta">7 лет опыта · <span class="comm-rating">★ 5.0</span></div>
+            <div class="comm-meta">Прибытие ~22 мин</div>
+          </div>
+          <div class="comm-price">2 800 ₽</div>
         </div>
       </div>
-      <div class="form-group">
-        <label>Комментарий</label>
-        <textarea id="quickText" placeholder="Что важно знать о районе?"></textarea>
-      </div>
-      <button class="btn btn-primary" style="width:100%;" onclick="submitQuickReview()">Отправить</button>
+      <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmCall()">Подтвердить вызов</button>
     </div>
-  </aside>
+
+    <div class="card" id="trackingCard" style="display:none;">
+      <h3>Статус вызова</h3>
+      <div id="trackingList"></div>
+      <div style="margin-top:12px; padding:12px; background:#0a0c10; border-radius:8px;">
+        <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Комиссар</div>
+        <div style="font-size:14px; font-weight:600;" id="trackingCommName">—</div>
+        <div style="font-size:12px; color:#f59e0b; margin-top:4px;" id="trackingCommMeta">—</div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn" style="flex:1;" onclick="toast('Чат с комиссаром')">💬 Чат</button>
+        <button class="btn" style="flex:1;" onclick="toast('Звонок комиссару')">📞 Звонок</button>
+      </div>
+    </div>
+
+    <div class="card" id="checklistCard" style="display:none;">
+      <h3>Оформление</h3>
+      <div id="checklistItems">
+        <div class="check-item" data-step="0">
+          <div class="check-box"></div>
+          <span>Фотофиксация места ДТП</span>
+        </div>
+        <div class="check-item" data-step="1">
+          <div class="check-box"></div>
+          <span>Обмен данными с участниками</span>
+        </div>
+        <div class="check-item" data-step="2">
+          <div class="check-box"></div>
+          <span>Составление схемы ДТП</span>
+        </div>
+        <div class="check-item" data-step="3">
+          <div class="check-box"></div>
+          <span>Заполнение европротокола</span>
+        </div>
+        <div class="check-item" data-step="4">
+          <div class="check-box"></div>
+          <span>Подписание документов</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="docsCard" style="display:none;">
+      <h3>Документы</h3>
+      <div id="docsList"></div>
+    </div>
+
+  </div>
 
   <div id="map"></div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#f87171;"></div> Шумно</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#facc15;"></div> Средне</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#4ade80;"></div> Комфортно</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div> Комиссары</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4ade80;"></div> Вы</div>
   </div>
 </div>
 
-<!-- Модалка отзыва -->
-<div class="modal-bg" id="reviewModal">
+<div class="modal-bg" id="confirmModal">
   <div class="modal">
-    <h2>📍 Отзыв о районе</h2>
-    <div class="form-group">
-      <label>Адрес / район</label>
-      <input type="text" id="modalAddress" placeholder="Улица, дом или название района">
-    </div>
-    <div class="form-group">
-      <label>Ваше имя</label>
-      <input type="text" id="modalName" placeholder="Аноним">
-    </div>
-    <div class="form-group">
-      <label>Оценка района</label>
-      <div class="stars" id="modalStars">
-        <span data-v="1">★</span>
-        <span data-v="2">★</span>
-        <span data-v="3">★</span>
-        <span data-v="4">★</span>
-        <span data-v="5">★</span>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Что важно знать?</label>
-      <textarea id="modalText" placeholder="Шум, парковка, транспорт, соседи, инфраструктура..."></textarea>
+    <h2>Подтверждение вызова</h2>
+    <div style="font-size:14px; line-height:1.7; color:#8b92a0;">
+      <div style="margin-bottom:6px;">Комиссар: <span id="modalCommName" style="color:#e8eaed;"></span></div>
+      <div style="margin-bottom:6px;">Тип ДТП: <span id="modalAccidentType" style="color:#e8eaed;"></span></div>
+      <div style="margin-bottom:6px;">Адрес: <span id="modalAddress" style="color:#e8eaed;"></span></div>
+      <div style="margin-bottom:6px;">Стоимость: <span id="modalPrice" style="color:#f59e0b; font-weight:700;"></span></div>
     </div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeReviewModal()">Отмена</button>
-      <button class="btn btn-primary" onclick="submitModalReview()">Опубликовать</button>
+      <button class="btn" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="confirmModalCall()">Вызвать</button>
     </div>
   </div>
 </div>
@@ -500,364 +311,240 @@
 <div class="toast" id="toast">Готово!</div>
 
 <script>
-// ============ КАРТА ============
-// Москва по умолчанию
-const map = L.map('map', { zoomControl: false }).setView([55.751244, 37.618423], 13);
+(function() {
+  'use strict';
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
-  maxZoom: 19
-}).addTo(map);
-
-L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-// ============ ДАННЫЕ РАЙОНОВ ============
-const neighborhoods = [
-  {
-    name: 'Хамовники',
-    coords: [55.735, 37.58],
-    comfort: 8.5,
-    noise: 'low', traffic: 'low', green: 'high',
-    reviews: 128
-  },
-  {
-    name: 'Пресня',
-    coords: [55.765, 37.555],
-    comfort: 8.0,
-    noise: 'medium', traffic: 'medium', green: 'medium',
-    reviews: 96
-  },
-  {
-    name: 'Арбат',
-    coords: [55.75, 37.59],
-    comfort: 6.2,
-    noise: 'high', traffic: 'high', green: 'low',
-    reviews: 212
-  },
-  {
-    name: 'Замоскворечье',
-    coords: [55.74, 37.63],
-    comfort: 7.8,
-    noise: 'medium', traffic: 'medium', green: 'medium',
-    reviews: 74
-  },
-  {
-    name: 'Басманный',
-    coords: [55.765, 37.665],
-    comfort: 7.5,
-    noise: 'medium', traffic: 'high', green: 'low',
-    reviews: 158
-  },
-  {
-    name: 'Таганский',
-    coords: [55.74, 37.665],
-    comfort: 7.0,
-    noise: 'high', traffic: 'medium', green: 'medium',
-    reviews: 143
-  },
-];
-
-const colorMap = {
-  low: '#4ade80',
-  medium: '#facc15',
-  high: '#f87171',
-  unknown: '#8b92a0'
-};
-
-const layers = {};
-['noise', 'traffic', 'green', 'schools', 'medical', 'reviews'].forEach(k => {
-  layers[k] = L.layerGroup().addTo(map);
-});
-
-// Слой шума — круги по районам
-neighborhoods.forEach(n => {
-  L.circle(n.coords, {
-    radius: 700,
-    color: colorMap[n.noise],
-    fillColor: colorMap[n.noise],
-    fillOpacity: 0.15,
-    weight: 1,
-    dashArray: '4 4'
-  }).addTo(layers.noise);
-
-  // Маркер района
-  const marker = L.circleMarker(n.coords, {
-    radius: 12,
-    color: '#4ade80',
-    fillColor: '#171a21',
-    fillOpacity: 1,
-    weight: 2
-  }).addTo(layers.reviews);
-
-  marker.bindPopup(`
-    <div style="min-width:200px;">
-      <div style="font-weight:700;font-size:15px;margin-bottom:8px;">${n.name}</div>
-      <div style="font-size:13px;color:#8b92a0;margin-bottom:8px;">Индекс комфорта: <b style="color:${n.comfort>=8?'#4ade80':n.comfort>=7?'#facc15':'#f87171'}">${n.comfort}</b></div>
-      <div style="font-size:12px;color:#8b92a0;">Отзывов: ${n.reviews}</div>
-    </div>
-  `);
-
-  marker.on('click', () => updateSidebar(n));
-});
-
-// Слой зелени — парки
-[
-  { name: 'Парк Горького', coords: [55.73, 37.60], type: 'park' },
-  { name: 'Парк Красная Пресня', coords: [55.76, 37.55], type: 'park' },
-  { name: 'Сад Эрмитаж', coords: [55.767, 37.61], type: 'park' },
-  { name: 'Парк Таганский', coords: [55.74, 37.66], type: 'park' },
-].forEach(p => {
-  L.circleMarker(p.coords, {
-    radius: 8,
-    color: '#4ade80',
-    fillColor: '#4ade80',
-    fillOpacity: 0.6,
-    weight: 2
-  }).bindPopup(`🌳 <b>${p.name}</b>`).addTo(layers.green);
-});
-
-// Школы
-[
-  { name: 'Школа №1234', coords: [55.75, 37.62] },
-  { name: 'Гимназия №1567', coords: [55.74, 37.58] },
-  { name: 'Школа №57', coords: [55.73, 37.60] },
-].forEach(s => {
-  L.marker(s.coords, {
-    icon: L.divIcon({
-      html: '🏫',
-      className: '',
-      iconSize: [24, 24]
-    })
-  }).bindPopup(`🏫 <b>${s.name}</b>`).addTo(layers.schools);
-});
-
-// Поликлиники
-[
-  { name: 'ГКБ №1', coords: [55.73, 37.58] },
-  { name: 'Поликлиника №5', coords: [55.76, 37.63] },
-  { name: 'Клиника на Арбате', coords: [55.75, 37.59] },
-].forEach(m => {
-  L.marker(m.coords, {
-    icon: L.divIcon({
-      html: '🏥',
-      className: '',
-      iconSize: [24, 24]
-    })
-  }).bindPopup(`🏥 <b>${m.name}</b>`).addTo(layers.medical);
-});
-
-// Пробки — линии
-[
-  [[55.75,37.6],[55.76,37.62],[55.77,37.65]],
-  [[55.73,37.58],[55.74,37.6],[55.75,37.62]],
-].forEach(line => {
-  L.polyline(line, {
-    color: colorMap.high,
-    weight: 4,
-    opacity: 0.6,
-    dashArray: '8 6'
-  }).addTo(layers.traffic);
-});
-
-// Изначально часть слоёв скрыта
-layers.green.remove();
-layers.schools.remove();
-layers.medical.remove();
-
-// ============ TOGGLE LAYERS ============
-function toggleLayer(key) {
-  const checkbox = document.getElementById('layer' + key.charAt(0).toUpperCase() + key.slice(1));
-  if (checkbox.checked) {
-    map.addLayer(layers[key]);
-  } else {
-    map.removeLayer(layers[key]);
+  // ============ MAP ============
+  let map;
+  try {
+    map = L.map('map', { zoomControl: false }).setView([55.755, 37.617], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap © CARTO',
+      maxZoom: 19
+    }).addTo(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+  } catch(e) {
+    document.getElementById('map').innerHTML = 
+      '<div style="padding:20px;color:#8b92a0;text-align:center;">Карта не загрузилась</div>';
   }
-}
 
-// ============ ОБНОВЛЕНИЕ SIDEBAR ============
-function updateSidebar(n) {
-  const circle = document.getElementById('comfortCircle');
-  circle.textContent = n.comfort.toFixed(1);
-  circle.className = 'comfort-circle ' + (n.comfort >= 8 ? 'good' : n.comfort >= 7 ? 'medium' : 'bad');
+  const userLoc = [55.755, 37.617];
 
-  const label = document.getElementById('comfortLabel');
-  label.textContent = n.comfort >= 8 ? 'Отличный район для жизни'
-                  : n.comfort >= 7 ? 'Хороший район, есть нюансы'
-                  : 'Есть серьёзные минусы';
-
-  toast('Район: ' + n.name);
-}
-
-// ============ ГЕОЛОКАЦИЯ ============
-function locateMe() {
-  if (!navigator.geolocation) {
-    toast('Геолокация недоступна');
-    return;
+  if (map) {
+    L.circleMarker(userLoc, {
+      radius: 10, color: '#4ade80', fillColor: '#4ade80',
+      fillOpacity: 1, weight: 3
+    }).addTo(map).bindPopup('📍 Вы здесь');
   }
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      const { latitude, longitude } = pos.coords;
-      map.setView([latitude, longitude], 15);
-      L.circleMarker([latitude, longitude], {
-        radius: 8,
-        color: '#4ade80',
-        fillColor: '#4ade80',
-        fillOpacity: 1,
-        weight: 3
-      }).addTo(map).bindPopup('📍 Вы здесь').openPopup();
-      toast('Определили ваше местоположение');
-    },
-    () => toast('Не удалось определить местоположение')
-  );
-}
 
-// ============ ПОИСК ============
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
+  const commissioners = [
+    { name: 'Алексей М.', coords: [55.760, 37.625], price: 2500, rating: 4.9 },
+    { name: 'Игорь В.', coords: [55.748, 37.608], price: 2200, rating: 4.7 },
+    { name: 'Дмитрий С.', coords: [55.765, 37.610], price: 2800, rating: 5.0 }
+  ];
 
-const searchablePlaces = [
-  ...neighborhoods.map(n => ({ name: n.name + ', Москва', coords: n.coords, type: 'район' })),
-  { name: 'Москва, Красная площадь', coords: [55.7539, 37.6208], type: 'адрес' },
-  { name: 'Москва, Парк Горького', coords: [55.73, 37.60], type: 'парк' },
-  { name: 'Санкт-Петербург', coords: [59.9343, 30.3351], type: 'город' },
-  { name: 'Казань', coords: [55.7963, 49.1088], type: 'город' },
-  { name: 'Екатеринбург', coords: [56.8389, 60.6057], type: 'город' },
-];
+  const commMarkers = [];
 
-searchInput.addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase().trim();
-  if (!q) {
-    searchResults.classList.remove('active');
-    return;
-  }
-  const matches = searchablePlaces.filter(p => p.name.toLowerCase().includes(q)).slice(0, 8);
-  if (!matches.length) {
-    searchResults.classList.remove('active');
-    return;
-  }
-  searchResults.innerHTML = matches.map(m =>
-    `<div class="search-item" onclick='goToPlace(${JSON.stringify(m.coords)}, ${JSON.stringify(m.name)})'>
-      ${m.name} <span style="color:#8b92a0;font-size:12px;">· ${m.type}</span>
-    </div>`
-  ).join('');
-  searchResults.classList.add('active');
-});
-
-function goToPlace(coords, name) {
-  map.setView(coords, 14);
-  searchInput.value = name;
-  searchResults.classList.remove('active');
-  toast('Перешли к: ' + name);
-}
-
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.search')) searchResults.classList.remove('active');
-});
-
-// ============ ЗВЁЗДЫ ============
-function setupStars(containerId, state) {
-  const container = document.getElementById(containerId);
-  const stars = container.querySelectorAll('span');
-  stars.forEach(star => {
-    star.addEventListener('click', () => {
-      const v = +star.dataset.v;
-      state.value = v;
-      stars.forEach(s => {
-        s.classList.toggle('active', +s.dataset.v <= v);
+  if (map) {
+    commissioners.forEach((c, i) => {
+      const marker = L.circleMarker(c.coords, {
+        radius: 9, color: '#f59e0b', fillColor: '#f59e0b',
+        fillOpacity: 0.9, weight: 2
+      }).addTo(map).bindPopup(
+        '<b>' + c.name + '</b><br>★ ' + c.rating + ' · ' + c.price + ' ₽'
+      );
+      marker.on('click', () => {
+        const cards = document.querySelectorAll('.comm-card');
+        if (cards[i]) {
+          document.getElementById('detailsCard').style.display = 'block';
+          document.getElementById('commissionersCard').style.display = 'block';
+          cards[i].click();
+        }
       });
+      commMarkers.push(marker);
     });
-    star.addEventListener('mouseenter', () => {
-      const v = +star.dataset.v;
-      stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= v));
+  }
+
+  // ============ STATE ============
+  let selectedComm = { name: 'Алексей М.', price: 2500, rating: 4.9 };
+  let activeMarker = null;
+
+  // ============ TOAST ============
+  let toastTimer;
+  window.toast = function(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('active');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('active'), 2200);
+  };
+
+  // ============ FLOW ============
+  window.startCall = function() {
+    document.getElementById('detailsCard').style.display = 'block';
+    document.getElementById('commissionersCard').style.display = 'block';
+    toast('Выберите комиссара и заполните детали');
+  };
+
+  window.selectCommissioner = function(el) {
+    document.querySelectorAll('.comm-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedComm = {
+      name: el.dataset.name,
+      price: +el.dataset.price,
+      rating: +el.dataset.rating
+    };
+    toast('Выбран: ' + selectedComm.name);
+  };
+
+  window.confirmCall = function() {
+    const type = document.getElementById('accidentType');
+    const addr = document.getElementById('addressInput').value.trim();
+
+    if (!addr) { toast('Укажите адрес'); return; }
+
+    document.getElementById('modalCommName').textContent = selectedComm.name;
+    document.getElementById('modalAccidentType').textContent = type.options[type.selectedIndex].text;
+    document.getElementById('modalAddress').textContent = addr;
+    document.getElementById('modalPrice').textContent = selectedComm.price + ' ₽';
+
+    document.getElementById('confirmModal').classList.add('active');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('confirmModal').classList.remove('active');
+  };
+
+  window.confirmModalCall = function() {
+    closeModal();
+
+    document.getElementById('sosCard').style.display = 'none';
+    document.getElementById('detailsCard').style.display = 'none';
+    document.getElementById('commissionersCard').style.display = 'none';
+    document.getElementById('trackingCard').style.display = 'block';
+    document.getElementById('trackingCommName').textContent = selectedComm.name;
+    document.getElementById('trackingCommMeta').textContent = '★ ' + selectedComm.rating + ' · ' + selectedComm.price + ' ₽';
+
+    // Simulate commissioner moving to user
+    if (map && commMarkers[0]) {
+      const start = commissioners[0].coords;
+      const end = userLoc;
+      let step = 0;
+      const totalSteps = 60;
+      const moveInterval = setInterval(() => {
+        step++;
+        const t = step / totalSteps;
+        const lat = start[0] + (end[0] - start[0]) * t;
+        const lng = start[1] + (end[1] - start[1]) * t;
+        commMarkers[0].setLatLng([lat, lng]);
+        if (step >= totalSteps) clearInterval(moveInterval);
+      }, 200);
+    }
+
+    // Tracking stages
+    const list = document.getElementById('trackingList');
+    list.innerHTML = '';
+
+    const stages = [
+      { text: 'Комиссар принял вызов', time: 'только что', delay: 500, active: true },
+      { text: 'Комиссар выехал', time: '', delay: 2500, active: false },
+      { text: 'Комиссар в пути · ~15 мин', time: '', delay: 5000, active: false },
+      { text: 'Комиссар прибыл', time: '', delay: 12000, active: false }
+    ];
+
+    stages.forEach((stage, i) => {
+      setTimeout(() => {
+        // Mark previous as done
+        if (i > 0) {
+          const prev = list.children[i - 1];
+          if (prev) {
+            const dot = prev.querySelector('.tracking-dot');
+            if (dot) dot.className = 'tracking-dot done';
+          }
+        }
+
+        const item = document.createElement('div');
+        item.className = 'tracking-item';
+        const isLast = (i === stages.length - 1);
+        item.innerHTML =
+          '<div class="tracking-dot ' + (isLast ? 'done' : 'active') + '"></div>' +
+          '<div>' +
+            '<div class="tracking-text active">' + stage.text + '</div>' +
+            '<div class="tracking-time">' + stage.time + '</div>' +
+          '</div>';
+        list.appendChild(item);
+
+        if (isLast) {
+          startChecklist();
+        }
+      }, stage.delay);
     });
+  };
+
+  function startChecklist() {
+    document.getElementById('checklistCard').style.display = 'block';
+    const items = document.querySelectorAll('#checklistItems .check-item');
+
+    items.forEach((item, i) => {
+      setTimeout(() => {
+        if (i > 0) {
+          const prev = items[i - 1];
+          prev.classList.remove('active');
+          prev.classList.add('done');
+          const box = prev.querySelector('.check-box');
+          if (box) box.textContent = '✓';
+        }
+        item.classList.add('active');
+
+        if (i === items.length - 1) {
+          setTimeout(() => {
+            item.classList.remove('active');
+            item.classList.add('done');
+            const box = item.querySelector('.check-box');
+            if (box) box.textContent = '✓';
+            showDocuments();
+          }, 1500);
+        }
+      }, i * 1800);
+    });
+  }
+
+  function showDocuments() {
+    document.getElementById('docsCard').style.display = 'block';
+    document.getElementById('docsList').innerHTML =
+      '<div class="doc-item">' +
+        '<div class="doc-icon">📄</div>' +
+        '<div class="doc-info">' +
+          '<div class="doc-name">Европротокол.pdf</div>' +
+          '<div class="doc-meta">Готов · 124 КБ</div>' +
+        '</div>' +
+        '<button class="btn" style="padding:6px 12px;font-size:12px;" onclick="toast(\'Скачивание...\')">↓</button>' +
+      '</div>' +
+      '<div class="doc-item">' +
+        '<div class="doc-icon">📷</div>' +
+        '<div class="doc-info">' +
+          '<div class="doc-name">Фотофиксация (8 файлов)</div>' +
+          '<div class="doc-meta">Загружено</div>' +
+        '</div>' +
+        '<button class="btn" style="padding:6px 12px;font-size:12px;" onclick="toast(\'Просмотр...\')">👁</button>' +
+      '</div>' +
+      '<div class="doc-item">' +
+        '<div class="doc-icon">📋</div>' +
+        '<div class="doc-info">' +
+          '<div class="doc-name">Схема ДТП.pdf</div>' +
+          '<div class="doc-meta">Готов · 86 КБ</div>' +
+        '</div>' +
+        '<button class="btn" style="padding:6px 12px;font-size:12px;" onclick="toast(\'Скачивание...\')">↓</button>' +
+      '</div>';
+    toast('✅ Оформление завершено!');
+  }
+
+  // Close modal on background click
+  document.getElementById('confirmModal').addEventListener('click', (e) => {
+    if (e.target.id === 'confirmModal') closeModal();
   });
-  container.addEventListener('mouseleave', () => {
-    stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= state.value));
-  });
-}
 
-const quickStars = { value: 0 };
-const modalStars = { value: 0 };
-setupStars('quickStars', quickStars);
-setupStars('modalStars', modalStars);
-
-// ============ ОТЗЫВЫ ============
-function submitQuickReview() {
-  const name = document.getElementById('quickName').value.trim() || 'Аноним';
-  const text = document.getElementById('quickText').value.trim();
-  const rating = quickStars.value;
-
-  if (!text) { toast('Напишите комментарий'); return; }
-  if (!rating) { toast('Поставьте оценку'); return; }
-
-  addReview(name, rating, text);
-  document.getElementById('quickText').value = '';
-  document.getElementById('quickName').value = '';
-  quickStars.value = 0;
-  document.querySelectorAll('#quickStars span').forEach(s => s.classList.remove('active'));
-  toast('Спасибо за отзыв!');
-}
-
-function addReview(name, rating, text) {
-  const list = document.getElementById('reviewsList');
-  const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-  const div = document.createElement('div');
-  div.className = 'review';
-  div.innerHTML = `
-    <div class="review-header">
-      <span class="review-author">${escapeHtml(name)}</span>
-      <span>только что</span>
-    </div>
-    <div class="review-rating">${stars}</div>
-    <div class="review-text">${escapeHtml(text)}</div>
-  `;
-  list.insertBefore(div, list.firstChild);
-
-  const h3 = list.parentElement.querySelector('h3');
-  const count = list.children.length;
-  h3.textContent = `Отзывы жителей (${count})`;
-}
-
-function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
-
-// ============ МОДАЛКА ============
-function openReviewModal() {
-  document.getElementById('reviewModal').classList.add('active');
-  document.getElementById('modalAddress').value = '';
-  document.getElementById('modalName').value = '';
-  document.getElementById('modalText').value = '';
-  modalStars.value = 0;
-  document.querySelectorAll('#modalStars span').forEach(s => s.classList.remove('active'));
-}
-function closeReviewModal() {
-  document.getElementById('reviewModal').classList.remove('active');
-}
-function submitModalReview() {
-  const name = document.getElementById('modalName').value.trim() || 'Аноним';
-  const text = document.getElementById('modalText').value.trim();
-  const rating = modalStars.value;
-  if (!text || !rating) { toast('Заполните все поля'); return; }
-  addReview(name, rating, text);
-  closeReviewModal();
-  toast('Отзыв опубликован!');
-}
-document.getElementById('reviewModal').addEventListener('click', (e) => {
-  if (e.target.id === 'reviewModal') closeReviewModal();
-});
-
-// ============ TOAST ============
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('active');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('active'), 2000);
-}
+})();
 </script>
 </body>
 </html>
