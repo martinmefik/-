@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>АварКом — аварийный комиссар онлайн</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -13,11 +11,10 @@ body {
   background:#0a0c10; color:#e8eaed; min-height:100vh;
 }
 
-/* ЭКРАНЫ */
 .screen { display:none; min-height:100vh; }
 .screen.active { display:flex; flex-direction:column; }
 
-/* AUTH */
+/* ============ AUTH ============ */
 .auth-wrap {
   min-height:100vh; display:flex; align-items:center; justify-content:center;
   padding:20px; background:radial-gradient(ellipse at top, #1a1f2e 0%, #0a0c10 70%);
@@ -39,11 +36,13 @@ body {
 .auth-form.active { display:block; }
 .field { margin-bottom:14px; }
 .field label { display:block; font-size:12px; color:#6b7280; margin-bottom:6px; }
-.field input {
+.field input, .field textarea, .field select {
   width:100%; background:#0a0c10; border:1px solid #1f232c; color:#e8eaed;
   padding:12px 14px; border-radius:10px; font-size:14px; font-family:inherit; outline:none;
 }
-.field input:focus { border-color:#f59e0b; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color:#f59e0b; }
+.field textarea { resize:vertical; min-height:80px; }
+
 .btn {
   background:#1f232c; border:none; color:#e8eaed; padding:12px 20px;
   border-radius:10px; font-size:14px; cursor:pointer; font-family:inherit;
@@ -54,8 +53,10 @@ body {
 .btn-primary:hover { background:#d97706; }
 .btn-block { width:100%; }
 .btn-lg { padding:16px; font-size:15px; }
+.btn-danger { background:#ef4444; color:#fff; }
+.btn-danger:hover { background:#dc2626; }
 
-/* HEADER */
+/* ============ HEADER ============ */
 .header {
   height:60px; background:#12151c; border-bottom:1px solid #1f232c;
   display:flex; align-items:center; padding:0 20px; gap:16px;
@@ -68,8 +69,21 @@ body {
   color:#6b7280; transition:0.15s;
 }
 .nav-item:hover, .nav-item.active { background:#1f232c; color:#e8eaed; }
+
+.header-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.icon-btn {
+  width:38px; height:38px; border-radius:10px; background:#1f232c;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:16px; transition:0.15s; border:none; color:#e8eaed;
+  position:relative;
+}
+.icon-btn:hover { background:#2a2f3a; }
+.icon-btn .badge {
+  position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff;
+  font-size:10px; font-weight:700; padding:2px 5px; border-radius:10px;
+}
 .header-user {
-  margin-left:auto; display:flex; align-items:center; gap:10px;
+  display:flex; align-items:center; gap:10px;
   cursor:pointer; padding:6px 12px; border-radius:8px; transition:0.15s;
 }
 .header-user:hover { background:#1f232c; }
@@ -79,13 +93,13 @@ body {
   font-size:14px; font-weight:700; color:#0a0c10;
 }
 
-/* MAIN */
+/* ============ MAIN ============ */
 .main { flex:1; padding:40px 20px; max-width:900px; margin:0 auto; width:100%; }
 .hero { text-align:center; margin-bottom:40px; }
 .hero h1 { font-size:32px; font-weight:800; margin-bottom:10px; }
 .hero p { color:#6b7280; font-size:15px; }
 
-/* ACTION CARDS */
+/* ============ ACTION CARDS ============ */
 .actions { display:grid; grid-template-columns:1fr; gap:16px; }
 .action-card {
   display:flex; align-items:center; gap:20px; padding:24px;
@@ -100,11 +114,12 @@ body {
 .action-icon.red { background:rgba(239,68,68,0.15); }
 .action-icon.orange { background:rgba(245,158,11,0.15); }
 .action-icon.blue { background:rgba(59,130,246,0.15); }
+.action-icon.green { background:rgba(74,222,128,0.15); }
 .action-info h3 { font-size:17px; margin-bottom:4px; }
 .action-info p { font-size:13px; color:#6b7280; }
 .action-arrow { margin-left:auto; color:#4b5563; font-size:20px; }
 
-/* РЕКОМЕНДАЦИИ */
+/* ============ РЕКОМЕНДАЦИИ ============ */
 .rec-item {
   display:flex; gap:16px; padding:18px; background:#12151c;
   border:1px solid #1f232c; border-radius:12px; margin-bottom:12px;
@@ -121,8 +136,8 @@ body {
   border-radius:12px; padding:16px; margin-top:20px; font-size:13px; line-height:1.6;
 }
 
-/* ЛК */
-.lk-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:24px; }
+/* ============ ЛК ============ */
+.lk-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px; }
 .lk-card {
   background:#12151c; border:1px solid #1f232c; border-radius:14px; padding:20px;
 }
@@ -141,17 +156,146 @@ body {
 .lk-row-sub { font-size:12px; color:#6b7280; margin-top:2px; }
 .lk-row-arrow { color:#4b5563; }
 
-/* КАРТА (внутри вызова) */
-.call-map-wrap { flex:1; display:flex; height:calc(100vh - 60px); }
-.call-sidebar {
-  width:340px; background:#12151c; border-right:1px solid #1f232c;
-  overflow-y:auto; flex-shrink:0;
+.lk-empty {
+  text-align:center; padding:40px 20px; color:#4b5563; font-size:14px;
 }
-.call-sidebar::-webkit-scrollbar { width:5px; }
-.call-sidebar::-webkit-scrollbar-thumb { background:#2f3440; border-radius:3px; }
-#callMap { flex:1; height:100%; }
 
-/* МОДАЛКА */
+/* ============ CALL SCREEN ============ */
+.call-wrap {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:40px 20px; background:radial-gradient(ellipse at center, #1a1f2e 0%, #0a0c10 70%);
+}
+.call-container {
+  width:100%; max-width:560px;
+  background:#12151c; border:1px solid #1f232c; border-radius:20px;
+  padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* Progress bar */
+.progress-bar {
+  height:4px; background:#1f232c; border-radius:2px; overflow:hidden; margin-bottom:24px;
+}
+.progress-fill {
+  height:100%; background:linear-gradient(90deg,#f59e0b,#4ade80);
+  width:0%; transition:width 1s ease;
+}
+
+.call-status-icon {
+  width:80px; height:80px; border-radius:50%;
+  background:rgba(245,158,11,0.15); color:#f59e0b;
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; margin:0 auto 20px;
+  animation:pulse-ring 2s infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow:0 0 0 0 rgba(245,158,11,0.4); }
+  70% { box-shadow:0 0 0 20px rgba(245,158,11,0); }
+  100% { box-shadow:0 0 0 0 rgba(245,158,11,0); }
+}
+
+.call-title { text-align:center; font-size:22px; font-weight:800; margin-bottom:8px; }
+.call-sub { text-align:center; color:#8b92a0; font-size:14px; margin-bottom:6px; }
+.call-timer {
+  text-align:center; color:#f59e0b; font-size:13px;
+  font-weight:600; margin-bottom:28px;
+}
+
+.call-info-block {
+  background:#0a0c10; border-radius:12px; padding:16px;
+  margin-bottom:16px; font-size:13px; line-height:1.8; color:#8b92a0;
+}
+.call-info-block b { color:#e8eaed; }
+
+.call-actions {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;
+}
+.call-actions .btn { padding:14px; font-size:13px; }
+
+.emergency-btn {
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff; grid-column:1 / -1;
+  box-shadow:0 4px 20px rgba(239,68,68,0.3);
+}
+.emergency-btn:hover { background:linear-gradient(135deg,#dc2626,#b91c1c); }
+
+/* Заметки */
+.notes-block {
+  background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2);
+  border-radius:12px; padding:16px; margin-top:20px;
+  font-size:12px; line-height:1.7; color:#8b92a0;
+}
+.notes-block b { color:#f59e0b; }
+
+/* Фото-превью */
+.photo-upload {
+  display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;
+}
+.photo-item {
+  width:64px; height:64px; border-radius:10px;
+  background:#0a0c10; border:1px dashed #2f3440;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; color:#4b5563; cursor:pointer;
+  transition:0.15s; position:relative;
+}
+.photo-item:hover { border-color:#f59e0b; color:#f59e0b; }
+.photo-item.filled {
+  border-style:solid; border-color:#1f232c;
+  background:linear-gradient(135deg,#1f232c,#2a2f3a);
+  color:#f59e0b; font-size:24px;
+}
+.photo-item.filled .remove {
+  position:absolute; top:-6px; right:-6px;
+  width:20px; height:20px; border-radius:50%;
+  background:#ef4444; color:#fff; font-size:12px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+}
+
+/* GPS button */
+.gps-btn {
+  position:absolute; right:12px; top:12px;
+  background:#1f232c; border:none; color:#f59e0b;
+  width:36px; height:36px; border-radius:10px;
+  cursor:pointer; font-size:16px;
+  display:flex; align-items:center; justify-content:center;
+}
+.gps-btn:hover { background:#2a2f3a; }
+.field-wrap { position:relative; }
+
+/* ============ ПОДДЕРЖКА ============ */
+.support-card {
+  background:#12151c; border:1px solid #1f232c; border-radius:14px;
+  padding:24px; margin-bottom:16px;
+}
+.support-card h3 { font-size:16px; margin-bottom:8px; }
+.support-card p { font-size:13px; color:#8b92a0; line-height:1.6; margin-bottom:16px; }
+.support-email {
+  display:flex; align-items:center; gap:12px;
+  padding:14px; background:#0a0c10; border-radius:10px;
+  font-family:monospace; font-size:14px; color:#f59e0b;
+  cursor:pointer; transition:0.15s; margin-bottom:12px;
+}
+.support-email:hover { background:#141820; }
+.support-email .copy-icon { margin-left:auto; color:#4b5563; font-size:14px; }
+
+.faq-item {
+  border-bottom:1px solid #1a1e26; padding:14px 0; cursor:pointer;
+}
+.faq-item:last-child { border-bottom:none; }
+.faq-q {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:14px; font-weight:600;
+}
+.faq-q .arrow { color:#6b7280; transition:0.2s; }
+.faq-item.open .faq-q .arrow { transform:rotate(90deg); }
+.faq-a {
+  font-size:13px; color:#8b92a0; line-height:1.6;
+  max-height:0; overflow:hidden; transition:max-height 0.3s, margin 0.3s;
+  margin-top:0;
+}
+.faq-item.open .faq-a { max-height:300px; margin-top:10px; }
+
+/* ============ MODAL ============ */
 .modal-bg {
   display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85);
   z-index:2000; align-items:center; justify-content:center; padding:20px;
@@ -164,16 +308,12 @@ body {
 .modal h2 { font-size:18px; margin-bottom:20px; }
 .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
 
-/* TOAST */
-.toast {
-  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px);
-  background:#f59e0b; color:#0a0c10; padding:14px 28px; border-radius:12px;
-  font-size:14px; font-weight:700; z-index:3000; transition:transform 0.3s;
-  pointer-events:none; box-shadow:0 10px 40px rgba(245,158,11,0.4);
-}
-.toast.active { transform:translateX(-50%) translateY(0); }
+/* ============ STAR RATING ============ */
+.stars { display:flex; gap:6px; justify-content:center; font-size:36px; margin:16px 0; cursor:pointer; user-select:none; }
+.stars span { color:#3a3f4a; transition:0.15s; }
+.stars span.active { color:#facc15; }
 
-/* Payment form */
+/* ============ PAYMENT ============ */
 .pay-methods { display:flex; gap:10px; margin-bottom:20px; }
 .pay-method {
   flex:1; padding:16px; background:#0a0c10; border:2px solid #1f232c;
@@ -183,19 +323,40 @@ body {
 .pay-method.selected { border-color:#f59e0b; background:rgba(245,158,11,0.08); }
 .pay-method-icon { font-size:24px; margin-bottom:6px; }
 .pay-method-label { font-size:12px; color:#8b92a0; }
-
 .pay-summary {
   background:#0a0c10; border-radius:12px; padding:16px; margin-bottom:20px;
 }
 .pay-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
 .pay-row.total { border-top:1px solid #1f232c; margin-top:10px; padding-top:14px; font-weight:800; font-size:17px; color:#f59e0b; }
 
+/* ============ NOTIFICATIONS ============ */
+.notif-list { max-height:400px; overflow-y:auto; }
+.notif-item {
+  display:flex; gap:12px; padding:14px; border-bottom:1px solid #1a1e26;
+}
+.notif-item:last-child { border-bottom:none; }
+.notif-icon { font-size:20px; }
+.notif-content { flex:1; }
+.notif-title { font-size:13px; font-weight:600; margin-bottom:2px; }
+.notif-text { font-size:12px; color:#8b92a0; line-height:1.5; }
+.notif-time { font-size:11px; color:#4b5563; margin-top:4px; }
+
+/* ============ TOAST ============ */
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px);
+  background:#f59e0b; color:#0a0c10; padding:14px 28px; border-radius:12px;
+  font-size:14px; font-weight:700; z-index:3000; transition:transform 0.3s;
+  pointer-events:none; box-shadow:0 10px 40px rgba(245,158,11,0.4);
+  max-width:90%; text-align:center;
+}
+.toast.active { transform:translateX(-50%) translateY(0); }
+
 @media (max-width:768px) {
   .hero h1 { font-size:24px; }
   .header-nav { display:none; }
-  .call-map-wrap { flex-direction:column; }
-  .call-sidebar { width:100%; max-height:45%; }
-  #callMap { min-height:55vh; }
+  .call-actions { grid-template-columns:1fr; }
+  .action-card { padding:18px; gap:14px; }
+  .action-icon { width:52px; height:52px; font-size:24px; }
 }
 </style>
 </head>
@@ -206,14 +367,13 @@ body {
   <div class="auth-wrap">
     <div class="auth-card">
       <div class="auth-logo">🚨 АварКом</div>
-      <div class="auth-sub">Аварийный комиссар онлайн — приедет за 15 минут</div>
+      <div class="auth-sub">Аварийный комиссар онлайн</div>
 
       <div class="auth-tabs">
         <div class="auth-tab active" onclick="switchAuth('login')">Вход</div>
         <div class="auth-tab" onclick="switchAuth('register')">Регистрация</div>
       </div>
 
-      <!-- Вход -->
       <div class="auth-form active" id="formLogin">
         <div class="field">
           <label>Телефон</label>
@@ -229,7 +389,6 @@ body {
         </div>
       </div>
 
-      <!-- Регистрация -->
       <div class="auth-form" id="formRegister">
         <div class="field">
           <label>Имя</label>
@@ -263,11 +422,17 @@ body {
     <div class="header-nav">
       <div class="nav-item active" onclick="showScreen('screenHome')">Главная</div>
       <div class="nav-item" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item" onclick="showScreen('screenLK')">Личный кабинет</div>
+      <div class="nav-item" onclick="showScreen('screenSupport')">Поддержка</div>
     </div>
-    <div class="header-user" onclick="showScreen('screenLK')">
-      <div class="user-avatar" id="headerAvatar">А</div>
-      <span style="font-size:13px;" id="headerName">Александр</span>
+    <div class="header-right">
+      <button class="icon-btn" onclick="openNotifications()" title="Уведомления">
+        🔔 <span class="badge" id="notifBadge">2</span>
+      </button>
+      <button class="icon-btn" onclick="toast('Смена языка (в разработке)')" title="Язык">🌐</button>
+      <div class="header-user" onclick="showScreen('screenLK')">
+        <div class="user-avatar" id="headerAvatar">А</div>
+        <span style="font-size:13px;" id="headerName">Александр</span>
+      </div>
     </div>
   </div>
 
@@ -278,7 +443,6 @@ body {
     </div>
 
     <div class="actions">
-      <!-- Вызвать комиссара -->
       <div class="action-card" onclick="startCall()">
         <div class="action-icon orange">🚗</div>
         <div class="action-info">
@@ -288,7 +452,6 @@ body {
         <div class="action-arrow">→</div>
       </div>
 
-      <!-- 112 -->
       <div class="action-card" onclick="call112()">
         <div class="action-icon red">📞</div>
         <div class="action-info">
@@ -298,7 +461,6 @@ body {
         <div class="action-arrow">→</div>
       </div>
 
-      <!-- Рекомендации -->
       <div class="action-card" onclick="showScreen('screenRecommendations')">
         <div class="action-icon blue">📖</div>
         <div class="action-info">
@@ -307,9 +469,17 @@ body {
         </div>
         <div class="action-arrow">→</div>
       </div>
+
+      <div class="action-card" onclick="showScreen('screenSupport')">
+        <div class="action-icon green">💬</div>
+        <div class="action-info">
+          <h3>Поддержка</h3>
+          <p>Свяжитесь с нами — ответим на любые вопросы</p>
+        </div>
+        <div class="action-arrow">→</div>
+      </div>
     </div>
 
-    <!-- Мини-баннер -->
     <div style="margin-top:32px; padding:20px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:14px; font-size:13px; color:#8b92a0; line-height:1.7;">
       <b style="color:#f59e0b;">⚡ Совет:</b> с 2025 года лимит европротокола с разногласиями — <b style="color:#e8eaed;">200 000 ₽</b>, без разногласий с фотофиксацией — <b style="color:#e8eaed;">400 000 ₽</b>. Если ущерб меньше — можно оформить без ГИБДД.
     </div>
@@ -323,25 +493,28 @@ body {
     <div class="header-nav">
       <div class="nav-item" onclick="showScreen('screenHome')">Главная</div>
       <div class="nav-item active" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item" onclick="showScreen('screenLK')">Личный кабинет</div>
+      <div class="nav-item" onclick="showScreen('screenSupport')">Поддержка</div>
     </div>
-    <div class="header-user" onclick="showScreen('screenLK')">
-      <div class="user-avatar" id="headerAvatar2">А</div>
-      <span style="font-size:13px;" id="headerName2">Александр</span>
+    <div class="header-right">
+      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge2">2</span></button>
+      <div class="header-user" onclick="showScreen('screenLK')">
+        <div class="user-avatar" id="headerAvatar2">А</div>
+        <span style="font-size:13px;" id="headerName2">Александр</span>
+      </div>
     </div>
   </div>
 
   <div class="main">
     <div class="hero" style="margin-bottom:30px;">
       <h1>Что делать при ДТП</h1>
-      <p>Пошаговая инструкция по ПДД РФ и правилам ОСАГО</p>
+      <p>Пошаговая инструкция</p>
     </div>
 
     <div class="rec-item">
       <div class="rec-num">1</div>
       <div class="rec-content">
         <h4>Остановитесь и не трогайте машину с места</h4>
-        <p>Немедленно остановитесь, заглушите двигатель, включите аварийку. Не перемещайте предметы, имеющие отношение к ДТП [citation:5].</p>
+        <p>Немедленно остановитесь, заглушите двигатель, включите аварийку. Не перемещайте предметы, имеющие отношение к ДТП.</p>
       </div>
     </div>
 
@@ -349,7 +522,7 @@ body {
       <div class="rec-num">2</div>
       <div class="rec-content">
         <h4>Выставьте знак аварийной остановки</h4>
-        <p>В населённом пункте — не менее 15 метров, вне населённого пункта — не менее 30 метров от машины [citation:17].</p>
+        <p>В населённом пункте — не менее 15 метров, вне населённого пункта — не менее 30 метров от машины.</p>
       </div>
     </div>
 
@@ -357,7 +530,7 @@ body {
       <div class="rec-num">3</div>
       <div class="rec-content">
         <h4>Проверьте, есть ли пострадавшие</h4>
-        <p>Если есть раненые — немедленно вызовите скорую (103) и полицию (102). Окажите первую помощь, если умеете. В экстренном случае отправьте пострадавшего на попутной машине или доставьте сами, сообщите свои данные и вернитесь на место [citation:17].</p>
+        <p>Если есть раненые — немедленно вызовите скорую (103) и полицию (102). Окажите первую помощь, если умеете. В экстренном случае отправьте пострадавшего на попутной машине и сообщите свои данные.</p>
       </div>
     </div>
 
@@ -365,7 +538,7 @@ body {
       <div class="rec-num">4</div>
       <div class="rec-content">
         <h4>Вызовите ГИБДД, если это необходимо</h4>
-        <p>ГИБДД обязательна, если: есть пострадавшие, 3+ участника, наезд на препятствие или третье имущество, разногласия, ущерб больше лимита. В остальных случаях можно оформить европротокол самостоятельно [citation:9][citation:17].</p>
+        <p>ГИБДД обязательна, если: есть пострадавшие, 3+ участника, наезд на препятствие или третье имущество, разногласия, ущерб больше лимита. В остальных случаях можно оформить европротокол.</p>
       </div>
     </div>
 
@@ -373,7 +546,7 @@ body {
       <div class="rec-num">5</div>
       <div class="rec-content">
         <h4>Зафиксируйте всё на фото и видео</h4>
-        <p>До того, как убрать машины с проезжей части, сфотографируйте: общий план, положение машин относительно друг друга и дорожных объектов, следы торможения, повреждения крупным планом, номера [citation:5][citation:9].</p>
+        <p>До того, как убрать машины с проезжей части, сфотографируйте: общий план, положение машин относительно друг друга и дорожных объектов, следы торможения, повреждения крупным планом, номера.</p>
       </div>
     </div>
 
@@ -381,7 +554,7 @@ body {
       <div class="rec-num">6</div>
       <div class="rec-content">
         <h4>Запишите свидетелей</h4>
-        <p>Если есть очевидцы — запишите их ФИО и контакты. Это поможет, если вторая сторона начнёт менять показания [citation:5].</p>
+        <p>Если есть очевидцы — запишите их ФИО и контакты. Это поможет, если вторая сторона начнёт менять показания.</p>
       </div>
     </div>
 
@@ -389,7 +562,7 @@ body {
       <div class="rec-num">7</div>
       <div class="rec-content">
         <h4>Оформите европротокол или дождитесь ГИБДД</h4>
-        <p>Если нет разногласий и ущерб в пределах лимита — заполните извещение о ДТП (бумажное или электронное через «Госуслуги Авто»). Оба водителя подписывают оба бланка, оборот заполняет каждый самостоятельно. Срок передачи в страховую — до 5 рабочих дней [citation:2][citation:14][citation:18].</p>
+        <p>Если нет разногласий и ущерб в пределах лимита — заполните извещение о ДТП (бумажное или электронное через «Госуслуги Авто»). Оба водителя подписывают оба бланка. Срок передачи в страховую — до 5 рабочих дней.</p>
       </div>
     </div>
 
@@ -397,7 +570,7 @@ body {
       <div class="rec-num">8</div>
       <div class="rec-content">
         <h4>Не покидайте место ДТП</h4>
-        <p>Оставление места ДТП — лишение прав от 1 до 1.5 лет или арест до 15 суток [citation:1][citation:13].</p>
+        <p>Оставление места ДТП — лишение прав от 1 до 1.5 лет или арест до 15 суток.</p>
       </div>
     </div>
 
@@ -405,7 +578,7 @@ body {
       <div class="rec-num">9</div>
       <div class="rec-content">
         <h4>Сообщите в страховую</h4>
-        <p>Уведомите страховую в установленный срок. При европротоколе — до 5 рабочих дней. Сохраните все документы и фото [citation:6][citation:9].</p>
+        <p>Уведомите страховую в установленный срок. При европротоколе — до 5 рабочих дней. Сохраните все документы и фото.</p>
       </div>
     </div>
 
@@ -413,15 +586,120 @@ body {
       <div class="rec-num">10</div>
       <div class="rec-content">
         <h4>Не ремонтируйте машину до осмотра</h4>
-        <p>Не приступайте к ремонту или утилизации в течение 15 календарных дней после ДТП, пока страховая не проведёт осмотр или экспертизу [citation:14].</p>
+        <p>Не приступайте к ремонту или утилизации в течение 15 календарных дней после ДТП, пока страховая не проведёт осмотр или экспертизу.</p>
       </div>
     </div>
 
     <div class="rec-warn">
       <b style="color:#f87171;">🚫 Категорически нельзя:</b><br>
-      • Употреблять алкоголь или наркотики после ДТП до освидетельствования — это усугубит ответственность [citation:5]<br>
-      • Покидать место происшествия даже «на минутку» — приравнивается к оставлению места ДТП [citation:1]<br>
+      • Употреблять алкоголь или наркотики после ДТП до освидетельствования<br>
+      • Покидать место происшествия даже «на минутку»<br>
       • Подписывать пустые бланки или документы, которые не читали
+    </div>
+  </div>
+</div>
+
+<!-- ============ ЭКРАН: ПОДДЕРЖКА ============ -->
+<div class="screen" id="screenSupport">
+  <div class="header">
+    <div class="logo">🚨 АварКом</div>
+    <div class="header-nav">
+      <div class="nav-item" onclick="showScreen('screenHome')">Главная</div>
+      <div class="nav-item" onclick="showScreen('screenRecommendations')">Рекомендации</div>
+      <div class="nav-item active" onclick="showScreen('screenSupport')">Поддержка</div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge3">2</span></button>
+      <div class="header-user" onclick="showScreen('screenLK')">
+        <div class="user-avatar" id="headerAvatar3">А</div>
+        <span style="font-size:13px;" id="headerName3">Александр</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="hero" style="text-align:left; margin-bottom:28px;">
+      <h1 style="font-size:24px;">Поддержка</h1>
+      <p>Свяжитесь с нами или найдите ответ в FAQ</p>
+    </div>
+
+    <div class="support-card">
+      <h3>📧 Написать нам</h3>
+      <p>Ответим в течение 24 часов в рабочие дни</p>
+      <div class="support-email" onclick="copyEmail()">
+        <span>support@avarkom.ru</span>
+        <span class="copy-icon">📋 Копировать</span>
+      </div>
+      <div class="support-email" onclick="copyEmail2()">
+        <span>help@avarkom.ru</span>
+        <span class="copy-icon">📋 Копировать</span>
+      </div>
+      <div style="font-size:11px; color:#4b5563; margin-top:8px;">
+        ⚠️ Это временные адреса. После запуска будут рабочие.
+      </div>
+    </div>
+
+    <div class="support-card">
+      <h3>💬 Частые вопросы</h3>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Сколько стоит вызов комиссара?</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="faq-a">Стоимость фиксирована и зависит от типа ДТП. Точная цена показывается перед подтверждением вызова — никаких скрытых доплат.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Что делать, если комиссар не приехал?</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="faq-a">Напишите в поддержку через форму выше. Мы вернём деньги в полном объёме и поможем оформить ДТП альтернативным способом.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Можно ли оформить ДТП без ГИБДД?</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="faq-a">Да, если нет пострадавших, участников не больше двух, нет разногласий и ущерб не превышает лимит европротокола. Комиссар поможет правильно всё заполнить.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Как оплатить вызов?</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="faq-a">Картой, через СБП или ЮMoney. Оплата проходит до прибытия комиссара. Если вызов отменён до принятия — деньги вернутся автоматически.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Храните ли вы мои данные?</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="faq-a">Все персональные данные обрабатываются в соответствии с 152-ФЗ. Документы по ДТП хранятся в вашем личном кабинете и доступны только вам.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Работаете ли вы в моём городе?</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="faq-a">На старте — только Москва и Санкт-Петербург. О других городах сообщим в уведомлениях.</div>
+      </div>
+    </div>
+
+    <div class="support-card">
+      <h3>🆘 Экстренные службы</h3>
+      <p>Если ситуация угрожает жизни — звоните напрямую</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
+        <button class="btn" onclick="window.location.href='tel:112'" style="padding:14px;">📞 112 — Единый</button>
+        <button class="btn" onclick="window.location.href='tel:102'" style="padding:14px;">🚔 102 — Полиция</button>
+        <button class="btn" onclick="window.location.href='tel:103'" style="padding:14px;">🚑 103 — Скорая</button>
+        <button class="btn" onclick="window.location.href='tel:101'" style="padding:14px;">🚒 101 — Пожарная</button>
+      </div>
     </div>
   </div>
 </div>
@@ -433,37 +711,38 @@ body {
     <div class="header-nav">
       <div class="nav-item" onclick="showScreen('screenHome')">Главная</div>
       <div class="nav-item" onclick="showScreen('screenRecommendations')">Рекомендации</div>
-      <div class="nav-item active" onclick="showScreen('screenLK')">Личный кабинет</div>
+      <div class="nav-item" onclick="showScreen('screenSupport')">Поддержка</div>
     </div>
-    <div class="header-user">
-      <div class="user-avatar" id="headerAvatar3">А</div>
-      <span style="font-size:13px;" id="headerName3">Александр</span>
+    <div class="header-right">
+      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge4">2</span></button>
+      <div class="header-user">
+        <div class="user-avatar" id="headerAvatar4">А</div>
+        <span style="font-size:13px;" id="headerName4">Александр</span>
+      </div>
     </div>
   </div>
 
   <div class="main">
     <div class="hero" style="text-align:left; margin-bottom:28px;">
       <h1 style="font-size:24px;">Личный кабинет</h1>
-      <p>История вызовов, документы, оплата</p>
+      <p id="lkGreeting">Добро пожаловать!</p>
     </div>
 
-    <!-- Статистика -->
     <div class="lk-grid">
       <div class="lk-card">
         <h4>Всего вызовов</h4>
-        <div class="lk-value" id="statCalls">3</div>
+        <div class="lk-value" id="statCalls">0</div>
       </div>
       <div class="lk-card">
         <h4>Потрачено</h4>
-        <div class="lk-value">7 200 ₽</div>
+        <div class="lk-value">0 ₽</div>
       </div>
       <div class="lk-card">
         <h4>Баланс</h4>
-        <div class="lk-value" style="color:#4ade80;">1 500 ₽</div>
+        <div class="lk-value" style="color:#4ade80;">0 ₽</div>
       </div>
     </div>
 
-    <!-- Действия -->
     <div class="lk-list" style="margin-bottom:20px;">
       <div class="lk-row" onclick="openPayment()">
         <div class="lk-row-icon">💳</div>
@@ -473,15 +752,15 @@ body {
         </div>
         <div class="lk-row-arrow">→</div>
       </div>
-      <div class="lk-row" onclick="toast('Документы')">
+      <div class="lk-row" onclick="toast('Документов пока нет')">
         <div class="lk-row-icon">📄</div>
         <div class="lk-row-info">
           <div class="lk-row-title">Мои документы</div>
-          <div class="lk-row-sub">Европротоколы, фото, схемы</div>
+          <div class="lk-row-sub">Появятся после первого оформления</div>
         </div>
         <div class="lk-row-arrow">→</div>
       </div>
-      <div class="lk-row" onclick="toast('Настройки')">
+      <div class="lk-row" onclick="toast('Настройки (в разработке)')">
         <div class="lk-row-icon">⚙️</div>
         <div class="lk-row-info">
           <div class="lk-row-title">Настройки</div>
@@ -491,32 +770,11 @@ body {
       </div>
     </div>
 
-    <!-- История -->
     <h3 style="font-size:13px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">История вызовов</h3>
     <div class="lk-list">
-      <div class="lk-row" onclick="toast('Заказ #1042')">
-        <div class="lk-row-icon">✅</div>
-        <div class="lk-row-info">
-          <div class="lk-row-title">ДТП на Тверской</div>
-          <div class="lk-row-sub">12 сентября 2026 · 2 500 ₽ · Завершён</div>
-        </div>
-        <div class="lk-row-arrow">→</div>
-      </div>
-      <div class="lk-row" onclick="toast('Заказ #0987')">
-        <div class="lk-row-icon">✅</div>
-        <div class="lk-row-info">
-          <div class="lk-row-title">ДТП на Садовом</div>
-          <div class="lk-row-sub">3 августа 2026 · 2 200 ₽ · Завершён</div>
-        </div>
-        <div class="lk-row-arrow">→</div>
-      </div>
-      <div class="lk-row" onclick="toast('Заказ #0765')">
-        <div class="lk-row-icon">✅</div>
-        <div class="lk-row-info">
-          <div class="lk-row-title">ДТП во дворе</div>
-          <div class="lk-row-sub">18 июня 2026 · 2 500 ₽ · Завершён</div>
-        </div>
-        <div class="lk-row-arrow">→</div>
+      <div class="lk-empty">
+        📭 У вас пока нет вызовов<br>
+        <span style="font-size:12px; color:#4b5563; margin-top:6px; display:block;">История появится после первого заказа</span>
       </div>
     </div>
 
@@ -524,7 +782,7 @@ body {
   </div>
 </div>
 
-<!-- ============ ЭКРАН: ВЫЗОВ (КАРТА) ============ -->
+<!-- ============ ЭКРАН: ВЫЗОВ ============ -->
 <div class="screen" id="screenCall">
   <div class="header">
     <div class="logo">🚨 АварКом</div>
@@ -532,64 +790,89 @@ body {
     <button class="btn" style="margin-left:auto; padding:8px 16px; font-size:13px;" onclick="cancelCall()">Отменить</button>
   </div>
 
-  <div class="call-map-wrap">
-    <div class="call-sidebar">
-      <div style="padding:20px; border-bottom:1px solid #1f232c;">
-        <h3 style="font-size:11px; color:#6b7280; text-transform:uppercase; margin-bottom:12px;">Статус</h3>
-        <div id="callStatus" style="font-size:15px; font-weight:600; color:#f59e0b;">Поиск комиссара...</div>
+  <div class="call-wrap">
+    <div class="call-container">
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
       </div>
 
-      <div style="padding:20px; border-bottom:1px solid #1f232c;">
-        <h3 style="font-size:11px; color:#6b7280; text-transform:uppercase; margin-bottom:12px;">Детали</h3>
-        <div style="font-size:13px; line-height:1.8; color:#8b92a0;">
-          <div>Тип: <span style="color:#e8eaed;" id="callType">2 машины, без пострадавших</span></div>
-          <div>Адрес: <span style="color:#e8eaed;" id="callAddress">Москва, ул. Тверская, 12</span></div>
-        </div>
+      <div class="call-status-icon" id="callIcon">🔍</div>
+      <div class="call-title" id="callTitle">Ищем комиссара...</div>
+      <div class="call-sub" id="callSub">Обычно занимает 1–2 минуты</div>
+      <div class="call-timer" id="callTimer">00:00</div>
+
+      <div class="call-info-block">
+        <div>Тип ДТП: <b id="callType">—</b></div>
+        <div>Адрес: <b id="callAddress">—</b></div>
+        <div id="callCommentRow" style="display:none;">Комментарий: <b id="callComment">—</b></div>
       </div>
 
-      <div style="padding:20px; border-bottom:1px solid #1f232c;" id="commInfo" style="display:none;">
-        <h3 style="font-size:11px; color:#6b7280; text-transform:uppercase; margin-bottom:12px;">Комиссар</h3>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div class="user-avatar" style="width:44px; height:44px; font-size:18px;">А</div>
-          <div>
-            <div style="font-size:14px; font-weight:600;" id="commName">Алексей М.</div>
-            <div style="font-size:12px; color:#f59e0b;" id="commMeta">★ 4.9 · 5 лет опыта</div>
-          </div>
-        </div>
+      <div class="call-actions">
+        <button class="btn btn-danger emergency-btn" onclick="window.location.href='tel:112'">
+          🆘 Экстренная помощь — 112
+        </button>
+        <button class="btn" onclick="toast('Чат (в разработке)')">💬 Чат</button>
+        <button class="btn" onclick="toast('Связь со поддержкой')">📞 Поддержка</button>
       </div>
 
-      <div style="padding:20px;">
-        <button class="btn btn-primary btn-block" onclick="toast('Оплата')" style="margin-bottom:8px;">💳 Оплатить 2 500 ₽</button>
-        <button class="btn btn-block" onclick="toast('Чат')">💬 Чат с комиссаром</button>
+      <div class="notes-block">
+        <b>📋 Что дальше:</b><br>
+        • Не покидайте место ДТП<br>
+        • Сфотографируйте повреждения и общий план<br>
+        • Запишите контакты свидетелей, если есть<br>
+        • Комиссар поможет заполнить все документы
       </div>
+
     </div>
-
-    <div id="callMap"></div>
   </div>
 </div>
 
-<!-- ============ МОДАЛКА: ПОДТВЕРЖДЕНИЕ ВЫЗОВА ============ -->
+<!-- ============ МОДАЛКА: ВЫЗОВ ============ -->
 <div class="modal-bg" id="confirmCallModal">
   <div class="modal">
-    <h2>Подтверждение вызова</h2>
+    <h2>Вызов комиссара</h2>
+
     <div class="field">
       <label>Тип ДТП</label>
-      <select id="modalAccidentType" style="width:100%; background:#0a0c10; border:1px solid #1f232c; color:#e8eaed; padding:12px 14px; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+      <select id="modalAccidentType">
         <option>2 машины, без пострадавших</option>
         <option>Сложное (3+ участника / разногласия)</option>
         <option>Один участник (наезд на препятствие)</option>
         <option>Парковка / двор</option>
       </select>
     </div>
+
     <div class="field">
       <label>Адрес</label>
-      <input type="text" id="modalAddress" value="Москва, ул. Тверская, 12">
+      <div class="field-wrap">
+        <input type="text" id="modalAddress" placeholder="Введите адрес или нажмите GPS" value="">
+        <button class="gps-btn" onclick="detectLocation()" title="Определить автоматически">📍</button>
+      </div>
     </div>
-    <div style="background:#0a0c10; border-radius:12px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0;">
-      <div>Комиссар: <span style="color:#e8eaed;">Алексей М. (★ 4.9)</span></div>
+
+    <div class="field">
+      <label>Комментарий (необязательно)</label>
+      <textarea id="modalComment" placeholder="Например: перекрыта одна полоса, второй участник уехал за документами, машина не заводится..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Фото с места (до 5 штук, необязательно)</label>
+      <div class="photo-upload" id="photoUpload">
+        <div class="photo-item" onclick="addPhoto(this)">+</div>
+        <div class="photo-item" onclick="addPhoto(this)">+</div>
+        <div class="photo-item" onclick="addPhoto(this)">+</div>
+        <div class="photo-item" onclick="addPhoto(this)">+</div>
+        <div class="photo-item" onclick="addPhoto(this)">+</div>
+      </div>
+    </div>
+
+    <div style="background:#0a0c10; border-radius:12px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0; margin-top:16px;">
       <div>Стоимость: <span style="color:#f59e0b; font-weight:700;">2 500 ₽</span></div>
-      <div>Прибытие: <span style="color:#e8eaed;">~12 минут</span></div>
+      <div>Оплата: <span style="color:#e8eaed;">до прибытия комиссара</span></div>
+      <div>Прибытие: <span style="color:#e8eaed;">15–25 минут</span></div>
     </div>
+
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('confirmCallModal')">Отмена</button>
       <button class="btn btn-primary" onclick="confirmCallSubmit()">Вызвать</button>
@@ -639,6 +922,56 @@ body {
   </div>
 </div>
 
+<!-- ============ МОДАЛКА: УВЕДОМЛЕНИЯ ============ -->
+<div class="modal-bg" id="notifModal">
+  <div class="modal">
+    <h2>🔔 Уведомления</h2>
+    <div class="notif-list">
+      <div class="notif-item">
+        <div class="notif-icon">⚡</div>
+        <div class="notif-content">
+          <div class="notif-title">Обновление лимитов европротокола</div>
+          <div class="notif-text">С 2025 года лимит с разногласиями — 200 000 ₽, без разногласий — 400 000 ₽</div>
+          <div class="notif-time">2 дня назад</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-icon">🆕</div>
+        <div class="notif-content">
+          <div class="notif-title">Добро пожаловать в АварКом</div>
+          <div class="notif-text">Спасибо, что выбрали наш сервис. Если что-то не работает — пишите в поддержку.</div>
+          <div class="notif-time">только что</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('notifModal')">Понятно</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ МОДАЛКА: ОЦЕНКА ============ -->
+<div class="modal-bg" id="ratingModal">
+  <div class="modal">
+    <h2>Оцените комиссара</h2>
+    <p style="font-size:13px; color:#8b92a0; text-align:center;">Как всё прошло?</p>
+    <div class="stars" id="ratingStars">
+      <span data-v="1">★</span>
+      <span data-v="2">★</span>
+      <span data-v="3">★</span>
+      <span data-v="4">★</span>
+      <span data-v="5">★</span>
+    </div>
+    <div class="field">
+      <textarea id="ratingComment" placeholder="Оставьте отзыв (необязательно)" style="min-height:70px;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('ratingModal')">Пропустить</button>
+      <button class="btn btn-primary" onclick="submitRating()">Отправить</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">Готово!</div>
 
@@ -646,9 +979,11 @@ body {
 (function() {
   'use strict';
 
-  let map = null;
   let currentScreen = 'screenAuth';
   let userName = 'Александр';
+  let callTimer = null;
+  let callSeconds = 0;
+  let currentRating = 0;
 
   // ============ SCREENS ============
   window.showScreen = function(id) {
@@ -656,6 +991,11 @@ body {
     document.getElementById(id).classList.add('active');
     currentScreen = id;
     window.scrollTo(0, 0);
+
+    // Обновляем активный пункт меню
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
   };
 
   window.switchAuth = function(tab) {
@@ -686,10 +1026,8 @@ body {
     const phone = document.getElementById('regPhone').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const pass = document.getElementById('regPass').value.trim();
-
     if (!name || !phone || !email || !pass) { toast('Заполните все поля'); return; }
     if (pass.length < 6) { toast('Пароль минимум 6 символов'); return; }
-
     userName = name;
     updateUserName();
     showScreen('screenHome');
@@ -697,123 +1035,182 @@ body {
   };
 
   window.doLogout = function() {
+    if (!confirm('Выйти из аккаунта?')) return;
     showScreen('screenAuth');
     toast('Вы вышли');
   };
 
   function updateUserName() {
     const initial = userName.charAt(0).toUpperCase();
-    ['headerAvatar', 'headerAvatar2', 'headerAvatar3'].forEach(id => {
+    ['headerAvatar', 'headerAvatar2', 'headerAvatar3', 'headerAvatar4'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = initial;
     });
-    ['headerName', 'headerName2', 'headerName3'].forEach(id => {
+    ['headerName', 'headerName2', 'headerName3', 'headerName4'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = userName;
     });
+    const greet = document.getElementById('lkGreeting');
+    if (greet) greet.textContent = 'Привет, ' + userName + '!';
   }
 
-  // ============ CALL ============
+  // ============ 112 ============
   window.call112 = function() {
-    if (confirm('Позвонить в 112? (В реальном приложении начнётся звонок)')) {
-      toast('Звонок в 112...');
-      // window.location.href = 'tel:112';
+    if (confirm('Позвонить в 112?')) {
+      window.location.href = 'tel:112';
     }
   };
 
+  // ============ CALL ============
   window.startCall = function() {
+    document.getElementById('modalAddress').value = '';
+    document.getElementById('modalComment').value = '';
+    document.querySelectorAll('.photo-item').forEach(p => {
+      p.classList.remove('filled');
+      p.innerHTML = '+';
+      p.onclick = () => addPhoto(p);
+    });
     document.getElementById('confirmCallModal').classList.add('active');
   };
 
+  window.detectLocation = function() {
+    if (!navigator.geolocation) { toast('Геолокация недоступна'); return; }
+    toast('Определяем адрес...');
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        // В реальном приложении здесь будет обратное геокодирование
+        const fakeAddr = 'Москва, ул. Тверская, ' + (Math.floor(Math.random() * 30) + 1);
+        document.getElementById('modalAddress').value = fakeAddr;
+        toast('Адрес определён');
+      },
+      () => toast('Не удалось определить. Введите вручную.')
+    );
+  };
+
+  window.addPhoto = function(el) {
+    if (el.classList.contains('filled')) return;
+    el.classList.add('filled');
+    el.innerHTML = '📷<span class="remove" onclick="removePhoto(event, this)">×</span>';
+    el.onclick = null;
+  };
+
+  window.removePhoto = function(e, el) {
+    e.stopPropagation();
+    const parent = el.parentElement;
+    parent.classList.remove('filled');
+    parent.innerHTML = '+';
+    parent.onclick = () => addPhoto(parent);
+  };
+
   window.confirmCallSubmit = function() {
+    const addr = document.getElementById('modalAddress').value.trim();
+    if (!addr) { toast('Укажите адрес'); return; }
+
+    const type = document.getElementById('modalAccidentType').value;
+    const comment = document.getElementById('modalComment').value.trim();
+
     closeModal('confirmCallModal');
 
-    // Показываем экран вызова
-    showScreen('screenCall');
-
-    // Обновляем детали
-    const type = document.getElementById('modalAccidentType').value;
-    const addr = document.getElementById('modalAddress').value;
+    // Обновляем данные на экране вызова
     document.getElementById('callType').textContent = type;
     document.getElementById('callAddress').textContent = addr;
+    if (comment) {
+      document.getElementById('callCommentRow').style.display = 'block';
+      document.getElementById('callComment').textContent = comment;
+    } else {
+      document.getElementById('callCommentRow').style.display = 'none';
+    }
 
-    // Инициализируем карту (только сейчас!)
-    setTimeout(() => {
-      initCallMap();
-      simulateCallFlow();
-    }, 100);
+    showScreen('screenCall');
+    startCallFlow();
   };
 
   window.cancelCall = function() {
-    if (confirm('Отменить вызов?')) {
-      if (map) { map.remove(); map = null; }
-      showScreen('screenHome');
-      toast('Вызов отменён');
-    }
+    if (!confirm('Отменить вызов?')) return;
+    if (callTimer) { clearInterval(callTimer); callTimer = null; }
+    callSeconds = 0;
+    showScreen('screenHome');
+    toast('Вызов отменён');
   };
 
-  // ============ MAP (инициализация только при вызове) ============
-  function initCallMap() {
-    const mapEl = document.getElementById('callMap');
-    if (!mapEl || typeof L === 'undefined') return;
+  function startCallFlow() {
+    // Сбрасываем
+    callSeconds = 0;
+    document.getElementById('callTimer').textContent = '00:00';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('callIcon').textContent = '🔍';
+    document.getElementById('callTitle').textContent = 'Ищем комиссара...';
+    document.getElementById('callSub').textContent = 'Обычно занимает 1–2 минуты';
 
-    map = L.map(mapEl, { zoomControl: false }).setView([55.755, 37.617], 14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap © CARTO',
-      maxZoom: 19
-    }).addTo(map);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    // Таймер
+    if (callTimer) clearInterval(callTimer);
+    callTimer = setInterval(() => {
+      callSeconds++;
+      const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+      const s = String(callSeconds % 60).padStart(2, '0');
+      document.getElementById('callTimer').textContent = m + ':' + s;
+    }, 1000);
 
-    // Вы
-    L.circleMarker([55.755, 37.617], {
-      radius: 10, color: '#4ade80', fillColor: '#4ade80',
-      fillOpacity: 1, weight: 3
-    }).addTo(map).bindPopup('📍 Вы здесь');
-
-    // Комиссар
-    const start = [55.760, 37.625];
-    const end = [55.755, 37.617];
-    const marker = L.circleMarker(start, {
-      radius: 10, color: '#f59e0b', fillColor: '#f59e0b',
-      fillOpacity: 1, weight: 3
-    }).addTo(map).bindPopup('🚗 Алексей М.');
-
-    // Анимация движения
-    let step = 0;
-    const totalSteps = 80;
-    setInterval(() => {
-      step++;
-      if (step > totalSteps) return;
-      const t = step / totalSteps;
-      const lat = start[0] + (end[0] - start[0]) * t;
-      const lng = start[1] + (end[1] - start[1]) * t;
-      marker.setLatLng([lat, lng]);
-    }, 150);
-  }
-
-  // ============ CALL FLOW ============
-  function simulateCallFlow() {
-    const statuses = [
-      { time: 800, text: 'Ищем комиссара...' },
-      { time: 2500, text: 'Комиссар принял вызов' },
-      { time: 4500, text: 'Алексей М. выехал к вам' },
-      { time: 7000, text: 'Алексей М. в пути · ~12 мин' },
-      { time: 13000, text: 'Алексей М. прибыл на место' }
+    // Этапы
+    const stages = [
+      { t: 1500, icon: '✅', title: 'Комиссар принял вызов', sub: 'Готовится к выезду', progress: 25 },
+      { t: 4000, icon: '🚗', title: 'Комиссар выехал', sub: 'В пути к вам', progress: 50 },
+      { t: 8000, icon: '📍', title: 'Комиссар рядом', sub: 'Будет через 2–3 минуты', progress: 75 },
+      { t: 13000, icon: '🎉', title: 'Комиссар прибыл', sub: 'Ищите машину с наклейкой АварКом', progress: 100 }
     ];
 
-    statuses.forEach(s => {
+    stages.forEach(s => {
       setTimeout(() => {
-        const el = document.getElementById('callStatus');
-        if (el) el.textContent = s.text;
-      }, s.time);
-    });
+        document.getElementById('callIcon').textContent = s.icon;
+        document.getElementById('callTitle').textContent = s.title;
+        document.getElementById('callSub').textContent = s.sub;
+        document.getElementById('progressFill').style.width = s.progress + '%';
 
-    // Показываем инфо о комиссаре
-    setTimeout(() => {
-      const el = document.getElementById('commInfo');
-      if (el) el.style.display = 'block';
-    }, 2500);
+        // На последнем этапе — предложить оценить через время
+        if (s.progress === 100) {
+          if (callTimer) { clearInterval(callTimer); callTimer = null; }
+          setTimeout(() => {
+            if (confirm('Оформление завершено. Оценить комиссара?')) {
+              openRating();
+            }
+          }, 3000);
+        }
+      }, s.t);
+    });
   }
+
+  // ============ RATING ============
+  function openRating() {
+    currentRating = 0;
+    document.querySelectorAll('#ratingStars span').forEach(s => s.classList.remove('active'));
+    document.getElementById('ratingComment').value = '';
+    document.getElementById('ratingModal').classList.add('active');
+  }
+
+  window.submitRating = function() {
+    if (!currentRating) { toast('Поставьте оценку'); return; }
+    closeModal('ratingModal');
+    toast('Спасибо за отзыв!');
+    setTimeout(() => showScreen('screenHome'), 800);
+  };
+
+  // Настройка звёзд
+  document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('#ratingStars span');
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        currentRating = +star.dataset.v;
+        stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= currentRating));
+      });
+      star.addEventListener('mouseenter', () => {
+        const v = +star.dataset.v;
+        stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= v));
+      });
+    });
+    document.getElementById('ratingStars').addEventListener('mouseleave', () => {
+      stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= currentRating));
+    });
+  });
 
   // ============ PAYMENT ============
   window.openPayment = function() {
@@ -832,7 +1229,6 @@ body {
     closeModal('paymentModal');
   };
 
-  // Обновление суммы в реальном времени
   document.addEventListener('DOMContentLoaded', () => {
     const amountInput = document.getElementById('payAmount');
     if (amountInput) {
@@ -843,6 +1239,28 @@ body {
       });
     }
   });
+
+  // ============ SUPPORT ============
+  window.copyEmail = function() {
+    navigator.clipboard.writeText('support@avarkom.ru').then(() => {
+      toast('Email скопирован');
+    }).catch(() => toast('support@avarkom.ru'));
+  };
+
+  window.copyEmail2 = function() {
+    navigator.clipboard.writeText('help@avarkom.ru').then(() => {
+      toast('Email скопирован');
+    }).catch(() => toast('help@avarkom.ru'));
+  };
+
+  window.toggleFaq = function(el) {
+    el.classList.toggle('open');
+  };
+
+  // ============ NOTIFICATIONS ============
+  window.openNotifications = function() {
+    document.getElementById('notifModal').classList.add('active');
+  };
 
   // ============ MODAL ============
   window.closeModal = function(id) {
@@ -864,6 +1282,9 @@ body {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('active'), 2500);
   };
+
+  // Инициализация имени
+  updateUserName();
 
 })();
 </script>
