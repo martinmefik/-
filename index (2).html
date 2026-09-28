@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мой район — узнай правду о районе</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f1115;
+    color: #e8eaed;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  header {
+    height: 60px;
+    background: #171a21;
+    border-bottom: 1px solid #252932;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+    z-index: 1000;
+    position: relative;
+  }
+  .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4ade80;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+  }
+  .search input {
+    width: 100%;
+    background: #0f1115;
+    border: 1px solid #252932;
+    color: #e8eaed;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+  .search input:focus { border-color: #4ade80; }
+  .search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #171a21;
+    border: 1px solid #252932;
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+  }
+  .search-results.active { display: block; }
+  .search-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .search-item:hover { background: #1f232c; }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .btn {
+    background: #252932;
+    border: none;
+    color: #e8eaed;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn:hover { background: #2f3440; }
+  .btn-primary {
+    background: #4ade80;
+    color: #0f1115;
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: #22c55e; }
+
+  /* LAYOUT */
+  .app {
+    display: flex;
+    height: calc(100vh - 60px);
+  }
+
+  /* SIDEBAR */
+  aside {
+    width: 340px;
+    background: #171a21;
+    border-right: 1px solid #252932;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .panel {
+    padding: 18px;
+    border-bottom: 1px solid #252932;
+  }
+  .panel h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8b92a0;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .layer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 4px;
+    transition: 0.15s;
+  }
+  .layer-toggle:hover { background: #1f232c; }
+  .layer-toggle input {
+    accent-color: #4ade80;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* COMFORT INDEX */
+  .comfort {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .comfort-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    position: relative;
+  }
+  .comfort-circle.good { background: rgba(74,222,128,0.15); color: #4ade80; border: 3px solid #4ade80; }
+  .comfort-circle.medium { background: rgba(250,204,21,0.15); color: #facc15; border: 3px solid #facc15; }
+  .comfort-circle.bad { background: rgba(248,113,113,0.15); color: #f87171; border: 3px solid #f87171; }
+  .comfort-label { font-size: 14px; color: #8b92a0; }
+
+  /* STATS */
+  .stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #1f232c;
+  }
+  .stat:last-child { border-bottom: none; }
+  .stat-label { color: #8b92a0; }
+  .stat-value { font-weight: 600; }
+
+  /* REVIEWS */
+  .review {
+    background: #1f232c;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #8b92a0;
+  }
+  .review-author { color: #4ade80; font-weight: 600; }
+  .review-text { color: #c8ccd4; }
+  .review-rating { color: #facc15; }
+
+  /* MAP */
+  #map {
+    flex: 1;
+    height: 100%;
+    z-index: 1;
+  }
+  .leaflet-container {
+    background: #0f1115;
+  }
+
+  /* FORM */
+  .form-group { margin-bottom: 12px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    color: #8b92a0;
+    margin-bottom: 5px;
+  }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    background: #0f1115;
+    border: 1px solid #252932;
+    color: #e8eaed;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: #4ade80;
+  }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .stars {
+    display: flex;
+    gap: 4px;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  .stars span { color: #3a3f4a; transition: 0.15s; }
+  .stars span.active { color: #facc15; }
+
+  /* MODAL */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-bg.active { display: flex; }
+  .modal {
+    background: #171a21;
+    border: 1px solid #252932;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 460px;
+  }
+  .modal h2 { font-size: 18px; margin-bottom: 16px; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  /* LEGEND */
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: #171a21;
+    border: 1px solid #252932;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    z-index: 1000;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .legend-item:last-child { margin-bottom: 0; }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  /* Notifications */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #4ade80;
+    color: #0f1115;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 3000;
+    transition: transform 0.3s;
+  }
+  .toast.active { transform: translateX(-50%) translateY(0); }
+
+  /* Scrollbar */
+  aside::-webkit-scrollbar { width: 6px; }
+  aside::-webkit-scrollbar-track { background: #171a21; }
+  aside::-webkit-scrollbar-thumb { background: #2f3440; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🗺️ Мой район</div>
+
+  <div class="search">
+    <input type="text" id="searchInput" placeholder="Найти район или адрес..." autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn" onclick="locateMe()">📍 Я здесь</button>
+    <button class="btn btn-primary" onclick="openReviewModal()">+ Отзыв о районе</button>
+  </div>
+</header>
+
+<div class="app">
+  <aside>
+    <!-- Индекс комфорта -->
+    <div class="panel">
+      <h3>Индекс комфорта</h3>
+      <div class="comfort">
+        <div class="comfort-circle good" id="comfortCircle">8.2</div>
+        <div class="comfort-label" id="comfortLabel">Отличный район для жизни</div>
+      </div>
+    </div>
+
+    <!-- Слои -->
+    <div class="panel">
+      <h3>Слои на карте</h3>
+      <label class="layer-toggle">
+        <input type="checkbox" id="layerNoise" onchange="toggleLayer('noise')" checked>
+        <span>🔊 Уровень шума</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" id="layerTraffic" onchange="toggleLayer('traffic')" checked>
+        <span>🚗 Пробки / транспорт</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" id="layerGreen" onchange="toggleLayer('green')">
+        <span>🌳 Зелёные зоны</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" id="layerSchools" onchange="toggleLayer('schools')">
+        <span>🏫 Школы и садики</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" id="layerMedical" onchange="toggleLayer('medical')">
+        <span>🏥 Поликлиники</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" id="layerReviews" onchange="toggleLayer('reviews')" checked>
+        <span>💬 Отзывы жителей</span>
+      </label>
+    </div>
+
+    <!-- Статистика района -->
+    <div class="panel">
+      <h3>О районе</h3>
+      <div class="stat">
+        <span class="stat-label">Уровень шума</span>
+        <span class="stat-value" style="color:#f87171;">Высокий днём</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Парковка</span>
+        <span class="stat-value" style="color:#facc15;">Проблематично</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Транспорт</span>
+        <span class="stat-value" style="color:#4ade80;">Отличный</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Зелень</span>
+        <span class="stat-value" style="color:#4ade80;">Много парков</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Магазины</span>
+        <span class="stat-value" style="color:#4ade80;">Всё рядом</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Безопасность</span>
+        <span class="stat-value" style="color:#facc15;">Средняя</span>
+      </div>
+    </div>
+
+    <!-- Отзывы -->
+    <div class="panel">
+      <h3>Отзывы жителей (3)</h3>
+      <div id="reviewsList">
+        <div class="review">
+          <div class="review-header">
+            <span class="review-author">Анна К.</span>
+            <span>2 недели назад</span>
+          </div>
+          <div class="review-rating">★★★★★</div>
+          <div class="review-text">Живу тут 3 года. Тихий двор, но по вечерам шумно от кафе на углу. Метро в 5 минутах — золото.</div>
+        </div>
+        <div class="review">
+          <div class="review-header">
+            <span class="review-author">Дмитрий</span>
+            <span>месяц назад</span>
+          </div>
+          <div class="review-rating">★★★☆☆</div>
+          <div class="review-text">Парковки нет вообще. Если машина — забудьте. В остальном норм, но с детьми гулять особо негде.</div>
+        </div>
+        <div class="review">
+          <div class="review-header">
+            <span class="review-author">Марина</span>
+            <span>2 месяца назад</span>
+          </div>
+          <div class="review-rating">★★★★☆</div>
+          <div class="review-text">Школа рядом хорошая, поликлиника тоже. Из минусов — старый фонд, зимой холодно в квартирах.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Форма быстрого отзыва -->
+    <div class="panel">
+      <h3>Оставить отзыв</h3>
+      <div class="form-group">
+        <label>Ваше имя</label>
+        <input type="text" id="quickName" placeholder="Аноним">
+      </div>
+      <div class="form-group">
+        <label>Оценка</label>
+        <div class="stars" id="quickStars">
+          <span data-v="1">★</span>
+          <span data-v="2">★</span>
+          <span data-v="3">★</span>
+          <span data-v="4">★</span>
+          <span data-v="5">★</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Комментарий</label>
+        <textarea id="quickText" placeholder="Что важно знать о районе?"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="submitQuickReview()">Отправить</button>
+    </div>
+  </aside>
+
+  <div id="map"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#f87171;"></div> Шумно</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#facc15;"></div> Средне</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4ade80;"></div> Комфортно</div>
+  </div>
+</div>
+
+<!-- Модалка отзыва -->
+<div class="modal-bg" id="reviewModal">
+  <div class="modal">
+    <h2>📍 Отзыв о районе</h2>
+    <div class="form-group">
+      <label>Адрес / район</label>
+      <input type="text" id="modalAddress" placeholder="Улица, дом или название района">
+    </div>
+    <div class="form-group">
+      <label>Ваше имя</label>
+      <input type="text" id="modalName" placeholder="Аноним">
+    </div>
+    <div class="form-group">
+      <label>Оценка района</label>
+      <div class="stars" id="modalStars">
+        <span data-v="1">★</span>
+        <span data-v="2">★</span>
+        <span data-v="3">★</span>
+        <span data-v="4">★</span>
+        <span data-v="5">★</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Что важно знать?</label>
+      <textarea id="modalText" placeholder="Шум, парковка, транспорт, соседи, инфраструктура..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeReviewModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="submitModalReview()">Опубликовать</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Готово!</div>
+
+<script>
+// ============ КАРТА ============
+// Москва по умолчанию
+const map = L.map('map', { zoomControl: false }).setView([55.751244, 37.618423], 13);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO',
+  maxZoom: 19
+}).addTo(map);
+
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+// ============ ДАННЫЕ РАЙОНОВ ============
+const neighborhoods = [
+  {
+    name: 'Хамовники',
+    coords: [55.735, 37.58],
+    comfort: 8.5,
+    noise: 'low', traffic: 'low', green: 'high',
+    reviews: 128
+  },
+  {
+    name: 'Пресня',
+    coords: [55.765, 37.555],
+    comfort: 8.0,
+    noise: 'medium', traffic: 'medium', green: 'medium',
+    reviews: 96
+  },
+  {
+    name: 'Арбат',
+    coords: [55.75, 37.59],
+    comfort: 6.2,
+    noise: 'high', traffic: 'high', green: 'low',
+    reviews: 212
+  },
+  {
+    name: 'Замоскворечье',
+    coords: [55.74, 37.63],
+    comfort: 7.8,
+    noise: 'medium', traffic: 'medium', green: 'medium',
+    reviews: 74
+  },
+  {
+    name: 'Басманный',
+    coords: [55.765, 37.665],
+    comfort: 7.5,
+    noise: 'medium', traffic: 'high', green: 'low',
+    reviews: 158
+  },
+  {
+    name: 'Таганский',
+    coords: [55.74, 37.665],
+    comfort: 7.0,
+    noise: 'high', traffic: 'medium', green: 'medium',
+    reviews: 143
+  },
+];
+
+const colorMap = {
+  low: '#4ade80',
+  medium: '#facc15',
+  high: '#f87171',
+  unknown: '#8b92a0'
+};
+
+const layers = {};
+['noise', 'traffic', 'green', 'schools', 'medical', 'reviews'].forEach(k => {
+  layers[k] = L.layerGroup().addTo(map);
+});
+
+// Слой шума — круги по районам
+neighborhoods.forEach(n => {
+  L.circle(n.coords, {
+    radius: 700,
+    color: colorMap[n.noise],
+    fillColor: colorMap[n.noise],
+    fillOpacity: 0.15,
+    weight: 1,
+    dashArray: '4 4'
+  }).addTo(layers.noise);
+
+  // Маркер района
+  const marker = L.circleMarker(n.coords, {
+    radius: 12,
+    color: '#4ade80',
+    fillColor: '#171a21',
+    fillOpacity: 1,
+    weight: 2
+  }).addTo(layers.reviews);
+
+  marker.bindPopup(`
+    <div style="min-width:200px;">
+      <div style="font-weight:700;font-size:15px;margin-bottom:8px;">${n.name}</div>
+      <div style="font-size:13px;color:#8b92a0;margin-bottom:8px;">Индекс комфорта: <b style="color:${n.comfort>=8?'#4ade80':n.comfort>=7?'#facc15':'#f87171'}">${n.comfort}</b></div>
+      <div style="font-size:12px;color:#8b92a0;">Отзывов: ${n.reviews}</div>
+    </div>
+  `);
+
+  marker.on('click', () => updateSidebar(n));
+});
+
+// Слой зелени — парки
+[
+  { name: 'Парк Горького', coords: [55.73, 37.60], type: 'park' },
+  { name: 'Парк Красная Пресня', coords: [55.76, 37.55], type: 'park' },
+  { name: 'Сад Эрмитаж', coords: [55.767, 37.61], type: 'park' },
+  { name: 'Парк Таганский', coords: [55.74, 37.66], type: 'park' },
+].forEach(p => {
+  L.circleMarker(p.coords, {
+    radius: 8,
+    color: '#4ade80',
+    fillColor: '#4ade80',
+    fillOpacity: 0.6,
+    weight: 2
+  }).bindPopup(`🌳 <b>${p.name}</b>`).addTo(layers.green);
+});
+
+// Школы
+[
+  { name: 'Школа №1234', coords: [55.75, 37.62] },
+  { name: 'Гимназия №1567', coords: [55.74, 37.58] },
+  { name: 'Школа №57', coords: [55.73, 37.60] },
+].forEach(s => {
+  L.marker(s.coords, {
+    icon: L.divIcon({
+      html: '🏫',
+      className: '',
+      iconSize: [24, 24]
+    })
+  }).bindPopup(`🏫 <b>${s.name}</b>`).addTo(layers.schools);
+});
+
+// Поликлиники
+[
+  { name: 'ГКБ №1', coords: [55.73, 37.58] },
+  { name: 'Поликлиника №5', coords: [55.76, 37.63] },
+  { name: 'Клиника на Арбате', coords: [55.75, 37.59] },
+].forEach(m => {
+  L.marker(m.coords, {
+    icon: L.divIcon({
+      html: '🏥',
+      className: '',
+      iconSize: [24, 24]
+    })
+  }).bindPopup(`🏥 <b>${m.name}</b>`).addTo(layers.medical);
+});
+
+// Пробки — линии
+[
+  [[55.75,37.6],[55.76,37.62],[55.77,37.65]],
+  [[55.73,37.58],[55.74,37.6],[55.75,37.62]],
+].forEach(line => {
+  L.polyline(line, {
+    color: colorMap.high,
+    weight: 4,
+    opacity: 0.6,
+    dashArray: '8 6'
+  }).addTo(layers.traffic);
+});
+
+// Изначально часть слоёв скрыта
+layers.green.remove();
+layers.schools.remove();
+layers.medical.remove();
+
+// ============ TOGGLE LAYERS ============
+function toggleLayer(key) {
+  const checkbox = document.getElementById('layer' + key.charAt(0).toUpperCase() + key.slice(1));
+  if (checkbox.checked) {
+    map.addLayer(layers[key]);
+  } else {
+    map.removeLayer(layers[key]);
+  }
+}
+
+// ============ ОБНОВЛЕНИЕ SIDEBAR ============
+function updateSidebar(n) {
+  const circle = document.getElementById('comfortCircle');
+  circle.textContent = n.comfort.toFixed(1);
+  circle.className = 'comfort-circle ' + (n.comfort >= 8 ? 'good' : n.comfort >= 7 ? 'medium' : 'bad');
+
+  const label = document.getElementById('comfortLabel');
+  label.textContent = n.comfort >= 8 ? 'Отличный район для жизни'
+                  : n.comfort >= 7 ? 'Хороший район, есть нюансы'
+                  : 'Есть серьёзные минусы';
+
+  toast('Район: ' + n.name);
+}
+
+// ============ ГЕОЛОКАЦИЯ ============
+function locateMe() {
+  if (!navigator.geolocation) {
+    toast('Геолокация недоступна');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude } = pos.coords;
+      map.setView([latitude, longitude], 15);
+      L.circleMarker([latitude, longitude], {
+        radius: 8,
+        color: '#4ade80',
+        fillColor: '#4ade80',
+        fillOpacity: 1,
+        weight: 3
+      }).addTo(map).bindPopup('📍 Вы здесь').openPopup();
+      toast('Определили ваше местоположение');
+    },
+    () => toast('Не удалось определить местоположение')
+  );
+}
+
+// ============ ПОИСК ============
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+const searchablePlaces = [
+  ...neighborhoods.map(n => ({ name: n.name + ', Москва', coords: n.coords, type: 'район' })),
+  { name: 'Москва, Красная площадь', coords: [55.7539, 37.6208], type: 'адрес' },
+  { name: 'Москва, Парк Горького', coords: [55.73, 37.60], type: 'парк' },
+  { name: 'Санкт-Петербург', coords: [59.9343, 30.3351], type: 'город' },
+  { name: 'Казань', coords: [55.7963, 49.1088], type: 'город' },
+  { name: 'Екатеринбург', coords: [56.8389, 60.6057], type: 'город' },
+];
+
+searchInput.addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) {
+    searchResults.classList.remove('active');
+    return;
+  }
+  const matches = searchablePlaces.filter(p => p.name.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) {
+    searchResults.classList.remove('active');
+    return;
+  }
+  searchResults.innerHTML = matches.map(m =>
+    `<div class="search-item" onclick='goToPlace(${JSON.stringify(m.coords)}, ${JSON.stringify(m.name)})'>
+      ${m.name} <span style="color:#8b92a0;font-size:12px;">· ${m.type}</span>
+    </div>`
+  ).join('');
+  searchResults.classList.add('active');
+});
+
+function goToPlace(coords, name) {
+  map.setView(coords, 14);
+  searchInput.value = name;
+  searchResults.classList.remove('active');
+  toast('Перешли к: ' + name);
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search')) searchResults.classList.remove('active');
+});
+
+// ============ ЗВЁЗДЫ ============
+function setupStars(containerId, state) {
+  const container = document.getElementById(containerId);
+  const stars = container.querySelectorAll('span');
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const v = +star.dataset.v;
+      state.value = v;
+      stars.forEach(s => {
+        s.classList.toggle('active', +s.dataset.v <= v);
+      });
+    });
+    star.addEventListener('mouseenter', () => {
+      const v = +star.dataset.v;
+      stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= v));
+    });
+  });
+  container.addEventListener('mouseleave', () => {
+    stars.forEach(s => s.classList.toggle('active', +s.dataset.v <= state.value));
+  });
+}
+
+const quickStars = { value: 0 };
+const modalStars = { value: 0 };
+setupStars('quickStars', quickStars);
+setupStars('modalStars', modalStars);
+
+// ============ ОТЗЫВЫ ============
+function submitQuickReview() {
+  const name = document.getElementById('quickName').value.trim() || 'Аноним';
+  const text = document.getElementById('quickText').value.trim();
+  const rating = quickStars.value;
+
+  if (!text) { toast('Напишите комментарий'); return; }
+  if (!rating) { toast('Поставьте оценку'); return; }
+
+  addReview(name, rating, text);
+  document.getElementById('quickText').value = '';
+  document.getElementById('quickName').value = '';
+  quickStars.value = 0;
+  document.querySelectorAll('#quickStars span').forEach(s => s.classList.remove('active'));
+  toast('Спасибо за отзыв!');
+}
+
+function addReview(name, rating, text) {
+  const list = document.getElementById('reviewsList');
+  const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+  const div = document.createElement('div');
+  div.className = 'review';
+  div.innerHTML = `
+    <div class="review-header">
+      <span class="review-author">${escapeHtml(name)}</span>
+      <span>только что</span>
+    </div>
+    <div class="review-rating">${stars}</div>
+    <div class="review-text">${escapeHtml(text)}</div>
+  `;
+  list.insertBefore(div, list.firstChild);
+
+  const h3 = list.parentElement.querySelector('h3');
+  const count = list.children.length;
+  h3.textContent = `Отзывы жителей (${count})`;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+// ============ МОДАЛКА ============
+function openReviewModal() {
+  document.getElementById('reviewModal').classList.add('active');
+  document.getElementById('modalAddress').value = '';
+  document.getElementById('modalName').value = '';
+  document.getElementById('modalText').value = '';
+  modalStars.value = 0;
+  document.querySelectorAll('#modalStars span').forEach(s => s.classList.remove('active'));
+}
+function closeReviewModal() {
+  document.getElementById('reviewModal').classList.remove('active');
+}
+function submitModalReview() {
+  const name = document.getElementById('modalName').value.trim() || 'Аноним';
+  const text = document.getElementById('modalText').value.trim();
+  const rating = modalStars.value;
+  if (!text || !rating) { toast('Заполните все поля'); return; }
+  addReview(name, rating, text);
+  closeReviewModal();
+  toast('Отзыв опубликован!');
+}
+document.getElementById('reviewModal').addEventListener('click', (e) => {
+  if (e.target.id === 'reviewModal') closeReviewModal();
+});
+
+// ============ TOAST ============
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('active');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('active'), 2000);
+}
+</script>
+</body>
+</html>
