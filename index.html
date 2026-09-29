@@ -8,7 +8,6 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
-/* ============ ГЛОБАЛЬНЫЙ СКРОЛЛБАР ============ */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: rgba(10,12,16,0.6); border-radius: 5px; }
 ::-webkit-scrollbar-thumb {
@@ -17,13 +16,10 @@
   border: 2px solid rgba(10,12,16,0.6);
   transition: 0.2s;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #fbbf24, #f59e0b);
-}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
 ::-webkit-scrollbar-corner { background: transparent; }
 * { scrollbar-width: thin; scrollbar-color: #f59e0b rgba(10,12,16,0.6); }
 
-/* ============ ФОН ============ */
 html, body { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -46,7 +42,6 @@ body::before {
   pointer-events: none;
 }
 
-/* ============ АНИМАЦИИ ============ */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -59,10 +54,6 @@ body::before {
   from { opacity: 0; transform: translateX(-20px); }
   to { opacity: 1; transform: translateX(0); }
 }
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
@@ -71,31 +62,17 @@ body::before {
   0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
   50% { box-shadow: 0 0 0 16px rgba(245,158,11,0); }
 }
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
 @keyframes heartbeat {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
-@keyframes spinner {
-  to { transform: rotate(360deg); }
-}
 
-.animate-fadeIn { animation: fadeIn 0.5s ease both; }
-.animate-fadeInScale { animation: fadeInScale 0.4s ease both; }
-.animate-slideInLeft { animation: slideInLeft 0.5s ease both; }
-.animate-slideInRight { animation: slideInRight 0.5s ease both; }
-
-/* Stagger для карточек */
 .actions .action-card:nth-child(1) { animation: fadeIn 0.5s ease 0.05s both; }
 .actions .action-card:nth-child(2) { animation: fadeIn 0.5s ease 0.10s both; }
 .actions .action-card:nth-child(3) { animation: fadeIn 0.5s ease 0.15s both; }
 .actions .action-card:nth-child(4) { animation: fadeIn 0.5s ease 0.20s both; }
 .actions .action-card:nth-child(5) { animation: fadeIn 0.5s ease 0.25s both; }
 
-/* ============ ЖИДКОЕ СТЕКЛО (iOS glassmorphism) ============ */
 .glass {
   background: rgba(30, 34, 44, 0.55);
   backdrop-filter: blur(24px) saturate(180%);
@@ -106,31 +83,10 @@ body::before {
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     inset 0 -1px 0 rgba(0, 0, 0, 0.15);
 }
-.glass-btn {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.10);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.glass-btn:hover {
-  background: rgba(255, 255, 255, 0.13);
-  border-color: rgba(255, 255, 255, 0.20);
-  transform: translateY(-2px);
-  box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-.glass-btn:active { transform: translateY(0) scale(0.99); }
 
-/* ============ SCREENS ============ */
 .screen { display:none; min-height:100vh; }
 .screen.active { display:flex; flex-direction:column; animation: fadeIn 0.4s ease; }
 
-/* ============ AUTH ============ */
 .auth-wrap {
   min-height:100vh; display:flex; align-items:center; justify-content:center;
   padding:20px;
@@ -184,7 +140,6 @@ body::before {
 }
 .field textarea { resize:vertical; min-height:80px; }
 
-/* ============ КНОПКИ (iOS style) ============ */
 .btn {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px) saturate(180%);
@@ -225,11 +180,8 @@ body::before {
   color:#fff;
   border: 1px solid rgba(255, 200, 200, 0.3);
 }
-.btn-danger:hover {
-  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-}
+.btn-danger:hover { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); }
 
-/* ============ HEADER ============ */
 .header {
   height:64px;
   background: rgba(18, 21, 28, 0.65);
@@ -277,9 +229,11 @@ body::before {
 .icon-btn .badge {
   position:absolute; top:-4px; right:-4px;
   background: linear-gradient(135deg, #ef4444, #dc2626);
-  color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:10px;
+  color:#fff; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px;
   box-shadow: 0 2px 8px rgba(239,68,68,0.5);
   animation: heartbeat 2s infinite;
+  min-width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
 }
 .header-user {
   display:flex; align-items:center; gap:10px;
@@ -294,7 +248,6 @@ body::before {
   box-shadow: 0 4px 12px rgba(245,158,11,0.4);
 }
 
-/* Lang dropdown */
 .lang-dropdown {
   position:absolute; top:100%; right:0; margin-top:8px;
   min-width:180px; max-height:400px; overflow-y:auto;
@@ -314,13 +267,11 @@ body::before {
 .lang-option.active { background: rgba(245,158,11,0.12); color:#f59e0b; }
 .lang-flag { font-size:18px; }
 
-/* ============ MAIN ============ */
 .main { flex:1; padding:40px 20px; max-width:900px; margin:0 auto; width:100%; }
 .hero { text-align:center; margin-bottom:40px; animation: fadeIn 0.5s ease; }
 .hero h1 { font-size:34px; font-weight:800; margin-bottom:10px; letter-spacing:-0.5px; }
 .hero p { color:#8b92a0; font-size:15px; }
 
-/* ============ ACTION CARDS ============ */
 .actions { display:grid; grid-template-columns:1fr; gap:14px; }
 .action-card {
   display:flex; align-items:center; gap:20px; padding:22px;
@@ -375,7 +326,6 @@ body::before {
   backdrop-filter: blur(10px);
 }
 
-/* ============ РЕКОМЕНДАЦИИ ============ */
 .rec-item {
   display:flex; gap:16px; padding:18px;
   border-radius:14px; margin-bottom:12px;
@@ -386,10 +336,7 @@ body::before {
   transition: 0.3s;
   animation: fadeIn 0.4s ease both;
 }
-.rec-item:hover {
-  transform: translateX(4px);
-  border-color: rgba(245,158,11,0.25);
-}
+.rec-item:hover { transform: translateX(4px); border-color: rgba(245,158,11,0.25); }
 .rec-item:nth-child(1) { animation-delay: 0.05s; }
 .rec-item:nth-child(2) { animation-delay: 0.10s; }
 .rec-item:nth-child(3) { animation-delay: 0.15s; }
@@ -417,7 +364,6 @@ body::before {
   backdrop-filter: blur(20px);
 }
 
-/* ============ ЛК ============ */
 .lk-grid {
   display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
   gap:16px; margin-bottom:24px;
@@ -475,12 +421,11 @@ body::before {
 }
 .doc-card:hover { transform: translateY(-2px); border-color: rgba(245,158,11,0.3); }
 .doc-icon { font-size:32px; }
-.doc-info { flex:1; }
+.doc-info { flex:1; min-width:0; }
 .doc-title { font-size:14px; font-weight:600; }
 .doc-meta { font-size:12px; color:#8b92a0; margin-top:2px; }
 .doc-actions { display:flex; gap:6px; }
 
-/* ============ CALL SCREEN ============ */
 .call-wrap {
   flex:1; display:flex; align-items:center; justify-content:center;
   padding:40px 20px;
@@ -555,7 +500,6 @@ body::before {
 }
 .notes-block b { color:#f59e0b; }
 
-/* ============ ФОТО ============ */
 .photo-upload { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 .photo-item {
   width:68px; height:68px; border-radius:12px;
@@ -590,7 +534,6 @@ body::before {
 }
 .photo-item .remove:hover { transform: scale(1.15); }
 
-/* GPS button */
 .field-wrap { position:relative; }
 .gps-btn {
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
@@ -610,7 +553,6 @@ body::before {
 .gps-btn:disabled { opacity:0.5; cursor:wait; }
 .field-wrap input { padding-right:56px; }
 
-/* GPS coords */
 .gps-coords {
   display:none; margin-top:8px; padding:12px 14px;
   background: rgba(74,222,128,0.08);
@@ -624,7 +566,6 @@ body::before {
 .gps-coords b { color:#e8eaed; }
 .gps-coords .coords-row { margin-bottom:3px; }
 
-/* ============ ЕВРОПРОТОКОЛ — ФОРМА ============ */
 .euro-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .euro-form-grid .full { grid-column:1 / -1; }
 .euro-section-title {
@@ -634,7 +575,6 @@ body::before {
   display:flex; align-items:center; gap:8px;
 }
 
-/* Фото в европротоколе */
 .euro-photo-preview {
   display:grid; grid-template-columns:repeat(5, 1fr);
   gap:8px; margin-top:10px;
@@ -650,7 +590,6 @@ body::before {
 }
 .euro-photo-thumb:hover { transform: scale(1.05); }
 
-/* ============ ЕВРОПРОТОКОЛ — ПЕЧАТНЫЙ ДОКУМЕНТ ============ */
 .euro-doc {
   background:#fff; color:#000; padding:15px;
   font-family: 'Times New Roman', serif; line-height: 1.25;
@@ -684,8 +623,18 @@ body::before {
 .euro-sign { border-top:0.7px solid #000; padding-top:3px; font-size:8px; text-align:center; }
 .euro-footer { font-size:7px; color:#666; text-align:center; margin-top:8px; border-top:0.5px dashed #999; padding-top:5px; line-height:1.3; }
 .euro-scheme-box {
-  height:70px; border:0.5px dashed #999; display:flex; align-items:center; justify-content:center;
-  color:#999; font-size:8px;
+  height: 180px;
+  border: 1px dashed #999;
+  display:flex; align-items:center; justify-content:center;
+  color:#999; font-size:10px;
+  background: repeating-linear-gradient(
+    45deg,
+    #fafafa,
+    #fafafa 10px,
+    #f5f5f5 10px,
+    #f5f5f5 20px
+  );
+  border-radius: 4px;
 }
 .euro-photos-grid {
   display: grid; grid-template-columns: repeat(5, 1fr);
@@ -696,7 +645,6 @@ body::before {
   border: 0.5px solid #333; border-radius: 3px;
 }
 
-/* ============ MODAL ============ */
 .modal-bg {
   display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
   backdrop-filter: blur(8px);
@@ -721,13 +669,11 @@ body::before {
 .modal h2 img { width: 32px; height: 32px; }
 .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; flex-wrap:wrap; }
 
-/* ============ STAR RATING ============ */
 .stars { display:flex; gap:6px; justify-content:center; font-size:36px; margin:16px 0; cursor:pointer; user-select:none; }
 .stars span { color:#3a3f4a; transition:0.2s; }
 .stars span:hover { transform: scale(1.15); }
 .stars span.active { color:#facc15; filter: drop-shadow(0 0 8px rgba(250,204,21,0.6)); }
 
-/* ============ SUPPORT ============ */
 .support-card {
   border-radius:16px; padding:24px; margin-bottom:16px;
   background: rgba(30, 34, 44, 0.5);
@@ -775,7 +721,6 @@ body::before {
 }
 .faq-item.open .faq-a { max-height:300px; margin-top:10px; }
 
-/* ============ PAYMENT ============ */
 .pay-methods { display:flex; gap:10px; margin-bottom:20px; }
 .pay-method {
   flex:1; padding:16px;
@@ -803,17 +748,31 @@ body::before {
   font-weight:800; font-size:17px; color:#f59e0b;
 }
 
-/* ============ NOTIFICATIONS ============ */
-.notif-list { max-height:400px; overflow-y:auto; }
-.notif-item { display:flex; gap:12px; padding:14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.notif-item:last-child { border-bottom:none; }
-.notif-icon { font-size:20px; }
-.notif-content { flex:1; }
-.notif-title { font-size:13px; font-weight:600; margin-bottom:2px; }
-.notif-text { font-size:12px; color:#8b92a0; line-height:1.5; }
-.notif-time { font-size:11px; color:#4b5563; margin-top:4px; }
+.notif-list { max-height:500px; overflow-y:auto; padding: 4px; }
+.notif-item {
+  display:flex; gap:14px; padding:16px;
+  border-radius:14px; margin-bottom:10px;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  animation: fadeIn 0.4s ease both;
+  transition: 0.25s;
+}
+.notif-item:hover { transform: translateX(3px); border-color: rgba(245,158,11,0.25); }
+.notif-item:last-child { margin-bottom:0; }
+.notif-icon {
+  width:40px; height:40px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+  background: rgba(245,158,11,0.1);
+  backdrop-filter: blur(10px);
+}
+.notif-content { flex:1; min-width:0; }
+.notif-title { font-size:14px; font-weight:600; margin-bottom:3px; color:#e8eaed; }
+.notif-text { font-size:12.5px; color:#8b92a0; line-height:1.5; word-break: break-word; }
+.notif-time { font-size:11px; color:#4b5563; margin-top:6px; }
 
-/* ============ TOAST ============ */
 .toast {
   position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px);
   background: rgba(24, 28, 36, 0.9);
@@ -831,7 +790,6 @@ body::before {
 }
 .toast.active { transform:translateX(-50%) translateY(0); }
 
-/* ============ PRINT ============ */
 @page { size: A4 portrait; margin: 8mm; }
 @media print {
   body * { visibility:hidden; }
@@ -843,7 +801,7 @@ body::before {
   .euro-doc { font-size:9px !important; padding:0 !important; line-height:1.2 !important; }
   .euro-section { margin-bottom:5px !important; page-break-inside: avoid; }
   .euro-doc h2 { font-size:13px !important; }
-  .euro-scheme-box { height:55px !important; }
+  .euro-scheme-box { height: 140px !important; }
   .no-print { display:none !important; }
   body::before { display: none !important; }
   body { background: #fff !important; }
@@ -929,7 +887,7 @@ body::before {
     </div>
     <div class="header-right">
       <button class="icon-btn" onclick="openNotifications()" title="Уведомления">
-        🔔 <span class="badge" id="notifBadge">2</span>
+        🔔 <span class="badge" id="notifBadge" style="display:none;"></span>
       </button>
       <div style="position:relative;">
         <button class="icon-btn" onclick="toggleLangDropdown(event)" title="Язык">🌐</button>
@@ -955,7 +913,7 @@ body::before {
           <h3 data-i18n="act_call_title">Вызвать комиссара</h3>
           <p data-i18n="act_call_desc">Приедет на место ДТП, оформит документы, поможет со страховой</p>
         </div>
-        <div class="action-arrow">→</div>
+        <div class="action-price">2500 ₽</div>
       </div>
 
       <div class="action-card highlight" onclick="openEuroProtocol()">
@@ -1014,7 +972,7 @@ body::before {
       <div class="nav-item" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
-      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge2">2</span></button>
+      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge2" style="display:none;"></span></button>
       <div style="position:relative;">
         <button class="icon-btn" onclick="toggleLangDropdown(event)">🌐</button>
         <div class="lang-dropdown" id="langDropdown2"></div>
@@ -1032,76 +990,16 @@ body::before {
       <p data-i18n="recs_sub">Пошаговая инструкция</p>
     </div>
 
-    <div class="rec-item">
-      <div class="rec-num">1</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec1_t">Остановитесь и не трогайте машину с места</h4>
-        <p data-i18n="rec1_d">Немедленно остановитесь, заглушите двигатель, включите аварийку.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">2</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec2_t">Выставьте знак аварийной остановки</h4>
-        <p data-i18n="rec2_d">В населённом пункте — 15 м, вне — 30 м от машины.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">3</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec3_t">Проверьте, есть ли пострадавшие</h4>
-        <p data-i18n="rec3_d">Если есть раненые — вызовите скорую (103) и полицию (102).</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">4</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec4_t">Вызовите ГИБДД, если это необходимо</h4>
-        <p data-i18n="rec4_d">ГИБДД обязательна: пострадавшие, 3+ участника, разногласия, ущерб больше лимита.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">5</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec5_t">Зафиксируйте всё на фото и видео</h4>
-        <p data-i18n="rec5_d">Общий план, положение машин, следы торможения, повреждения, номера.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">6</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec6_t">Запишите свидетелей</h4>
-        <p data-i18n="rec6_d">ФИО и контакты очевидцев — на случай спора.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">7</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec7_t">Оформите европротокол или дождитесь ГИБДД</h4>
-        <p data-i18n="rec7_d">Срок передачи в страховую — до 5 рабочих дней.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">8</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec8_t">Не покидайте место ДТП</h4>
-        <p data-i18n="rec8_d">Оставление места — лишение прав от 1 до 1.5 лет.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">9</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec9_t">Сообщите в страховую</h4>
-        <p data-i18n="rec9_d">При европротоколе — до 5 рабочих дней.</p>
-      </div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-num">10</div>
-      <div class="rec-content">
-        <h4 data-i18n="rec10_t">Не ремонтируйте машину до осмотра</h4>
-        <p data-i18n="rec10_d">15 календарных дней — до осмотра или экспертизы.</p>
-      </div>
-    </div>
+    <div class="rec-item"><div class="rec-num">1</div><div class="rec-content"><h4 data-i18n="rec1_t">Остановитесь и не трогайте машину с места</h4><p data-i18n="rec1_d">Немедленно остановитесь, заглушите двигатель, включите аварийку.</p></div></div>
+    <div class="rec-item"><div class="rec-num">2</div><div class="rec-content"><h4 data-i18n="rec2_t">Выставьте знак аварийной остановки</h4><p data-i18n="rec2_d">В населённом пункте — 15 м, вне — 30 м от машины.</p></div></div>
+    <div class="rec-item"><div class="rec-num">3</div><div class="rec-content"><h4 data-i18n="rec3_t">Проверьте, есть ли пострадавшие</h4><p data-i18n="rec3_d">Если есть раненые — вызовите скорую (103) и полицию (102).</p></div></div>
+    <div class="rec-item"><div class="rec-num">4</div><div class="rec-content"><h4 data-i18n="rec4_t">Вызовите ГИБДД, если это необходимо</h4><p data-i18n="rec4_d">ГИБДД обязательна: пострадавшие, 3+ участника, разногласия, ущерб больше лимита.</p></div></div>
+    <div class="rec-item"><div class="rec-num">5</div><div class="rec-content"><h4 data-i18n="rec5_t">Зафиксируйте всё на фото и видео</h4><p data-i18n="rec5_d">Общий план, положение машин, следы торможения, повреждения, номера.</p></div></div>
+    <div class="rec-item"><div class="rec-num">6</div><div class="rec-content"><h4 data-i18n="rec6_t">Запишите свидетелей</h4><p data-i18n="rec6_d">ФИО и контакты очевидцев — на случай спора.</p></div></div>
+    <div class="rec-item"><div class="rec-num">7</div><div class="rec-content"><h4 data-i18n="rec7_t">Оформите европротокол или дождитесь ГИБДД</h4><p data-i18n="rec7_d">Срок передачи в страховую — до 5 рабочих дней.</p></div></div>
+    <div class="rec-item"><div class="rec-num">8</div><div class="rec-content"><h4 data-i18n="rec8_t">Не покидайте место ДТП</h4><p data-i18n="rec8_d">Оставление места — лишение прав от 1 до 1.5 лет.</p></div></div>
+    <div class="rec-item"><div class="rec-num">9</div><div class="rec-content"><h4 data-i18n="rec9_t">Сообщите в страховую</h4><p data-i18n="rec9_d">При европротоколе — до 5 рабочих дней.</p></div></div>
+    <div class="rec-item"><div class="rec-num">10</div><div class="rec-content"><h4 data-i18n="rec10_t">Не ремонтируйте машину до осмотра</h4><p data-i18n="rec10_d">15 календарных дней — до осмотра или экспертизы.</p></div></div>
 
     <div class="rec-warn">
       <b style="color:#f87171;" data-i18n="rec_warn_t">🚫 Категорически нельзя:</b><br>
@@ -1123,7 +1021,7 @@ body::before {
       <div class="nav-item active" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
-      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge3">2</span></button>
+      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge3" style="display:none;"></span></button>
       <div style="position:relative;">
         <button class="icon-btn" onclick="toggleLangDropdown(event)">🌐</button>
         <div class="lang-dropdown" id="langDropdown3"></div>
@@ -1162,7 +1060,6 @@ body::before {
 
     <div class="support-card">
       <h3 data-i18n="sup_faq">💬 Частые вопросы</h3>
-
       <div class="faq-item" onclick="toggleFaq(this)">
         <div class="faq-q"><span data-i18n="faq1_q">Сколько стоит вызов комиссара?</span><span class="arrow">›</span></div>
         <div class="faq-a" data-i18n="faq1_a">Стоимость фиксирована — от 2 500 ₽. Точная цена показывается перед подтверждением вызова.</div>
@@ -1173,7 +1070,7 @@ body::before {
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
         <div class="faq-q"><span data-i18n="faq3_q">Как оплатить?</span><span class="arrow">›</span></div>
-        <div class="faq-a" data-i18n="faq3_a">Картой, через СБП или ЮMoney. Если вызов отменён до принятия — деньги вернутся автоматически.</div>
+        <div class="faq-a" data-i18n="faq3_a">Через СБП. Если вызов отменён до принятия — деньги вернутся автоматически.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
         <div class="faq-q"><span data-i18n="faq4_q">Что с моими данными?</span><span class="arrow">›</span></div>
@@ -1185,7 +1082,7 @@ body::before {
       <h3 data-i18n="sup_emergency">🆘 Экстренные службы</h3>
       <p data-i18n="sup_emergency_sub">Если ситуация угрожает жизни — звоните напрямую</p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
-        <button class="btn" onclick="window.location.href='tel:112'" style="padding:14px;">📞 112</button>
+        <button class="btn" onclick="call112()" style="padding:14px;">📞 112</button>
         <button class="btn" onclick="window.location.href='tel:102'" style="padding:14px;">🚔 102</button>
         <button class="btn" onclick="window.location.href='tel:103'" style="padding:14px;">🚑 103</button>
         <button class="btn" onclick="window.location.href='tel:101'" style="padding:14px;">🚒 101</button>
@@ -1207,7 +1104,7 @@ body::before {
       <div class="nav-item" onclick="showScreen('screenSupport')" data-i18n="nav_support">Поддержка</div>
     </div>
     <div class="header-right">
-      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge4">2</span></button>
+      <button class="icon-btn" onclick="openNotifications()">🔔 <span class="badge" id="notifBadge4" style="display:none;"></span></button>
       <div style="position:relative;">
         <button class="icon-btn" onclick="toggleLangDropdown(event)">🌐</button>
         <div class="lang-dropdown" id="langDropdown4"></div>
@@ -1245,7 +1142,7 @@ body::before {
         <div class="lk-row-icon">💳</div>
         <div class="lk-row-info">
           <div class="lk-row-title" data-i18n="lk_topup">Пополнить баланс</div>
-          <div class="lk-row-sub" data-i18n="lk_topup_sub">Оплата картой или СБП</div>
+          <div class="lk-row-sub" data-i18n="lk_topup_sub">Оплата через СБП</div>
         </div>
         <div class="lk-row-arrow">→</div>
       </div>
@@ -1275,7 +1172,12 @@ body::before {
       </div>
     </div>
 
-    <h3 style="font-size:13px; color:#8b92a0; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;" data-i18n="lk_docs">Мои документы</h3>
+    <h3 style="font-size:13px; color:#8b92a0; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;" data-i18n="lk_history">История вызовов</h3>
+    <div id="callsContainer">
+      <div class="lk-empty">📭 У вас пока нет вызовов</div>
+    </div>
+
+    <h3 style="font-size:13px; color:#8b92a0; text-transform:uppercase; letter-spacing:0.5px; margin:24px 0 12px;" data-i18n="lk_docs">Мои документы</h3>
     <div id="docsContainer">
       <div class="lk-empty" data-i18n="lk_docs_empty">📭 Документов пока нет<br><span style="font-size:12px; color:#4b5563; margin-top:6px; display:block;">Появятся после оформления европротокола</span></div>
     </div>
@@ -1313,7 +1215,7 @@ body::before {
       </div>
 
       <div class="call-actions">
-        <button class="btn btn-danger emergency-btn" onclick="window.location.href='tel:112'">
+        <button class="btn btn-danger emergency-btn" onclick="call112()">
           🆘 <span data-i18n="btn_emergency">Экстренная помощь — 112</span>
         </button>
         <button class="btn" onclick="toast(t('chat_dev'))" data-i18n="btn_chat">💬 Чат</button>
@@ -1374,8 +1276,8 @@ body::before {
 
     <div style="background: rgba(0,0,0,0.3); border-radius:14px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0; margin-top:16px;">
       <div><span data-i18n="cost">Стоимость:</span> <span style="color:#f59e0b; font-weight:700;">2 500 ₽</span></div>
-      <div><span data-i18n="payment_before">Оплата:</span> <span style="color:#e8eaed;" data-i18n="payment_before_val">до прибытия комиссара</span></div>
       <div><span data-i18n="arrival">Прибытие:</span> <span style="color:#e8eaed;">15–25 <span data-i18n="minutes">минут</span></span></div>
+      <div style="margin-top:6px;"><span data-i18n="balance">Баланс:</span> <span style="color:#4ade80; font-weight:700;" id="callBalance">0 ₽</span></div>
     </div>
 
     <div class="modal-actions">
@@ -1511,6 +1413,11 @@ body::before {
       Фото автоматически добавятся в документ
     </div>
 
+    <div style="background: rgba(0,0,0,0.3); border-radius:14px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0; margin-top:16px;">
+      <div><span data-i18n="cost">Стоимость:</span> <span style="color:#f59e0b; font-weight:700;">1 000 ₽</span></div>
+      <div style="margin-top:6px;"><span data-i18n="balance">Баланс:</span> <span style="color:#4ade80; font-weight:700;" id="euroBalance">0 ₽</span></div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('euroModal')" data-i18n="btn_close">Закрыть</button>
       <button class="btn btn-primary" onclick="generateEuroDoc()" data-i18n="euro_generate">📋 Сформировать документ</button>
@@ -1590,16 +1497,8 @@ body::before {
     </div>
     <div class="pay-methods">
       <div class="pay-method selected" onclick="selectPayMethod(this)">
-        <div class="pay-method-icon">💳</div>
-        <div class="pay-method-label" data-i18n="pay_card">Карта</div>
-      </div>
-      <div class="pay-method" onclick="selectPayMethod(this)">
         <div class="pay-method-icon">📱</div>
         <div class="pay-method-label" data-i18n="pay_sbp">СБП</div>
-      </div>
-      <div class="pay-method" onclick="selectPayMethod(this)">
-        <div class="pay-method-icon">🟡</div>
-        <div class="pay-method-label">ЮMoney</div>
       </div>
     </div>
     <div class="pay-summary">
@@ -1640,24 +1539,7 @@ body::before {
 <div class="modal-bg" id="notifModal">
   <div class="modal">
     <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="notif_title">🔔 Уведомления</span></h2>
-    <div class="notif-list">
-      <div class="notif-item">
-        <div class="notif-icon">⚡</div>
-        <div class="notif-content">
-          <div class="notif-title" data-i18n="notif1_t">Обновление лимитов европротокола</div>
-          <div class="notif-text" data-i18n="notif1_d">С 2025 года лимиты увеличены: до 200 000 ₽ с разногласиями, до 400 000 ₽ без.</div>
-          <div class="notif-time" data-i18n="notif1_time">2 дня назад</div>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-icon">🆕</div>
-        <div class="notif-content">
-          <div class="notif-title" data-i18n="notif2_t">Добро пожаловать в АварКом</div>
-          <div class="notif-text" data-i18n="notif2_d">Спасибо, что выбрали нас. Если что-то не работает — пишите в поддержку.</div>
-          <div class="notif-time" data-i18n="notif2_time">только что</div>
-        </div>
-      </div>
-    </div>
+    <div class="notif-list" id="notifList"></div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="closeModal('notifModal')" data-i18n="btn_ok">Понятно</button>
     </div>
@@ -1727,22 +1609,23 @@ body::before {
       btn_complaint: "Подать жалобу", sup_faq: "💬 Частые вопросы",
       faq1_q: "Сколько стоит вызов комиссара?", faq1_a: "Стоимость фиксирована — от 2 500 ₽. Точная цена показывается перед подтверждением вызова.",
       faq2_q: "Можно ли оформить без ГИБДД?", faq2_a: "Да, если нет пострадавших, участников не больше двух и ущерб в пределах лимита европротокола.",
-      faq3_q: "Как оплатить?", faq3_a: "Картой, через СБП или ЮMoney. Если вызов отменён до принятия — деньги вернутся автоматически.",
+      faq3_q: "Как оплатить?", faq3_a: "Через СБП. Если вызов отменён до принятия — деньги вернутся автоматически.",
       faq4_q: "Что с моими данными?", faq4_a: "Всё по 152-ФЗ. Документы хранятся в вашем ЛК и доступны только вам.",
       sup_emergency: "🆘 Экстренные службы", sup_emergency_sub: "Если ситуация угрожает жизни — звоните напрямую",
       copy: "📋 Копировать",
       lk_title: "Личный кабинет", lk_greeting: "Добро пожаловать!",
       lk_calls: "Всего вызовов", lk_spent: "Потрачено", lk_balance: "Баланс",
-      lk_topup: "Пополнить баланс", lk_topup_sub: "Оплата картой или СБП",
+      lk_topup: "Пополнить баланс", lk_topup_sub: "Оплата через СБП",
       lk_complaint: "Подать жалобу", lk_complaint_sub: "На комиссара или сервис",
       lk_settings: "Настройки", lk_settings_sub: "Профиль, язык, уведомления",
       lk_support: "Поддержка", lk_support_sub: "FAQ и контакты",
       lk_docs: "Мои документы", lk_docs_empty: "📭 Документов пока нет<br><span style='font-size:12px;color:#4b5563;margin-top:6px;display:block;'>Появятся после оформления европротокола</span>",
+      lk_history: "История вызовов",
       btn_logout: "Выйти из аккаунта",
       call_header: "Вызов комиссара", btn_cancel: "Отмена",
       call_searching: "Ищем комиссара...", call_searching_sub: "Обычно занимает 1–2 минуты",
       call_type: "Тип ДТП:", call_addr: "Адрес:", call_comment: "Комментарий:",
-      geo_coords: "Координаты:",
+      geo_coords: "Координаты:", balance: "Баланс:",
       btn_emergency: "Экстренная помощь — 112", btn_chat: "💬 Чат", btn_support: "📞 Поддержка",
       notes_title: "📋 Что дальше:", notes_text: "• Не покидайте место ДТП<br>• Сфотографируйте повреждения<br>• Запишите свидетелей<br>• Комиссар поможет с документами",
       modal_call_title: "Вызов комиссара",
@@ -1750,8 +1633,7 @@ body::before {
       field_photos: "Фото с места (до 5 штук, необязательно)",
       dtp_simple: "2 машины, без пострадавших", dtp_complex: "Сложное (3+ участника / разногласия)",
       dtp_solo: "Один участник (наезд на препятствие)", dtp_parking: "Парковка / двор",
-      cost: "Стоимость:", payment_before: "Оплата:", payment_before_val: "до прибытия комиссара",
-      arrival: "Прибытие:", minutes: "минут", btn_call: "Вызвать",
+      cost: "Стоимость:", arrival: "Прибытие:", minutes: "минут", btn_call: "Вызвать",
       euro_title: "📋 Европротокол", euro_sub: "Заполните поля — мы сформируем документ. Можно сохранить в PDF и распечатать.",
       euro_demo: "🎲 Демо-данные", euro_clear: "🗑 Очистить",
       euro_general: "Общие сведения",
@@ -1772,12 +1654,10 @@ body::before {
       complaint_t3: "Ошибки в документах", complaint_t4: "Пытался навязать услуги", complaint_t5: "Другое",
       complaint_desc: "Подробности", btn_send: "Отправить",
       payment_title: "💳 Пополнение баланса", payment_amount: "Сумма", payment_method: "Способ оплаты",
-      pay_card: "Карта", pay_sbp: "СБП", payment_commission: "Комиссия", payment_total: "Итого", btn_pay: "Оплатить",
+      pay_sbp: "СБП", payment_commission: "Комиссия", payment_total: "Итого", btn_pay: "Оплатить",
       settings_title: "⚙️ Настройки", settings_lang: "Язык интерфейса", settings_notif: "Уведомления",
       settings_notif_all: "Все", settings_notif_imp: "Только важные", settings_notif_none: "Отключить", btn_done: "Готово",
       notif_title: "🔔 Уведомления",
-      notif1_t: "Обновление лимитов европротокола", notif1_d: "С 2025 года лимиты увеличены: до 200 000 ₽ с разногласиями, до 400 000 ₽ без.", notif1_time: "2 дня назад",
-      notif2_t: "Добро пожаловать в АварКом", notif2_d: "Спасибо, что выбрали нас. Если что-то не работает — пишите в поддержку.", notif2_time: "только что",
       btn_ok: "Понятно",
       rating_title: "Оцените комиссара", rating_sub: "Как всё прошло?", btn_skip: "Пропустить",
       chat_dev: "Чат (в разработке)"
@@ -1813,22 +1693,23 @@ body::before {
       btn_complaint: "File a complaint", sup_faq: "💬 FAQ",
       faq1_q: "How much does a commissioner cost?", faq1_a: "Fixed price — from 2,500 ₽. Exact price is shown before confirming the call.",
       faq2_q: "Can I file without traffic police?", faq2_a: "Yes, if no one is injured, no more than two participants and damage within the euro protocol limit.",
-      faq3_q: "How to pay?", faq3_a: "Card, SBP or YuMoney. If cancelled before acceptance — money returns automatically.",
+      faq3_q: "How to pay?", faq3_a: "Via SBP. If cancelled before acceptance — money returns automatically.",
       faq4_q: "What about my data?", faq4_a: "All per 152-FZ. Documents are stored in your account and available only to you.",
       sup_emergency: "🆘 Emergency services", sup_emergency_sub: "If life is at risk — call directly",
       copy: "📋 Copy",
       lk_title: "Dashboard", lk_greeting: "Welcome!",
       lk_calls: "Total calls", lk_spent: "Spent", lk_balance: "Balance",
-      lk_topup: "Top up balance", lk_topup_sub: "Card or SBP payment",
+      lk_topup: "Top up balance", lk_topup_sub: "SBP payment",
       lk_complaint: "File a complaint", lk_complaint_sub: "About commissioner or service",
       lk_settings: "Settings", lk_settings_sub: "Profile, language, notifications",
       lk_support: "Support", lk_support_sub: "FAQ and contacts",
       lk_docs: "My documents", lk_docs_empty: "📭 No documents yet<br><span style='font-size:12px;color:#4b5563;margin-top:6px;display:block;'>Will appear after filing a euro protocol</span>",
+      lk_history: "Call history",
       btn_logout: "Log out",
       call_header: "Commissioner call", btn_cancel: "Cancel",
       call_searching: "Searching for commissioner...", call_searching_sub: "Usually takes 1–2 minutes",
       call_type: "Accident type:", call_addr: "Address:", call_comment: "Comment:",
-      geo_coords: "Coordinates:",
+      geo_coords: "Coordinates:", balance: "Balance:",
       btn_emergency: "Emergency — 112", btn_chat: "💬 Chat", btn_support: "📞 Support",
       notes_title: "📋 What's next:", notes_text: "• Don't leave the scene<br>• Take photos of damage<br>• Record witnesses<br>• Commissioner will help with documents",
       modal_call_title: "Call a commissioner",
@@ -1836,8 +1717,7 @@ body::before {
       field_photos: "Photos from scene (up to 5, optional)",
       dtp_simple: "2 cars, no injuries", dtp_complex: "Complex (3+ participants / disagreements)",
       dtp_solo: "Single participant (hit obstacle)", dtp_parking: "Parking / yard",
-      cost: "Cost:", payment_before: "Payment:", payment_before_val: "before commissioner arrival",
-      arrival: "Arrival:", minutes: "minutes", btn_call: "Call",
+      cost: "Cost:", arrival: "Arrival:", minutes: "minutes", btn_call: "Call",
       euro_title: "📋 Euro protocol", euro_sub: "Fill in the fields — we'll generate the document. Can save as PDF and print.",
       euro_demo: "🎲 Demo data", euro_clear: "🗑 Clear",
       euro_general: "General information",
@@ -1858,12 +1738,10 @@ body::before {
       complaint_t3: "Errors in documents", complaint_t4: "Tried to push services", complaint_t5: "Other",
       complaint_desc: "Details", btn_send: "Send",
       payment_title: "💳 Top up balance", payment_amount: "Amount", payment_method: "Payment method",
-      pay_card: "Card", pay_sbp: "SBP", payment_commission: "Commission", payment_total: "Total", btn_pay: "Pay",
+      pay_sbp: "SBP", payment_commission: "Commission", payment_total: "Total", btn_pay: "Pay",
       settings_title: "⚙️ Settings", settings_lang: "Interface language", settings_notif: "Notifications",
       settings_notif_all: "All", settings_notif_imp: "Important only", settings_notif_none: "Disable", btn_done: "Done",
       notif_title: "🔔 Notifications",
-      notif1_t: "Euro protocol limits update", notif1_d: "Since 2025 limits increased: up to 200,000 ₽ with disagreements, up to 400,000 ₽ without.", notif1_time: "2 days ago",
-      notif2_t: "Welcome to AvarKom", notif2_d: "Thanks for choosing us. If something doesn't work — write to support.", notif2_time: "just now",
       btn_ok: "Got it",
       rating_title: "Rate the commissioner", rating_sub: "How did it go?", btn_skip: "Skip",
       chat_dev: "Chat (in development)"
@@ -1875,81 +1753,79 @@ body::before {
       btn_login: "Увайсці", btn_register: "Стварыць акаўнт",
       nav_home: "Галоўная", nav_recs: "Рэкамендацыі", nav_support: "Падтрымка",
       home_title: "Што здарылася?", home_sub: "Выберыце дзеянне — мы дапаможам",
-      act_call_title: "Выклікаць камісара", act_call_desc: "Прыедзе на месца ДТЗ, аформіць дакументы, дапаможа са страхавой",
-      act_euro_title: "Еўрапратакол без камісара", act_euro_desc: "Аформіце ДТЗ самастойна з нашай дапамогай",
-      act_112_title: "Выклікаць спецслужбы", act_112_desc: "Адзіны нумар экстраных службаў — 112",
-      act_recs_title: "Рэкамендацыі пры ДТЗ", act_recs_desc: "Пакрокавая інструкцыя, што рабіць на месцы аварыі",
-      act_support_title: "Падтрымка і скаргі", act_support_desc: "Звяжыцеся з намі або паскардзіцеся на камісара",
-      tip_title: "⚡ Парада:", tip_text: "з 2025 года ліміт еўрапратакола з рознагалоссямі — 200 000 ₽, без — 400 000 ₽.",
+      act_call_title: "Выклікаць камісара", act_call_desc: "Прыедзе на месца ДТЗ, аформіць дакументы",
+      act_euro_title: "Еўрапратакол без камісара", act_euro_desc: "Аформіце ДТЗ самастойна",
+      act_112_title: "Выклікаць спецслужбы", act_112_desc: "Адзіны нумар — 112",
+      act_recs_title: "Рэкамендацыі пры ДТЗ", act_recs_desc: "Пакрокавая інструкцыя",
+      act_support_title: "Падтрымка і скаргі", act_support_desc: "Звяжыцеся з намі",
+      tip_title: "⚡ Парада:", tip_text: "з 2025 ліміт еўрапратакола — 200 000 ₽.",
       recs_title: "Што рабіць пры ДТЗ", recs_sub: "Пакрокавая інструкцыя",
-      rec1_t: "Спыніцеся і не рухайце машыну", rec1_d: "Неадкладна спыніцеся, выключыце рухавік, уключыце аварыйку.",
-      rec2_t: "Пастаўце знак аварыйнай прыпынку", rec2_d: "У населеным пункце — 15 м, звонку — 30 м.",
-      rec3_t: "Праверце, ці ёсць пацярпелыя", rec3_d: "Калі ёсць параненыя — выклічце хуткую (103) і паліцыю (102).",
-      rec4_t: "Выклічце ДАІ, калі гэта неабходна", rec4_d: "ДАІ абавязкова: пацярпелыя, 3+ удзельнікі, рознагалоссі, шкода больш ліміту.",
-      rec5_t: "Зафіксуйце ўсё на фота і відэа", rec5_d: "Агульны план, становішча машын, сляды тармажэння, пашкоджанні, нумары.",
-      rec6_t: "Запішыце сведкаў", rec6_d: "ПІБ і кантакты відавочцаў.",
-      rec7_t: "Аформіце еўрапратакол або дачакайцеся ДАІ", rec7_d: "Тэрмін перадачы ў страхавую — да 5 рабочых дзён.",
-      rec8_t: "Не пакідайце месца ДТЗ", rec8_d: "Пакіданне месца — пазбаўленне правоў ад 1 да 1.5 гадоў.",
-      rec9_t: "Паведаміце страхавой", rec9_d: "Пры еўрапратаколе — да 5 рабочых дзён.",
-      rec10_t: "Не рамантуйце машыну да агляду", rec10_d: "15 каляндарных дзён.",
-      rec_warn_t: "🚫 Катэгарычна нельга:", rec_warn_d: "• Ужываць алкаголь пасля ДТЗ<br>• Пакідаць месца здарэння<br>• Падпісваць пустыя бланкі",
-      support_title: "Падтрымка", support_sub: "Звяжыцеся з намі або знойдзіце адказ у FAQ",
-      sup_write: "📧 Напісаць нам", sup_write_sub: "Адказваем на працягу 24 гадзін у працоўныя дні",
-      sup_complaint: "🚨 Скарга на камісара", sup_complaint_sub: "Калі нешта пайшло не так — раскажыце. Разбяромся на працягу 48 гадзін.",
-      btn_complaint: "Падаць скаргу", sup_faq: "💬 Частыя пытанні",
-      faq1_q: "Колькі каштуе выклік камісара?", faq1_a: "Кошт фіксаваны — ад 2 500 ₽. Дакладная цана паказваецца перад пацверджаннем.",
-      faq2_q: "Ці можна аформіць без ДАІ?", faq2_a: "Так, калі няма пацярпелых, удзельнікаў не больш за двух і шкода ў межах ліміту.",
-      faq3_q: "Як аплаціць?", faq3_a: "Картай, праз СБП або ЮMoney.",
-      faq4_q: "Што з маімі дадзенымі?", faq4_a: "Усё па 152-ФЗ. Дакументы захоўваюцца ў вашым ЛК.",
-      sup_emergency: "🆘 Экстраныя службы", sup_emergency_sub: "Калі сітуацыя пагражае жыццю — тэлефануйце напрамую",
+      rec1_t: "Спыніцеся і не рухайце машыну", rec1_d: "Неадкладна спыніцеся.",
+      rec2_t: "Пастаўце знак", rec2_d: "15 м / 30 м.",
+      rec3_t: "Праверце пацярпелых", rec3_d: "Выклічце 103 і 102.",
+      rec4_t: "Выклічце ДАІ", rec4_d: "Пры пацярпелых і рознагалоссях.",
+      rec5_t: "Зрабіце фота", rec5_d: "Агульны план, пашкоджанні.",
+      rec6_t: "Запішыце сведкаў", rec6_d: "ПІБ і кантакты.",
+      rec7_t: "Аформіце еўрапратакол", rec7_d: "5 дзён у страхавую.",
+      rec8_t: "Не пакідайце месца", rec8_d: "Пазбаўленне правоў.",
+      rec9_t: "Паведаміце страхавой", rec9_d: "5 дзён.",
+      rec10_t: "Не рамантуйце", rec10_d: "15 дзён.",
+      rec_warn_t: "🚫 Нельга:", rec_warn_d: "• Алкаголь<br>• Пакідаць месца<br>• Пустыя бланкі",
+      support_title: "Падтрымка", support_sub: "Звяжыцеся з намі",
+      sup_write: "📧 Напісаць", sup_write_sub: "Адказваем 24 гадзіны",
+      sup_complaint: "🚨 Скарга", sup_complaint_sub: "Раскажыце, што здарылася.",
+      btn_complaint: "Падаць скаргу", sup_faq: "💬 FAQ",
+      faq1_q: "Колькі каштуе выклік?", faq1_a: "Ад 2 500 ₽.",
+      faq2_q: "Без ДАІ можна?", faq2_a: "Так, калі няма пацярпелых.",
+      faq3_q: "Як аплаціць?", faq3_a: "Праз СБП.",
+      faq4_q: "Што з дадзенымі?", faq4_a: "Па 152-ФЗ.",
+      sup_emergency: "🆘 Экстраныя службы", sup_emergency_sub: "Калі пагражае жыццю",
       copy: "📋 Капіяваць",
       lk_title: "Асабісты кабінет", lk_greeting: "Сардэчна запрашаем!",
-      lk_calls: "Усяго выклікаў", lk_spent: "Патрачана", lk_balance: "Баланс",
-      lk_topup: "Папоўніць баланс", lk_topup_sub: "Аплата картай або СБП",
-      lk_complaint: "Падаць скаргу", lk_complaint_sub: "На камісара або сэрвіс",
-      lk_settings: "Налады", lk_settings_sub: "Профіль, мова, апавяшчэнні",
-      lk_support: "Падтрымка", lk_support_sub: "FAQ і кантакты",
-      lk_docs: "Мае дакументы", lk_docs_empty: "📭 Дакументаў пакуль няма<br><span style='font-size:12px;color:#4b5563;margin-top:6px;display:block;'>З'явяцца пасля афармлення еўрапратакола</span>",
-      btn_logout: "Выйсці з акаўнта",
+      lk_calls: "Выклікаў", lk_spent: "Патрачана", lk_balance: "Баланс",
+      lk_topup: "Папоўніць", lk_topup_sub: "Праз СБП",
+      lk_complaint: "Скарга", lk_complaint_sub: "На камісара",
+      lk_settings: "Налады", lk_settings_sub: "Профіль, мова",
+      lk_support: "Падтрымка", lk_support_sub: "FAQ",
+      lk_docs: "Мае дакументы", lk_docs_empty: "📭 Дакументаў няма",
+      lk_history: "Гісторыя выклікаў",
+      btn_logout: "Выйсці",
       call_header: "Выклік камісара", btn_cancel: "Адмена",
-      call_searching: "Шукаем камісара...", call_searching_sub: "Звычайна займае 1–2 хвіліны",
-      call_type: "Тып ДТЗ:", call_addr: "Адрас:", call_comment: "Каментар:",
-      geo_coords: "Каардынаты:",
+      call_searching: "Шукаем камісара...", call_searching_sub: "1–2 хвіліны",
+      call_type: "Тып:", call_addr: "Адрас:", call_comment: "Каментар:",
+      geo_coords: "Каардынаты:", balance: "Баланс:",
       btn_emergency: "Экстраная дапамога — 112", btn_chat: "💬 Чат", btn_support: "📞 Падтрымка",
-      notes_title: "📋 Што далей:", notes_text: "• Не пакідайце месца ДТЗ<br>• Сфатаграфуйце пашкоджанні<br>• Запішыце сведкаў<br>• Камісар дапаможа з дакументамі",
+      notes_title: "📋 Што далей:", notes_text: "• Не пакідайце месца<br>• Сфатаграфуйце<br>• Запішыце сведкаў",
       modal_call_title: "Выклік камісара",
-      field_dtp_type: "Тып ДТЗ", field_address: "Адрас", field_comment: "Каментар (неабавязкова)",
-      field_photos: "Фота з месца (да 5 штук, неабавязкова)",
-      dtp_simple: "2 машыны, без пацярпелых", dtp_complex: "Складанае (3+ удзельнікі / рознагалоссі)",
-      dtp_solo: "Адзін удзельнік (наезд на перашкоду)", dtp_parking: "Паркоўка / двор",
-      cost: "Кошт:", payment_before: "Аплата:", payment_before_val: "да прыезду камісара",
-      arrival: "Прыбыццё:", minutes: "хвілін", btn_call: "Выклікаць",
-      euro_title: "📋 Еўрапратакол", euro_sub: "Запоўніце палі — мы сфарміруем дакумент. Можна захаваць у PDF і раздрукаваць.",
-      euro_demo: "🎲 Дэма-дадзеныя", euro_clear: "🗑 Ачысціць",
+      field_dtp_type: "Тып ДТЗ", field_address: "Адрас", field_comment: "Каментар",
+      field_photos: "Фота (да 5)",
+      dtp_simple: "2 машыны", dtp_complex: "Складанае",
+      dtp_solo: "Адзін удзельнік", dtp_parking: "Паркоўка",
+      cost: "Кошт:", arrival: "Прыбыццё:", minutes: "хвілін", btn_call: "Выклікаць",
+      euro_title: "📋 Еўрапратакол", euro_sub: "Запоўніце палі",
+      euro_demo: "🎲 Дэма", euro_clear: "🗑 Ачысціць",
       euro_general: "Агульныя звесткі",
-      euro_generate: "📋 Сфарміраваць дакумент", euro_date: "Дата і час ДТЗ",
-      euro_location: "Месца ДТЗ", euro_count: "Колькасць удзельнікаў",
-      euro_driver_a: "Кіроўца A (вы)", euro_driver_b: "Кіроўца B (другі ўдзельнік)",
-      field_fio: "ПІБ", field_license: "Пасведчанне кіроўцы", field_sts: "СТС",
-      field_car: "Марка і мадэль", field_gosnomer: "Дзярж. нумар", field_osago: "Поліс АСАГА",
-      field_damage_a: "Пашкоджанні вашага аўто", field_damage_b: "Пашкоджанні аўто B",
-      euro_circumstances: "Абставіны ДТЗ",
-      euro_photos_title: "Фота з месца ДТЗ (да 5 штук)",
-      euro_photos_hint: "Фота аўтаматычна дададуцца ў дакумент",
-      btn_close: "Зачыніць", btn_print: "🖨 Друк", btn_pdf: "📄 PDF", btn_save: "💾 Захаваць у ЛК",
-      complaint_title: "🚨 Скарга на камісара", complaint_sub: "Раскажыце, што здарылася. Разбяромся на працягу 48 гадзін.",
-      complaint_comm_name: "Імя камісара (калі вядома)", complaint_date: "Дата выкліку",
+      euro_generate: "📋 Сфарміраваць", euro_date: "Дата і час",
+      euro_location: "Месца", euro_count: "Колькасць",
+      euro_driver_a: "Кіроўца A (вы)", euro_driver_b: "Кіроўца B",
+      field_fio: "ПІБ", field_license: "Пасведчанне", field_sts: "СТС",
+      field_car: "Марка", field_gosnomer: "Нумар", field_osago: "АСАГА",
+      field_damage_a: "Пашкоджанні вашага", field_damage_b: "Пашкоджанні B",
+      euro_circumstances: "Абставіны",
+      euro_photos_title: "Фота (да 5)",
+      euro_photos_hint: "Фота дададуцца ў дакумент",
+      btn_close: "Зачыніць", btn_print: "🖨 Друк", btn_pdf: "📄 PDF", btn_save: "💾 Захаваць",
+      complaint_title: "🚨 Скарга", complaint_sub: "Раскажыце",
+      complaint_comm_name: "Імя камісара", complaint_date: "Дата",
       complaint_type: "Тып праблемы",
-      complaint_t1: "Спазніўся / не прыехаў", complaint_t2: "Грубае стаўленне",
-      complaint_t3: "Памылкі ў дакументах", complaint_t4: "Спрабаваў навязаць паслугі", complaint_t5: "Іншае",
+      complaint_t1: "Спазніўся", complaint_t2: "Грубасць",
+      complaint_t3: "Памылкі", complaint_t4: "Навязваў", complaint_t5: "Іншае",
       complaint_desc: "Падрабязнасці", btn_send: "Адправіць",
-      payment_title: "💳 Папаўненне балансу", payment_amount: "Сума", payment_method: "Спосаб аплаты",
-      pay_card: "Карта", pay_sbp: "СБП", payment_commission: "Камісія", payment_total: "Разам", btn_pay: "Аплаціць",
-      settings_title: "⚙️ Налады", settings_lang: "Мова інтэрфейсу", settings_notif: "Апавяшчэнні",
-      settings_notif_all: "Усе", settings_notif_imp: "Толькі важныя", settings_notif_none: "Адключыць", btn_done: "Гатова",
+      payment_title: "💳 Папаўненне", payment_amount: "Сума", payment_method: "Спосаб",
+      pay_sbp: "СБП", payment_commission: "Камісія", payment_total: "Разам", btn_pay: "Аплаціць",
+      settings_title: "⚙️ Налады", settings_lang: "Мова", settings_notif: "Апавяшчэнні",
+      settings_notif_all: "Усе", settings_notif_imp: "Важныя", settings_notif_none: "Адключыць", btn_done: "Гатова",
       notif_title: "🔔 Апавяшчэнні",
-      notif1_t: "Абнаўленне лімітаў еўрапратакола", notif1_d: "З 2025 года ліміты павялічаны: да 200 000 ₽ з рознагалоссямі, да 400 000 ₽ без.", notif1_time: "2 дні таму",
-      notif2_t: "Сардэчна запрашаем у АварКом", notif2_d: "Дзякуй, што выбралі нас.", notif2_time: "толькі што",
       btn_ok: "Зразумела",
       rating_title: "Ацаніце камісара", rating_sub: "Як усё прайшло?", btn_skip: "Прапусціць",
       chat_dev: "Чат (у распрацоўцы)"
@@ -1965,7 +1841,7 @@ body::before {
   let currentLang = localStorage.getItem('avarkom_lang') || 'ru';
   let currentUser = JSON.parse(localStorage.getItem('avarkom_user') || 'null');
   let lastCoords = null;
-  let euroPhotos = []; // base64 фото для европротокола
+  let euroPhotos = [];
 
   function t(key) {
     return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key])
@@ -2034,12 +1910,212 @@ body::before {
   document.addEventListener('click', () => closeAllLangDropdowns());
 
   // ============================================
+  // БАЛАНС
+  // ============================================
+  function getBalance() {
+    return parseInt(localStorage.getItem('avarkom_balance') || '0', 10);
+  }
+
+  function setBalance(v) {
+    localStorage.setItem('avarkom_balance', String(v));
+    updateBalanceUI();
+  }
+
+  function updateBalanceUI() {
+    const b = getBalance();
+    const el1 = document.getElementById('statBalance');
+    if (el1) el1.textContent = b.toLocaleString('ru-RU') + ' ₽';
+    const el2 = document.getElementById('callBalance');
+    if (el2) el2.textContent = b.toLocaleString('ru-RU') + ' ₽';
+    const el3 = document.getElementById('euroBalance');
+    if (el3) el3.textContent = b.toLocaleString('ru-RU') + ' ₽';
+  }
+
+  function chargeAccount(amount, description) {
+    const current = getBalance();
+    if (current < amount) return false;
+    setBalance(current - amount);
+    addNotification('charge', 'Списание со счёта', description, -amount);
+    return true;
+  }
+
+  function showInsufficientFunds(needed) {
+    closeModal('confirmCallModal');
+    closeModal('euroModal');
+    closeModal('euroDocModal');
+
+    const existing = document.getElementById('insufficientModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-bg active';
+    modal.id = 'insufficientModal';
+    modal.innerHTML = `
+      <div class="modal" style="max-width:420px; text-align:center;">
+        <div style="font-size:48px; margin-bottom:12px;">💰</div>
+        <h2 style="justify-content:center;">Недостаточно средств</h2>
+        <p style="color:#8b92a0; font-size:14px; line-height:1.6; margin-bottom:20px;">
+          На вашем балансе недостаточно средств.<br>
+          Не хватает: <b style="color:#f87171; font-size:16px;">${needed.toLocaleString('ru-RU')} ₽</b>
+        </p>
+        <div style="background: rgba(0,0,0,0.3); border-radius:12px; padding:14px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:#8b92a0; font-size:13px;">Текущий баланс:</span>
+          <b style="color:#f59e0b; font-size:16px;">${getBalance().toLocaleString('ru-RU')} ₽</b>
+        </div>
+        <div class="modal-actions" style="justify-content:center;">
+          <button class="btn" onclick="closeInsufficient()">Отмена</button>
+          <button class="btn btn-primary" onclick="closeInsufficient(); openPayment();">💳 Пополнить баланс</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeInsufficient();
+    });
+  }
+
+  window.closeInsufficient = function() {
+    const m = document.getElementById('insufficientModal');
+    if (m) m.remove();
+  };
+
+  // ============================================
+  // УВЕДОМЛЕНИЯ
+  // ============================================
+  function getNotifications() {
+    return JSON.parse(localStorage.getItem('avarkom_notifications') || '[]');
+  }
+
+  function saveNotifications(arr) {
+    localStorage.setItem('avarkom_notifications', JSON.stringify(arr.slice(0, 50)));
+  }
+
+  function addNotification(type, title, text, amount) {
+    const notifs = getNotifications();
+    notifs.unshift({
+      id: Date.now() + Math.random(),
+      type: type,
+      title: title,
+      text: text,
+      amount: amount || null,
+      time: new Date().toISOString()
+    });
+    saveNotifications(notifs);
+    updateNotifBadge();
+    renderNotifications();
+  }
+
+  function updateNotifBadge() {
+    const count = getNotifications().length;
+    ['notifBadge', 'notifBadge2', 'notifBadge3', 'notifBadge4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (count > 0) {
+          el.textContent = count > 99 ? '99+' : count;
+          el.style.display = 'flex';
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  function renderNotifications() {
+    const list = document.getElementById('notifList');
+    if (!list) return;
+    const notifs = getNotifications();
+    if (!notifs.length) {
+      list.innerHTML = '<div style="text-align:center; padding:30px; color:#6b7280; font-size:13px;">Пока нет уведомлений</div>';
+      return;
+    }
+    const iconMap = {
+      call: '🚗', euro: '📋', emergency: '🆘',
+      topup: '💰', charge: '💸', complaint: '🚨'
+    };
+    list.innerHTML = notifs.map(n => {
+      const icon = iconMap[n.type] || '🔔';
+      const time = timeAgo(n.time);
+      const borderColor = n.type === 'topup' ? '#4ade80' : n.type === 'charge' ? '#f87171' : '#f59e0b';
+      const amountColor = n.type === 'topup' ? '#4ade80' : '#f87171';
+      return `
+        <div class="notif-item" style="border-left:3px solid ${borderColor};">
+          <div class="notif-icon">${icon}</div>
+          <div class="notif-content">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-text">${n.text}${n.amount ? ' <b style="color:' + amountColor + ';">' + (n.amount > 0 ? '+' : '') + n.amount.toLocaleString('ru-RU') + ' ₽</b>' : ''}</div>
+            <div class="notif-time">${time}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function timeAgo(iso) {
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return Math.floor(diff / 60) + ' мин назад';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' ч назад';
+    return Math.floor(diff / 86400) + ' дн назад';
+  }
+
+  // ============================================
+  // ИСТОРИЯ ВЫЗОВОВ
+  // ============================================
+  function getCalls() {
+    return JSON.parse(localStorage.getItem('avarkom_calls') || '[]');
+  }
+
+  function addCallToLK(call) {
+    const calls = getCalls();
+    calls.unshift({ id: Date.now(), ...call });
+    localStorage.setItem('avarkom_calls', JSON.stringify(calls));
+    renderCalls();
+    updateStats();
+  }
+
+  function renderCalls() {
+    const container = document.getElementById('callsContainer');
+    if (!container) return;
+    const calls = getCalls();
+    if (!calls.length) {
+      container.innerHTML = '<div class="lk-empty">📭 У вас пока нет вызовов<br><span style="font-size:12px; color:#4b5563; margin-top:6px; display:block;">История появится после первого заказа</span></div>';
+      return;
+    }
+    container.innerHTML = calls.map(c => {
+      const statusColor = c.status === 'Активен' ? '#f59e0b' : c.status === 'Отменён' ? '#f87171' : '#4ade80';
+      const icon = c.type === 'Европротокол' ? '📋' : '🚗';
+      return `
+        <div class="doc-card">
+          <div class="doc-icon">${icon}</div>
+          <div class="doc-info">
+            <div class="doc-title">${c.type}</div>
+            <div class="doc-meta">${c.address || '—'} · ${new Date(c.date).toLocaleString('ru-RU')}</div>
+            <div class="doc-meta" style="color:${statusColor}; margin-top:4px;">● ${c.status}</div>
+          </div>
+          <div style="font-weight:700; color:#f59e0b; font-size:14px; white-space:nowrap;">${c.price.toLocaleString('ru-RU')} ₽</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function updateStats() {
+    const calls = getCalls();
+    const spent = calls.reduce((sum, c) => sum + (c.price || 0), 0);
+    const callsEl = document.getElementById('statCalls');
+    const spentEl = document.getElementById('statSpent');
+    if (callsEl) callsEl.textContent = calls.length;
+    if (spentEl) spentEl.textContent = spent.toLocaleString('ru-RU') + ' ₽';
+    updateBalanceUI();
+  }
+
+  // ============================================
   // SCREENS
   // ============================================
   window.showScreen = function(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
+    updateBalanceUI();
   };
 
   window.switchAuth = function(tab) {
@@ -2106,93 +2182,109 @@ body::before {
   }
 
   // ============================================
-  // CALL
-  // ============================================
-  window.startCall = function() {
-    document.getElementById('modalAddress').value = '';
-    document.getElementById('modalComment').value = '';
-    document.getElementById('gpsCoords').classList.remove('active');
-    lastCoords = null;
-    document.querySelectorAll('#photoUpload .photo-item').forEach(p => {
-      p.classList.remove('filled');
-      p.innerHTML = '+';
-      p.onclick = () => addPhoto(p, 'call');
-    });
-    document.getElementById('confirmCallModal').classList.add('active');
-  };
-
-  // ============================================
-  // ГЕОЛОКАЦИЯ — все способы
+  // ГЕОЛОКАЦИЯ — точность до 10 м
   // ============================================
   window.detectLocation = function() {
     const btn = document.getElementById('gpsBtn');
     if (!navigator.geolocation) {
-      // Fallback на IP
-      getLocationByIP();
+      toast('Геолокация не поддерживается браузером');
       return;
     }
     btn.disabled = true;
     btn.textContent = '⏳';
-    toast('Определяем...');
+    toast('Определяем точное местоположение...');
 
-    // Сначала пробуем высокоточный GPS
-    navigator.geolocation.getCurrentPosition(
-      pos => handleGeoSuccess(pos, btn, 'gps'),
-      err => {
-        console.warn('GPS failed, trying IP:', err);
-        // Fallback: пробуем с меньшей точностью
-        navigator.geolocation.getCurrentPosition(
-          pos => handleGeoSuccess(pos, btn, 'network'),
-          err2 => {
-            console.warn('Network geo failed, trying IP:', err2);
-            // Fallback: IP-геолокация
-            getLocationByIP(btn);
-          },
-          { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
-        );
+    let bestPos = null;
+    let watchId = null;
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    const finish = (pos) => {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      const { latitude, longitude, accuracy } = pos.coords;
+      lastCoords = { lat: latitude, lng: longitude, accuracy };
+
+      document.getElementById('gpsLat').textContent = latitude.toFixed(6);
+      document.getElementById('gpsLng').textContent = longitude.toFixed(6);
+      document.getElementById('gpsAccRow').style.display = 'block';
+      document.getElementById('gpsAcc').textContent = '±' + Math.round(accuracy) + ' м' + (accuracy <= 10 ? ' ✓' : '');
+      document.getElementById('gpsCoords').classList.add('active');
+
+      reverseGeocode(latitude, longitude, 'modalAddress', btn);
+    };
+
+    const handleError = (err) => {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      btn.disabled = false; btn.textContent = '📍';
+      let msg = 'Не удалось определить';
+      if (err.code === 1) msg = 'Доступ к геолокации запрещён. Разрешите в настройках браузера.';
+      else if (err.code === 2) msg = 'Позиция недоступна. Проверьте GPS/интернет.';
+      else if (err.code === 3) msg = 'Превышено время ожидания. Попробуйте ещё раз.';
+      toast(msg);
+    };
+
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        attempts++;
+        const acc = pos.coords.accuracy;
+        if (!bestPos || acc < bestPos.coords.accuracy) bestPos = pos;
+
+        document.getElementById('gpsLat').textContent = pos.coords.latitude.toFixed(6);
+        document.getElementById('gpsLng').textContent = pos.coords.longitude.toFixed(6);
+        document.getElementById('gpsAccRow').style.display = 'block';
+        document.getElementById('gpsAcc').textContent = '±' + Math.round(acc) + ' м (уточняем...)';
+        document.getElementById('gpsCoords').classList.add('active');
+
+        if (acc <= 10) { finish(bestPos); return; }
+        if (attempts >= maxAttempts) finish(bestPos);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      handleError,
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
     );
+
+    setTimeout(() => { if (bestPos) finish(bestPos); }, 30000);
   };
 
-  function handleGeoSuccess(pos, btn, source) {
-    const { latitude, longitude, accuracy } = pos.coords;
-    lastCoords = { lat: latitude, lng: longitude };
-
-    document.getElementById('gpsLat').textContent = latitude.toFixed(6);
-    document.getElementById('gpsLng').textContent = longitude.toFixed(6);
-    if (accuracy) {
-      document.getElementById('gpsAccRow').style.display = 'block';
-      document.getElementById('gpsAcc').textContent = '±' + Math.round(accuracy) + ' м' + (source === 'gps' ? ' (GPS)' : ' (сеть)');
+  window.detectEuroLocation = function() {
+    if (!navigator.geolocation) {
+      toast('Геолокация не поддерживается');
+      return;
     }
-    document.getElementById('gpsCoords').classList.add('active');
+    toast('Определяем точное местоположение...');
 
-    reverseGeocode(latitude, longitude, 'modalAddress', btn);
-  }
+    let bestPos = null;
+    let watchId = null;
+    let attempts = 0;
+    const maxAttempts = 30;
 
-  function getLocationByIP(btn) {
-    if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
-    toast('Определяем по IP...');
-    fetch('https://ipapi.co/json/')
-      .then(r => r.json())
-      .then(data => {
-        if (data.latitude && data.longitude) {
-          lastCoords = { lat: data.latitude, lng: data.longitude };
-          document.getElementById('gpsLat').textContent = data.latitude.toFixed(6);
-          document.getElementById('gpsLng').textContent = data.longitude.toFixed(6);
-          document.getElementById('gpsAccRow').style.display = 'block';
-          document.getElementById('gpsAcc').textContent = 'по IP (город)';
-          document.getElementById('gpsCoords').classList.add('active');
-          reverseGeocode(data.latitude, data.longitude, 'modalAddress', btn);
-        } else {
-          throw new Error('no coords');
-        }
-      })
-      .catch(() => {
-        if (btn) { btn.disabled = false; btn.textContent = '📍'; }
-        toast('Не удалось определить. Введите адрес вручную.');
-      });
-  }
+    const finish = (pos) => {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      const { latitude, longitude } = pos.coords;
+      document.getElementById('euroGpsLat').textContent = latitude.toFixed(6);
+      document.getElementById('euroGpsLng').textContent = longitude.toFixed(6);
+      document.getElementById('euroGpsCoords').classList.add('active');
+      reverseGeocode(latitude, longitude, 'euroLocation', null);
+    };
+
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        attempts++;
+        const acc = pos.coords.accuracy;
+        if (!bestPos || acc < bestPos.coords.accuracy) bestPos = pos;
+
+        document.getElementById('euroGpsLat').textContent = pos.coords.latitude.toFixed(6);
+        document.getElementById('euroGpsLng').textContent = pos.coords.longitude.toFixed(6);
+        document.getElementById('euroGpsCoords').classList.add('active');
+
+        if (acc <= 10) { finish(bestPos); return; }
+        if (attempts >= maxAttempts) finish(bestPos);
+      },
+      () => toast('Не удалось определить'),
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
+    );
+
+    setTimeout(() => { if (bestPos) finish(bestPos); }, 30000);
+  };
 
   function reverseGeocode(lat, lng, targetInputId, btn) {
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=${currentLang}`)
@@ -2211,49 +2303,8 @@ body::before {
       });
   }
 
-  window.detectEuroLocation = function() {
-    if (!navigator.geolocation) { getEuroLocationByIP(); return; }
-    toast('Определяем...');
-    navigator.geolocation.getCurrentPosition(
-      pos => handleEuroGeoSuccess(pos),
-      () => {
-        navigator.geolocation.getCurrentPosition(
-          pos => handleEuroGeoSuccess(pos),
-          () => getEuroLocationByIP(),
-          { enableHighAccuracy: false, timeout: 8000 }
-        );
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
-
-  function handleEuroGeoSuccess(pos) {
-    const { latitude, longitude } = pos.coords;
-    document.getElementById('euroGpsLat').textContent = latitude.toFixed(6);
-    document.getElementById('euroGpsLng').textContent = longitude.toFixed(6);
-    document.getElementById('euroGpsCoords').classList.add('active');
-    reverseGeocode(latitude, longitude, 'euroLocation', null);
-  }
-
-  function getEuroLocationByIP() {
-    toast('Определяем по IP...');
-    fetch('https://ipapi.co/json/')
-      .then(r => r.json())
-      .then(data => {
-        if (data.latitude && data.longitude) {
-          document.getElementById('euroGpsLat').textContent = data.latitude.toFixed(6);
-          document.getElementById('euroGpsLng').textContent = data.longitude.toFixed(6);
-          document.getElementById('euroGpsCoords').classList.add('active');
-          reverseGeocode(data.latitude, data.longitude, 'euroLocation', null);
-        } else {
-          toast('Введите адрес вручную');
-        }
-      })
-      .catch(() => toast('Введите адрес вручную'));
-  }
-
   // ============================================
-  // ФОТО (универсальная функция для вызова и европротокола)
+  // ФОТО
   // ============================================
   window.addPhoto = function(el, context) {
     if (el.classList.contains('filled')) return;
@@ -2269,10 +2320,7 @@ body::before {
         el.classList.add('filled');
         el.innerHTML = '<img src="' + base64 + '"><span class="remove" onclick="removePhoto(event, this, \'' + context + '\')">×</span>';
         el.onclick = null;
-        // Сохраняем фото для европротокола
-        if (context === 'euro') {
-          euroPhotos.push(base64);
-        }
+        if (context === 'euro') euroPhotos.push(base64);
       };
       reader.readAsDataURL(file);
     };
@@ -2294,13 +2342,36 @@ body::before {
   };
 
   // ============================================
-  // CALL FLOW
+  // CALL
   // ============================================
+  window.startCall = function() {
+    if (getBalance() < 2500) {
+      showInsufficientFunds(2500 - getBalance());
+      return;
+    }
+    document.getElementById('modalAddress').value = '';
+    document.getElementById('modalComment').value = '';
+    document.getElementById('gpsCoords').classList.remove('active');
+    lastCoords = null;
+    document.querySelectorAll('#photoUpload .photo-item').forEach(p => {
+      p.classList.remove('filled');
+      p.innerHTML = '+';
+      p.onclick = () => addPhoto(p, 'call');
+    });
+    updateBalanceUI();
+    document.getElementById('confirmCallModal').classList.add('active');
+  };
+
   let callTimerInterval = null;
   let callSeconds = 0;
-  let currentCallState = 'idle'; // idle | active | cancelled
+  let currentCallState = 'idle';
 
   window.confirmCallSubmit = function() {
+    if (getBalance() < 2500) {
+      closeModal('confirmCallModal');
+      showInsufficientFunds(2500 - getBalance());
+      return;
+    }
     const addr = document.getElementById('modalAddress').value.trim();
     if (!addr) { toast('Укажите адрес'); return; }
     const type = document.getElementById('modalAccidentType').value;
@@ -2323,6 +2394,12 @@ body::before {
     }
     showScreen('screenCall');
     currentCallState = 'active';
+
+    // Списание
+    chargeAccount(2500, 'Вызов комиссара');
+    addNotification('call', 'Вы вызвали комиссара', 'Тип: ' + type + '. Адрес: ' + addr);
+    addCallToLK({ type: 'Вызов комиссара', address: addr, price: 2500, status: 'Активен', date: new Date().toISOString() });
+
     startCallFlow();
   };
 
@@ -2331,9 +2408,9 @@ body::before {
     currentCallState = 'cancelled';
     if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
     callSeconds = 0;
+    addNotification('charge', 'Вы отменили вызов', 'Деньги не списаны');
     showScreen('screenHome');
     toast('Вызов отменён');
-    // ВАЖНО: НЕ открываем оценку при отмене
   };
 
   function startCallFlow() {
@@ -2346,7 +2423,6 @@ body::before {
 
     if (callTimerInterval) clearInterval(callTimerInterval);
     callTimerInterval = setInterval(() => {
-      // Если вызов отменён — таймер останавливаем
       if (currentCallState === 'cancelled') {
         clearInterval(callTimerInterval);
         return;
@@ -2366,7 +2442,6 @@ body::before {
 
     stages.forEach(s => {
       setTimeout(() => {
-        // Если вызов отменён — не показываем этапы
         if (currentCallState === 'cancelled') return;
         document.getElementById('callIcon').textContent = s.icon;
         document.getElementById('callTitle').textContent = s.title;
@@ -2374,7 +2449,6 @@ body::before {
         document.getElementById('progressFill').style.width = s.progress + '%';
         if (s.progress === 100) {
           if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
-          // Оценка только если НЕ отменён
           setTimeout(() => {
             if (currentCallState === 'cancelled') return;
             if (confirm('Оформление завершено. Оценить комиссара?')) openRating();
@@ -2385,15 +2459,28 @@ body::before {
   }
 
   // ============================================
+  // 112
+  // ============================================
+  window.call112 = function() {
+    if (confirm('Позвонить в 112?')) {
+      addNotification('emergency', 'Вы вызвали службу 112', 'Экстренный вызов');
+      window.location.href = 'tel:112';
+    }
+  };
+
+  // ============================================
   // ЕВРОПРОТОКОЛ
   // ============================================
   window.openEuroProtocol = function() {
+    if (getBalance() < 1000) {
+      showInsufficientFunds(1000 - getBalance());
+      return;
+    }
     const saved = JSON.parse(localStorage.getItem('avarkom_euro_draft') || '{}');
     ['euroDate','euroLocation','euroCount','driverAName','driverAPhone','driverALicense','driverASTS','driverACar','driverAPlate','driverAOsago','driverADamage','driverBName','driverBPhone','driverBLicense','driverBSTS','driverBCar','driverBPlate','driverBOsago','driverBDamage','euroCirc'].forEach(id => {
       const el = document.getElementById(id);
       if (el && saved[id]) el.value = saved[id];
     });
-    // Восстанавливаем фото
     if (saved.photos && Array.isArray(saved.photos)) {
       euroPhotos = saved.photos.slice();
       const items = document.querySelectorAll('#euroPhotoUpload .photo-item');
@@ -2405,6 +2492,7 @@ body::before {
         }
       });
     }
+    updateBalanceUI();
     document.getElementById('euroModal').classList.add('active');
   };
 
@@ -2441,7 +2529,6 @@ body::before {
     });
     document.getElementById('euroCount').value = '2';
     document.getElementById('euroGpsCoords').classList.remove('active');
-    // Очищаем фото
     euroPhotos = [];
     document.querySelectorAll('#euroPhotoUpload .photo-item').forEach(p => {
       p.classList.remove('filled');
@@ -2487,7 +2574,6 @@ body::before {
     const dateStr = data.date ? new Date(data.date).toLocaleString('ru-RU') : now.toLocaleString('ru-RU');
     const docNum = Math.floor(Math.random() * 900000) + 100000;
 
-    // Блок с фото
     let photosBlock = '';
     if (data.photos && data.photos.length) {
       photosBlock = `
@@ -2667,6 +2753,11 @@ body::before {
   }
 
   window.generateEuroDoc = function() {
+    if (getBalance() < 1000) {
+      closeModal('euroModal');
+      showInsufficientFunds(1000 - getBalance());
+      return;
+    }
     const data = getEuroData();
     if (!data.location || !data.a.name || !data.b.name) {
       toast('Заполните минимум: место, имена обоих водителей');
@@ -2676,6 +2767,10 @@ body::before {
     closeModal('euroModal');
     document.getElementById('euroDocModal').classList.add('active');
     localStorage.setItem('avarkom_euro_draft', JSON.stringify(data));
+
+    chargeAccount(1000, 'Оформление европротокола');
+    addNotification('euro', 'Вы оформили европротокол', 'Место: ' + data.location);
+    addCallToLK({ type: 'Европротокол', address: data.location, price: 1000, status: 'Завершён', date: new Date().toISOString() });
   };
 
   window.printEuro = function() {
@@ -2703,7 +2798,7 @@ body::before {
       .euro-signatures { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:6px; }
       .euro-sign { border-top:0.7px solid #000; padding-top:2px; font-size:7px; text-align:center; }
       .euro-footer { font-size:6px; color:#666; text-align:center; margin-top:5px; border-top:0.5px dashed #999; padding-top:3px; line-height:1.3; }
-      .euro-scheme-box { height:45px; border:0.5px dashed #999; display:flex; align-items:center; justify-content:center; color:#999; font-size:7px; }
+      .euro-scheme-box { height:140px; border:1px dashed #999; display:flex; align-items:center; justify-content:center; color:#999; font-size:8px; }
       .euro-photos-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:3px; margin-top:4px; }
       .euro-photos-grid img { width:100%; aspect-ratio:1; object-fit:cover; border:0.5px solid #333; }
     </style></head><body>${content}</body></html>`);
@@ -2833,6 +2928,7 @@ body::before {
     const phone = document.getElementById('complaintPhone').value.trim();
     const text = document.getElementById('complaintText').value.trim();
     if (!name || !phone || !text) { toast('Заполните обязательные поля'); return; }
+    addNotification('complaint', 'Жалоба отправлена', 'Разберёмся в течение 48 часов');
     toast('Жалоба отправлена. Ответим в течение 48 часов.');
     closeModal('complaintModal');
     ['complaintName','complaintPhone','complaintCommName','complaintDate','complaintText'].forEach(id => {
@@ -2854,10 +2950,13 @@ body::before {
   };
 
   window.processPayment = function() {
-    const amount = document.getElementById('payAmount').value;
-    if (!amount || amount < 100) { toast('Минимальная сумма 100 ₽'); return; }
-    toast('✅ Оплата ' + amount + ' ₽ прошла успешно');
+    const amount = parseInt(document.getElementById('payAmount').value) || 0;
+    if (amount < 100) { toast('Минимальная сумма 100 ₽'); return; }
+    setBalance(getBalance() + amount);
+    addNotification('topup', 'Вы пополнили счёт', 'Баланс пополнен', +amount);
+    toast('✅ Оплата ' + amount.toLocaleString('ru-RU') + ' ₽ прошла успешно');
     closeModal('paymentModal');
+    updateBalanceUI();
   };
 
   // ============================================
@@ -2882,6 +2981,7 @@ body::before {
   // NOTIFICATIONS
   // ============================================
   window.openNotifications = function() {
+    renderNotifications();
     document.getElementById('notifModal').classList.add('active');
   };
 
@@ -2889,7 +2989,8 @@ body::before {
   // MODAL
   // ============================================
   window.closeModal = function(id) {
-    document.getElementById(id).classList.remove('active');
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
   };
 
   document.querySelectorAll('.modal-bg').forEach(modal => {
@@ -2944,6 +3045,10 @@ body::before {
     }
 
     renderDocs();
+    renderCalls();
+    updateStats();
+    updateBalanceUI();
+    updateNotifBadge();
 
     const stars = document.querySelectorAll('#ratingStars span');
     stars.forEach(star => {
