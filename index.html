@@ -9,315 +9,616 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 /* ============ ГЛОБАЛЬНЫЙ СКРОЛЛБАР ============ */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: #0a0c10;
-  border-radius: 5px;
-}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(10,12,16,0.6); border-radius: 5px; }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #f59e0b, #d97706);
   border-radius: 5px;
-  border: 2px solid #0a0c10;
+  border: 2px solid rgba(10,12,16,0.6);
   transition: 0.2s;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #fbbf24, #f59e0b);
-  border: 2px solid #1f232c;
 }
-::-webkit-scrollbar-corner { background: #0a0c10; }
+::-webkit-scrollbar-corner { background: transparent; }
+* { scrollbar-width: thin; scrollbar-color: #f59e0b rgba(10,12,16,0.6); }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #f59e0b #0a0c10;
-}
-
+/* ============ ФОН ============ */
+html, body { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background:#0a0c10; color:#e8eaed; min-height:100vh;
+  color:#e8eaed; min-height:100vh;
   overflow-x: hidden;
+  background: #0a0c10;
+  background-image: url('fone.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,12,16,0.75) 0%, rgba(10,12,16,0.92) 100%);
+  z-index: -1;
+  pointer-events: none;
 }
 
+/* ============ АНИМАЦИИ ============ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
+  50% { box-shadow: 0 0 0 16px rgba(245,158,11,0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.5s ease both; }
+.animate-fadeInScale { animation: fadeInScale 0.4s ease both; }
+.animate-slideInLeft { animation: slideInLeft 0.5s ease both; }
+.animate-slideInRight { animation: slideInRight 0.5s ease both; }
+
+/* Stagger для карточек */
+.actions .action-card:nth-child(1) { animation: fadeIn 0.5s ease 0.05s both; }
+.actions .action-card:nth-child(2) { animation: fadeIn 0.5s ease 0.10s both; }
+.actions .action-card:nth-child(3) { animation: fadeIn 0.5s ease 0.15s both; }
+.actions .action-card:nth-child(4) { animation: fadeIn 0.5s ease 0.20s both; }
+.actions .action-card:nth-child(5) { animation: fadeIn 0.5s ease 0.25s both; }
+
+/* ============ ЖИДКОЕ СТЕКЛО (iOS glassmorphism) ============ */
+.glass {
+  background: rgba(30, 34, 44, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+.glass-btn {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.20);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.glass-btn:active { transform: translateY(0) scale(0.99); }
+
+/* ============ SCREENS ============ */
 .screen { display:none; min-height:100vh; }
-.screen.active { display:flex; flex-direction:column; }
+.screen.active { display:flex; flex-direction:column; animation: fadeIn 0.4s ease; }
 
 /* ============ AUTH ============ */
 .auth-wrap {
   min-height:100vh; display:flex; align-items:center; justify-content:center;
-  padding:20px; background:radial-gradient(ellipse at top, #1a1f2e 0%, #0a0c10 70%);
+  padding:20px;
 }
 .auth-card {
-  width:100%; max-width:440px; background:#12151c;
-  border:1px solid #1f232c; border-radius:20px; padding:32px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  width:100%; max-width:440px;
+  border-radius:24px; padding:32px;
+  animation: fadeInScale 0.5s ease;
 }
 .auth-logo-wrap { text-align:center; margin-bottom:20px; }
-.auth-logo-icon { font-size:44px; margin-bottom:6px; }
+.auth-logo-img {
+  width:80px; height:80px; object-fit:contain;
+  margin-bottom:10px; display:inline-block;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 8px 20px rgba(245,158,11,0.3));
+}
 .auth-logo { font-size:26px; font-weight:800; color:#f59e0b; }
-.auth-sub { text-align:center; color:#6b7280; font-size:13px; margin-bottom:24px; }
-.auth-tabs { display:flex; gap:8px; margin-bottom:24px; background:#0a0c10; border-radius:10px; padding:4px; }
+.auth-sub { text-align:center; color:#8b92a0; font-size:13px; margin-bottom:24px; }
+.auth-tabs {
+  display:flex; gap:8px; margin-bottom:24px;
+  background: rgba(0, 0, 0, 0.3); border-radius:12px; padding:4px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
 .auth-tab {
   flex:1; padding:10px; text-align:center; font-size:14px; cursor:pointer;
-  border-radius:8px; color:#6b7280; transition:0.2s; font-weight:600;
+  border-radius:9px; color:#8b92a0; transition:0.25s; font-weight:600;
 }
-.auth-tab.active { background:#f59e0b; color:#0a0c10; }
+.auth-tab.active {
+  background: rgba(245,158,11,0.18);
+  color:#f59e0b;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+}
 .auth-form { display:none; }
-.auth-form.active { display:block; }
+.auth-form.active { display:block; animation: fadeIn 0.35s ease; }
+
 .field { margin-bottom:14px; }
-.field label { display:block; font-size:12px; color:#6b7280; margin-bottom:6px; font-weight:600; }
+.field label { display:block; font-size:12px; color:#8b92a0; margin-bottom:6px; font-weight:600; }
 .field input, .field textarea, .field select {
-  width:100%; background:#0a0c10; border:1px solid #1f232c; color:#e8eaed;
-  padding:12px 14px; border-radius:10px; font-size:14px; font-family:inherit; outline:none;
-  transition:0.15s;
+  width:100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color:#e8eaed;
+  padding:12px 14px; border-radius:12px; font-size:14px; font-family:inherit; outline:none;
+  transition:0.25s;
+  backdrop-filter: blur(10px);
 }
-.field input:focus, .field textarea:focus, .field select:focus { border-color:#f59e0b; }
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: rgba(245,158,11,0.6);
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+}
 .field textarea { resize:vertical; min-height:80px; }
 
+/* ============ КНОПКИ (iOS style) ============ */
 .btn {
-  background:#1f232c; border:none; color:#e8eaed; padding:12px 20px;
-  border-radius:10px; font-size:14px; cursor:pointer; font-family:inherit;
-  transition:0.15s; font-weight:600;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color:#e8eaed;
+  padding:12px 20px; border-radius:14px;
+  font-size:14px; cursor:pointer; font-family:inherit; font-weight:600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
-.btn:hover { background:#2a2f3a; }
-.btn-primary { background:#f59e0b; color:#0a0c10; }
-.btn-primary:hover { background:#d97706; }
+.btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+.btn:active { transform: translateY(0) scale(0.98); }
+.btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color:#0a0c10;
+  border: 1px solid rgba(255, 220, 150, 0.4);
+  box-shadow:
+    0 4px 20px rgba(245,158,11,0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow:
+    0 8px 28px rgba(245,158,11,0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.40);
+}
 .btn-block { width:100%; }
 .btn-lg { padding:16px; font-size:15px; }
-.btn-danger { background:#ef4444; color:#fff; }
-.btn-danger:hover { background:#dc2626; }
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color:#fff;
+  border: 1px solid rgba(255, 200, 200, 0.3);
+}
+.btn-danger:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+}
 
 /* ============ HEADER ============ */
 .header {
-  height:60px; background:#12151c; border-bottom:1px solid #1f232c;
+  height:64px;
+  background: rgba(18, 21, 28, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display:flex; align-items:center; padding:0 20px; gap:16px;
   position:sticky; top:0; z-index:100;
+  animation: slideInLeft 0.4s ease;
 }
-.logo { font-weight:800; font-size:17px; color:#f59e0b; display:flex; align-items:center; gap:8px; cursor:pointer; }
+.logo {
+  font-weight:800; font-size:17px; color:#f59e0b;
+  display:flex; align-items:center; gap:10px; cursor:pointer;
+}
+.logo-img {
+  width:36px; height:36px; object-fit:contain;
+  filter: drop-shadow(0 2px 8px rgba(245,158,11,0.4));
+}
 .header-nav { display:flex; gap:4px; margin-left:20px; }
 .nav-item {
-  padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer;
-  color:#6b7280; transition:0.15s; font-weight:500;
+  padding:8px 14px; border-radius:10px; font-size:13px; cursor:pointer;
+  color:#8b92a0; transition:0.25s; font-weight:500;
 }
-.nav-item:hover, .nav-item.active { background:#1f232c; color:#e8eaed; }
+.nav-item:hover { background: rgba(255,255,255,0.06); color:#e8eaed; }
+.nav-item.active {
+  background: rgba(245,158,11,0.15);
+  color:#f59e0b;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
 
 .header-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .icon-btn {
-  width:38px; height:38px; border-radius:10px; background:#1f232c;
+  width:40px; height:40px; border-radius:12px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:16px; transition:0.15s; border:none; color:#e8eaed;
-  position:relative;
+  cursor:pointer; font-size:16px; transition:0.25s;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color:#e8eaed; position:relative;
 }
-.icon-btn:hover { background:#2a2f3a; }
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
 .icon-btn .badge {
-  position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff;
-  font-size:10px; font-weight:700; padding:2px 5px; border-radius:10px;
+  position:absolute; top:-4px; right:-4px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:10px;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.5);
+  animation: heartbeat 2s infinite;
 }
 .header-user {
   display:flex; align-items:center; gap:10px;
-  cursor:pointer; padding:6px 12px; border-radius:8px; transition:0.15s;
+  cursor:pointer; padding:6px 12px; border-radius:12px; transition:0.25s;
 }
-.header-user:hover { background:#1f232c; }
+.header-user:hover { background: rgba(255,255,255,0.06); }
 .user-avatar {
-  width:32px; height:32px; border-radius:50%; background:#f59e0b;
+  width:34px; height:34px; border-radius:50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   display:flex; align-items:center; justify-content:center;
   font-size:14px; font-weight:700; color:#0a0c10;
+  box-shadow: 0 4px 12px rgba(245,158,11,0.4);
 }
 
+/* Lang dropdown */
 .lang-dropdown {
   position:absolute; top:100%; right:0; margin-top:8px;
-  background:#12151c; border:1px solid #1f232c; border-radius:12px;
-  min-width:200px; max-height:400px; overflow-y:auto;
-  z-index:200; display:none; box-shadow:0 10px 40px rgba(0,0,0,0.6);
+  min-width:180px; max-height:400px; overflow-y:auto;
+  border-radius:14px; z-index:200; display:none;
+  background: rgba(18, 21, 28, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  animation: fadeInScale 0.2s ease;
 }
 .lang-dropdown.active { display:block; }
 .lang-option {
   padding:12px 16px; font-size:13px; cursor:pointer; transition:0.15s;
   display:flex; align-items:center; gap:10px;
 }
-.lang-option:hover { background:#1f232c; }
-.lang-option.active { background:rgba(245,158,11,0.1); color:#f59e0b; }
+.lang-option:hover { background: rgba(255,255,255,0.06); }
+.lang-option.active { background: rgba(245,158,11,0.12); color:#f59e0b; }
 .lang-flag { font-size:18px; }
 
 /* ============ MAIN ============ */
 .main { flex:1; padding:40px 20px; max-width:900px; margin:0 auto; width:100%; }
-.hero { text-align:center; margin-bottom:40px; }
-.hero h1 { font-size:32px; font-weight:800; margin-bottom:10px; }
-.hero p { color:#6b7280; font-size:15px; }
+.hero { text-align:center; margin-bottom:40px; animation: fadeIn 0.5s ease; }
+.hero h1 { font-size:34px; font-weight:800; margin-bottom:10px; letter-spacing:-0.5px; }
+.hero p { color:#8b92a0; font-size:15px; }
 
+/* ============ ACTION CARDS ============ */
 .actions { display:grid; grid-template-columns:1fr; gap:14px; }
 .action-card {
   display:flex; align-items:center; gap:20px; padding:22px;
-  background:#12151c; border:1px solid #1f232c; border-radius:16px;
-  cursor:pointer; transition:0.2s; text-align:left;
+  border-radius:18px; cursor:pointer; text-align:left;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.action-card:hover { border-color:#f59e0b; transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+.action-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(245,158,11,0.4);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(245,158,11,0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  background: rgba(35, 40, 52, 0.6);
+}
 .action-card.highlight {
-  background:linear-gradient(135deg,#12151c 0%,#1a1f2e 100%);
-  border-color:rgba(245,158,11,0.4);
+  background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(30, 34, 44, 0.55) 100%);
+  border-color: rgba(245,158,11,0.3);
 }
 .action-icon {
   width:60px; height:60px; border-radius:16px; display:flex;
   align-items:center; justify-content:center; font-size:28px; flex-shrink:0;
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+  transition: transform 0.3s ease;
 }
-.action-icon.red { background:rgba(239,68,68,0.15); }
-.action-icon.orange { background:rgba(245,158,11,0.15); }
-.action-icon.blue { background:rgba(59,130,246,0.15); }
-.action-icon.green { background:rgba(74,222,128,0.15); }
-.action-icon.purple { background:rgba(168,85,247,0.15); }
+.action-card:hover .action-icon { transform: scale(1.08) rotate(-3deg); }
+.action-icon.red { background: rgba(239,68,68,0.18); }
+.action-icon.orange { background: rgba(245,158,11,0.18); }
+.action-icon.blue { background: rgba(59,130,246,0.18); }
+.action-icon.green { background: rgba(74,222,128,0.18); }
+.action-icon.purple { background: rgba(168,85,247,0.18); }
 .action-info { flex:1; }
 .action-info h3 { font-size:16px; margin-bottom:4px; }
-.action-info p { font-size:13px; color:#6b7280; }
-.action-arrow { color:#4b5563; font-size:20px; }
+.action-info p { font-size:13px; color:#8b92a0; line-height:1.5; }
+.action-arrow {
+  color:#4b5563; font-size:20px; transition: transform 0.3s ease, color 0.3s;
+}
+.action-card:hover .action-arrow { transform: translateX(4px); color:#f59e0b; }
 .action-price {
   font-size:13px; font-weight:700; color:#f59e0b;
-  background:rgba(245,158,11,0.1); padding:4px 10px; border-radius:8px;
+  background: rgba(245,158,11,0.12);
+  padding:5px 12px; border-radius:10px;
+  border: 1px solid rgba(245,158,11,0.2);
+  backdrop-filter: blur(10px);
 }
 
 /* ============ РЕКОМЕНДАЦИИ ============ */
 .rec-item {
-  display:flex; gap:16px; padding:18px; background:#12151c;
-  border:1px solid #1f232c; border-radius:12px; margin-bottom:12px;
+  display:flex; gap:16px; padding:18px;
+  border-radius:14px; margin-bottom:12px;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: 0.3s;
+  animation: fadeIn 0.4s ease both;
 }
+.rec-item:hover {
+  transform: translateX(4px);
+  border-color: rgba(245,158,11,0.25);
+}
+.rec-item:nth-child(1) { animation-delay: 0.05s; }
+.rec-item:nth-child(2) { animation-delay: 0.10s; }
+.rec-item:nth-child(3) { animation-delay: 0.15s; }
+.rec-item:nth-child(4) { animation-delay: 0.20s; }
+.rec-item:nth-child(5) { animation-delay: 0.25s; }
+.rec-item:nth-child(6) { animation-delay: 0.30s; }
+.rec-item:nth-child(7) { animation-delay: 0.35s; }
+.rec-item:nth-child(8) { animation-delay: 0.40s; }
+.rec-item:nth-child(9) { animation-delay: 0.45s; }
+.rec-item:nth-child(10) { animation-delay: 0.50s; }
 .rec-num {
-  width:32px; height:32px; border-radius:50%; background:#f59e0b;
+  width:32px; height:32px; border-radius:50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color:#0a0c10; display:flex; align-items:center; justify-content:center;
   font-weight:700; font-size:14px; flex-shrink:0;
+  box-shadow: 0 4px 12px rgba(245,158,11,0.35);
 }
 .rec-content h4 { font-size:15px; margin-bottom:6px; }
 .rec-content p { font-size:13px; color:#8b92a0; line-height:1.6; }
 .rec-warn {
-  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
-  border-radius:12px; padding:16px; margin-top:20px; font-size:13px; line-height:1.6;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius:14px; padding:16px; margin-top:20px;
+  font-size:13px; line-height:1.6;
+  backdrop-filter: blur(20px);
 }
 
 /* ============ ЛК ============ */
-.lk-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px; }
-.lk-card {
-  background:#12151c; border:1px solid #1f232c; border-radius:14px; padding:20px;
+.lk-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:16px; margin-bottom:24px;
 }
-.lk-card h4 { font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
-.lk-value { font-size:24px; font-weight:800; color:#f59e0b; }
-.lk-list { background:#12151c; border:1px solid #1f232c; border-radius:14px; overflow:hidden; margin-bottom:20px; }
+.lk-card {
+  border-radius:16px; padding:20px;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: 0.3s;
+  animation: fadeIn 0.4s ease both;
+}
+.lk-card:hover { transform: translateY(-3px); }
+.lk-card:nth-child(1) { animation-delay: 0.05s; }
+.lk-card:nth-child(2) { animation-delay: 0.10s; }
+.lk-card:nth-child(3) { animation-delay: 0.15s; }
+.lk-card h4 {
+  font-size:12px; color:#8b92a0; text-transform:uppercase;
+  letter-spacing:0.5px; margin-bottom:10px; font-weight:600;
+}
+.lk-value { font-size:26px; font-weight:800; color:#f59e0b; }
+
+.lk-list {
+  border-radius:16px; overflow:hidden; margin-bottom:20px;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
 .lk-row {
   display:flex; align-items:center; gap:14px; padding:16px 20px;
-  border-bottom:1px solid #1a1e26; cursor:pointer; transition:0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor:pointer; transition:0.2s;
 }
-.lk-row:hover { background:#141820; }
+.lk-row:hover { background: rgba(255,255,255,0.04); padding-left: 24px; }
 .lk-row:last-child { border-bottom:none; }
 .lk-row-icon { font-size:22px; }
 .lk-row-info { flex:1; }
 .lk-row-title { font-size:14px; font-weight:600; }
-.lk-row-sub { font-size:12px; color:#6b7280; margin-top:2px; }
-.lk-row-arrow { color:#4b5563; }
+.lk-row-sub { font-size:12px; color:#8b92a0; margin-top:2px; }
+.lk-row-arrow { color:#4b5563; transition: 0.2s; }
+.lk-row:hover .lk-row-arrow { color: #f59e0b; transform: translateX(3px); }
 .lk-empty { text-align:center; padding:36px 20px; color:#4b5563; font-size:14px; }
 
 .doc-card {
-  background:#12151c; border:1px solid #1f232c; border-radius:14px;
-  padding:18px; margin-bottom:12px; display:flex; gap:14px; align-items:center;
+  border-radius:16px; padding:18px; margin-bottom:12px;
+  display:flex; gap:14px; align-items:center;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transition: 0.3s;
+  animation: fadeIn 0.4s ease;
 }
+.doc-card:hover { transform: translateY(-2px); border-color: rgba(245,158,11,0.3); }
 .doc-icon { font-size:32px; }
 .doc-info { flex:1; }
 .doc-title { font-size:14px; font-weight:600; }
-.doc-meta { font-size:12px; color:#6b7280; margin-top:2px; }
+.doc-meta { font-size:12px; color:#8b92a0; margin-top:2px; }
 .doc-actions { display:flex; gap:6px; }
 
 /* ============ CALL SCREEN ============ */
 .call-wrap {
   flex:1; display:flex; align-items:center; justify-content:center;
-  padding:40px 20px; background:radial-gradient(ellipse at center, #1a1f2e 0%, #0a0c10 70%);
+  padding:40px 20px;
 }
 .call-container {
   width:100%; max-width:560px;
-  background:#12151c; border:1px solid #1f232c; border-radius:20px;
-  padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  border-radius:24px; padding:32px;
+  background: rgba(30, 34, 44, 0.55);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  animation: fadeInScale 0.5s ease;
 }
-.progress-bar { height:4px; background:#1f232c; border-radius:2px; overflow:hidden; margin-bottom:24px; }
+.progress-bar {
+  height:4px; background: rgba(255,255,255,0.08);
+  border-radius:2px; overflow:hidden; margin-bottom:24px;
+}
 .progress-fill {
-  height:100%; background:linear-gradient(90deg,#f59e0b,#4ade80);
-  width:0%; transition:width 1s ease;
+  height:100%;
+  background: linear-gradient(90deg,#f59e0b,#4ade80);
+  width:0%; transition:width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(245,158,11,0.6);
 }
 .call-status-icon {
-  width:80px; height:80px; border-radius:50%;
-  background:rgba(245,158,11,0.15); color:#f59e0b;
+  width:84px; height:84px; border-radius:50%;
+  background: rgba(245,158,11,0.15);
+  color:#f59e0b;
   display:flex; align-items:center; justify-content:center;
-  font-size:36px; margin:0 auto 20px;
-  animation:pulse-ring 2s infinite;
-}
-@keyframes pulse-ring {
-  0% { box-shadow:0 0 0 0 rgba(245,158,11,0.4); }
-  70% { box-shadow:0 0 0 20px rgba(245,158,11,0); }
-  100% { box-shadow:0 0 0 0 rgba(245,158,11,0); }
+  font-size:38px; margin:0 auto 20px;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(245,158,11,0.25);
+  animation: pulse-glow 2s infinite;
 }
 .call-title { text-align:center; font-size:22px; font-weight:800; margin-bottom:8px; }
 .call-sub { text-align:center; color:#8b92a0; font-size:14px; margin-bottom:6px; }
-.call-timer { text-align:center; color:#f59e0b; font-size:13px; font-weight:600; margin-bottom:28px; }
+.call-timer {
+  text-align:center; color:#f59e0b; font-size:14px;
+  font-weight:700; margin-bottom:28px;
+  font-family: 'SF Mono', Menlo, monospace;
+  letter-spacing: 1px;
+}
 .call-info-block {
-  background:#0a0c10; border-radius:12px; padding:16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius:14px; padding:16px;
   margin-bottom:16px; font-size:13px; line-height:1.8; color:#8b92a0;
   word-break: break-word;
+  backdrop-filter: blur(10px);
 }
 .call-info-block b { color:#e8eaed; }
 .call-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; }
 .call-actions .btn { padding:14px; font-size:13px; }
 .emergency-btn {
-  background:linear-gradient(135deg,#ef4444,#dc2626);
+  background: linear-gradient(135deg,#ef4444,#dc2626);
   color:#fff; grid-column:1 / -1;
-  box-shadow:0 4px 20px rgba(239,68,68,0.3);
+  box-shadow: 0 4px 24px rgba(239,68,68,0.4);
+  border: 1px solid rgba(255, 200, 200, 0.3);
 }
-.emergency-btn:hover { background:linear-gradient(135deg,#dc2626,#b91c1c); }
+.emergency-btn:hover {
+  background: linear-gradient(135deg,#f87171,#ef4444);
+  transform: translateY(-2px);
+}
 .notes-block {
-  background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2);
-  border-radius:12px; padding:16px; margin-top:20px;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius:14px; padding:16px; margin-top:20px;
   font-size:12px; line-height:1.7; color:#8b92a0;
+  backdrop-filter: blur(10px);
 }
 .notes-block b { color:#f59e0b; }
 
 /* ============ ФОТО ============ */
 .photo-upload { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 .photo-item {
-  width:64px; height:64px; border-radius:10px;
-  background:#0a0c10; border:1px dashed #2f3440;
+  width:68px; height:68px; border-radius:12px;
+  background: rgba(0,0,0,0.3);
+  border: 1.5px dashed rgba(255,255,255,0.15);
   display:flex; align-items:center; justify-content:center;
-  font-size:20px; color:#4b5563; cursor:pointer;
-  transition:0.15s; position:relative; overflow:hidden;
+  font-size:22px; color:#4b5563; cursor:pointer;
+  transition:0.25s; position:relative; overflow:hidden;
+  backdrop-filter: blur(10px);
 }
-.photo-item:hover { border-color:#f59e0b; color:#f59e0b; }
+.photo-item:hover {
+  border-color: #f59e0b;
+  color:#f59e0b;
+  transform: translateY(-2px);
+  background: rgba(245,158,11,0.08);
+}
 .photo-item.filled {
-  border-style:solid; border-color:#1f232c;
-  background:linear-gradient(135deg,#1f232c,#2a2f3a);
+  border-style:solid;
+  border-color: rgba(255,255,255,0.15);
+  background: linear-gradient(135deg, rgba(30,34,44,0.8), rgba(42,47,58,0.8));
 }
 .photo-item img { width:100%; height:100%; object-fit:cover; }
 .photo-item .remove {
-  position:absolute; top:-2px; right:-2px;
-  width:20px; height:20px; border-radius:50%;
-  background:#ef4444; color:#fff; font-size:12px;
+  position:absolute; top:2px; right:2px;
+  width:22px; height:22px; border-radius:50%;
+  background: linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff; font-size:12px;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; z-index:2;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.5);
+  transition: 0.2s;
 }
+.photo-item .remove:hover { transform: scale(1.15); }
 
 /* GPS button */
 .field-wrap { position:relative; }
 .gps-btn {
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  background:#1f232c; border:none; color:#f59e0b;
-  width:36px; height:36px; border-radius:8px;
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.25);
+  color:#f59e0b;
+  width:38px; height:38px; border-radius:10px;
   cursor:pointer; font-size:16px;
   display:flex; align-items:center; justify-content:center;
-  transition:0.15s;
+  transition:0.25s;
+  backdrop-filter: blur(10px);
 }
-.gps-btn:hover { background:#2a2f3a; }
+.gps-btn:hover {
+  background: rgba(245,158,11,0.25);
+  transform: translateY(-50%) scale(1.08);
+}
 .gps-btn:disabled { opacity:0.5; cursor:wait; }
-.field-wrap input { padding-right:52px; }
+.field-wrap input { padding-right:56px; }
 
-/* GPS coordinates display */
+/* GPS coords */
 .gps-coords {
-  display:none; margin-top:8px; padding:10px 12px;
-  background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25);
-  border-radius:10px; font-size:12px; color:#4ade80;
-  font-family:monospace;
+  display:none; margin-top:8px; padding:12px 14px;
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.25);
+  border-radius:12px; font-size:12px; color:#4ade80;
+  font-family: 'SF Mono', Menlo, monospace;
+  animation: fadeIn 0.4s ease;
+  backdrop-filter: blur(10px);
 }
 .gps-coords.active { display:block; }
 .gps-coords b { color:#e8eaed; }
@@ -329,16 +630,31 @@ body {
 .euro-section-title {
   font-size:13px; font-weight:700; color:#f59e0b;
   margin:20px 0 12px; padding-bottom:8px;
-  border-bottom:1px solid #1f232c;
+  border-bottom: 1px solid rgba(245,158,11,0.2);
   display:flex; align-items:center; gap:8px;
 }
+
+/* Фото в европротоколе */
+.euro-photo-preview {
+  display:grid; grid-template-columns:repeat(5, 1fr);
+  gap:8px; margin-top:10px;
+}
+.euro-photo-thumb {
+  aspect-ratio: 1;
+  border-radius:12px;
+  object-fit: cover;
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: 0.3s;
+}
+.euro-photo-thumb:hover { transform: scale(1.05); }
 
 /* ============ ЕВРОПРОТОКОЛ — ПЕЧАТНЫЙ ДОКУМЕНТ ============ */
 .euro-doc {
   background:#fff; color:#000; padding:15px;
   font-family: 'Times New Roman', serif; line-height: 1.25;
-  font-size: 10px;
-  width: 100%;
+  font-size: 10px; width: 100%;
 }
 .euro-doc h2 { text-align:center; font-size:14px; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.5px; }
 .euro-doc .euro-sub { text-align:center; font-size:8px; margin-bottom:10px; color:#444; }
@@ -346,7 +662,13 @@ body {
   display:flex; justify-content:space-between; border-bottom:1.5px solid #000;
   padding-bottom:6px; margin-bottom:10px; font-size:8px; align-items:center;
 }
-.euro-doc .euro-logo { font-weight:800; font-size:11px; color:#d97706; }
+.euro-doc .euro-header-left {
+  display:flex; align-items:center; gap:8px;
+}
+.euro-doc .euro-logo-img {
+  width: 32px; height: 32px; object-fit: contain;
+}
+.euro-doc .euro-logo { font-weight:800; font-size:12px; color:#d97706; }
 .euro-section { margin-bottom:8px; border:0.7px solid #000; padding:6px 8px; }
 .euro-section h3 {
   font-size:9px; text-transform:uppercase; background:#f0f0f0;
@@ -365,71 +687,125 @@ body {
   height:70px; border:0.5px dashed #999; display:flex; align-items:center; justify-content:center;
   color:#999; font-size:8px;
 }
+.euro-photos-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 4px; margin-top: 6px;
+}
+.euro-photos-grid img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  border: 0.5px solid #333; border-radius: 3px;
+}
 
 /* ============ MODAL ============ */
 .modal-bg {
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85);
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
   z-index:2000; align-items:center; justify-content:center; padding:20px;
   overflow-y:auto;
 }
-.modal-bg.active { display:flex; }
+.modal-bg.active { display:flex; animation: fadeIn 0.25s ease; }
 .modal {
-  background:#12151c; border:1px solid #1f232c; border-radius:18px;
+  background: rgba(24, 28, 36, 0.85);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius:20px;
   padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  animation: fadeInScale 0.3s ease;
 }
 .modal.wide { max-width:900px; }
-.modal h2 { font-size:18px; margin-bottom:20px; }
+.modal h2 { font-size:18px; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+.modal h2 img { width: 32px; height: 32px; }
 .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; flex-wrap:wrap; }
 
 /* ============ STAR RATING ============ */
 .stars { display:flex; gap:6px; justify-content:center; font-size:36px; margin:16px 0; cursor:pointer; user-select:none; }
-.stars span { color:#3a3f4a; transition:0.15s; }
-.stars span.active { color:#facc15; }
+.stars span { color:#3a3f4a; transition:0.2s; }
+.stars span:hover { transform: scale(1.15); }
+.stars span.active { color:#facc15; filter: drop-shadow(0 0 8px rgba(250,204,21,0.6)); }
 
 /* ============ SUPPORT ============ */
 .support-card {
-  background:#12151c; border:1px solid #1f232c; border-radius:14px;
-  padding:24px; margin-bottom:16px;
+  border-radius:16px; padding:24px; margin-bottom:16px;
+  background: rgba(30, 34, 44, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: 0.3s;
+  animation: fadeIn 0.4s ease both;
 }
+.support-card:nth-child(1) { animation-delay: 0.05s; }
+.support-card:nth-child(2) { animation-delay: 0.10s; }
+.support-card:nth-child(3) { animation-delay: 0.15s; }
+.support-card:nth-child(4) { animation-delay: 0.20s; }
 .support-card h3 { font-size:16px; margin-bottom:8px; }
 .support-card p { font-size:13px; color:#8b92a0; line-height:1.6; margin-bottom:16px; }
 .support-email {
   display:flex; align-items:center; gap:12px;
-  padding:14px; background:#0a0c10; border-radius:10px;
-  font-family:monospace; font-size:14px; color:#f59e0b;
-  cursor:pointer; transition:0.15s; margin-bottom:12px;
+  padding:14px; border-radius:12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size:14px; color:#f59e0b;
+  cursor:pointer; transition:0.2s; margin-bottom:12px;
 }
-.support-email:hover { background:#141820; }
+.support-email:hover {
+  background: rgba(245,158,11,0.08);
+  border-color: rgba(245,158,11,0.3);
+  transform: translateX(3px);
+}
 .support-email .copy-icon { margin-left:auto; color:#4b5563; font-size:12px; }
 
-.faq-item { border-bottom:1px solid #1a1e26; padding:14px 0; cursor:pointer; }
+.faq-item {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding:14px 0; cursor:pointer;
+}
 .faq-item:last-child { border-bottom:none; }
 .faq-q { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; }
-.faq-q .arrow { color:#6b7280; transition:0.2s; }
-.faq-item.open .faq-q .arrow { transform:rotate(90deg); }
+.faq-q .arrow { color:#6b7280; transition:0.3s; }
+.faq-item.open .faq-q .arrow { transform:rotate(90deg); color:#f59e0b; }
 .faq-a {
   font-size:13px; color:#8b92a0; line-height:1.6;
-  max-height:0; overflow:hidden; transition:max-height 0.3s, margin 0.3s; margin-top:0;
+  max-height:0; overflow:hidden;
+  transition: max-height 0.35s ease, margin 0.35s ease;
+  margin-top:0;
 }
 .faq-item.open .faq-a { max-height:300px; margin-top:10px; }
 
 /* ============ PAYMENT ============ */
 .pay-methods { display:flex; gap:10px; margin-bottom:20px; }
 .pay-method {
-  flex:1; padding:16px; background:#0a0c10; border:2px solid #1f232c;
-  border-radius:12px; text-align:center; cursor:pointer; transition:0.15s;
+  flex:1; padding:16px;
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius:14px; text-align:center; cursor:pointer; transition:0.25s;
 }
-.pay-method:hover { border-color:#2f3440; }
-.pay-method.selected { border-color:#f59e0b; background:rgba(245,158,11,0.08); }
+.pay-method:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+.pay-method.selected {
+  border-color: #f59e0b;
+  background: rgba(245,158,11,0.10);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+}
 .pay-method-icon { font-size:24px; margin-bottom:6px; }
 .pay-method-label { font-size:12px; color:#8b92a0; }
-.pay-summary { background:#0a0c10; border-radius:12px; padding:16px; margin-bottom:20px; }
+.pay-summary {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius:14px; padding:16px; margin-bottom:20px;
+}
 .pay-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
-.pay-row.total { border-top:1px solid #1f232c; margin-top:10px; padding-top:14px; font-weight:800; font-size:17px; color:#f59e0b; }
+.pay-row.total {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top:10px; padding-top:14px;
+  font-weight:800; font-size:17px; color:#f59e0b;
+}
 
 /* ============ NOTIFICATIONS ============ */
 .notif-list { max-height:400px; overflow-y:auto; }
-.notif-item { display:flex; gap:12px; padding:14px; border-bottom:1px solid #1a1e26; }
+.notif-item { display:flex; gap:12px; padding:14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .notif-item:last-child { border-bottom:none; }
 .notif-icon { font-size:20px; }
 .notif-content { flex:1; }
@@ -440,18 +816,23 @@ body {
 /* ============ TOAST ============ */
 .toast {
   position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px);
-  background:#f59e0b; color:#0a0c10; padding:14px 28px; border-radius:12px;
-  font-size:14px; font-weight:700; z-index:3000; transition:transform 0.3s;
-  pointer-events:none; box-shadow:0 10px 40px rgba(245,158,11,0.4);
+  background: rgba(24, 28, 36, 0.9);
+  backdrop-filter: blur(24px) saturate(180%);
+  color:#f59e0b;
+  padding:14px 28px; border-radius:16px;
+  font-size:14px; font-weight:700; z-index:3000;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events:none;
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(245,158,11,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.10);
   max-width:90%; text-align:center;
 }
 .toast.active { transform:translateX(-50%) translateY(0); }
 
 /* ============ PRINT ============ */
-@page {
-  size: A4 portrait;
-  margin: 8mm;
-}
+@page { size: A4 portrait; margin: 8mm; }
 @media print {
   body * { visibility:hidden; }
   #printArea, #printArea * { visibility:visible; }
@@ -459,15 +840,13 @@ body {
     position:absolute; left:0; top:0; width:210mm; min-height:297mm;
     background:#fff; color:#000; padding:0; margin:0;
   }
-  .euro-doc {
-    font-size:9px !important;
-    padding:0 !important;
-    line-height:1.2 !important;
-  }
+  .euro-doc { font-size:9px !important; padding:0 !important; line-height:1.2 !important; }
   .euro-section { margin-bottom:5px !important; page-break-inside: avoid; }
   .euro-doc h2 { font-size:13px !important; }
   .euro-scheme-box { height:55px !important; }
   .no-print { display:none !important; }
+  body::before { display: none !important; }
+  body { background: #fff !important; }
 }
 
 @media (max-width:768px) {
@@ -478,6 +857,7 @@ body {
   .action-icon { width:48px; height:48px; font-size:22px; }
   .euro-row, .euro-row.three { grid-template-columns:1fr; }
   .euro-form-grid { grid-template-columns:1fr; }
+  .euro-photo-preview { grid-template-columns:repeat(3, 1fr); }
   .modal { padding:20px; }
   ::-webkit-scrollbar { width: 6px; }
 }
@@ -488,9 +868,9 @@ body {
 <!-- ============ ЭКРАН: ВХОД / РЕГИСТРАЦИЯ ============ -->
 <div class="screen" id="screenAuth">
   <div class="auth-wrap">
-    <div class="auth-card">
+    <div class="auth-card glass">
       <div class="auth-logo-wrap">
-        <div class="auth-logo-icon">🚨</div>
+        <img src="logo.png" alt="АварКом" class="auth-logo-img" onerror="this.style.display='none'">
         <div class="auth-logo">АварКом</div>
       </div>
       <div class="auth-sub" data-i18n="auth_sub">Аварийный комиссар онлайн</div>
@@ -538,7 +918,10 @@ body {
 <!-- ============ ЭКРАН: ГЛАВНАЯ ============ -->
 <div class="screen" id="screenHome">
   <div class="header">
-    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
+    <div class="logo" onclick="showScreen('screenHome')">
+      <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+      <span data-i18n="app_name">АварКом</span>
+    </div>
     <div class="header-nav">
       <div class="nav-item active" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
       <div class="nav-item" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
@@ -612,7 +995,7 @@ body {
       </div>
     </div>
 
-    <div style="margin-top:32px; padding:20px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:14px; font-size:13px; color:#8b92a0; line-height:1.7;">
+    <div style="margin-top:32px; padding:20px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius:14px; font-size:13px; color:#8b92a0; line-height:1.7; backdrop-filter: blur(10px);">
       <b style="color:#f59e0b;" data-i18n="tip_title">⚡ Совет:</b> <span data-i18n="tip_text">с 2025 года лимит европротокола с разногласиями — 200 000 ₽, без разногласий с фотофиксацией — 400 000 ₽.</span>
     </div>
   </div>
@@ -621,7 +1004,10 @@ body {
 <!-- ============ ЭКРАН: РЕКОМЕНДАЦИИ ============ -->
 <div class="screen" id="screenRecommendations">
   <div class="header">
-    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
+    <div class="logo" onclick="showScreen('screenHome')">
+      <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+      <span data-i18n="app_name">АварКом</span>
+    </div>
     <div class="header-nav">
       <div class="nav-item" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
       <div class="nav-item active" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
@@ -727,7 +1113,10 @@ body {
 <!-- ============ ЭКРАН: ПОДДЕРЖКА ============ -->
 <div class="screen" id="screenSupport">
   <div class="header">
-    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
+    <div class="logo" onclick="showScreen('screenHome')">
+      <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+      <span data-i18n="app_name">АварКом</span>
+    </div>
     <div class="header-nav">
       <div class="nav-item" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
       <div class="nav-item" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
@@ -808,7 +1197,10 @@ body {
 <!-- ============ ЭКРАН: ЛИЧНЫЙ КАБИНЕТ ============ -->
 <div class="screen" id="screenLK">
   <div class="header">
-    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
+    <div class="logo" onclick="showScreen('screenHome')">
+      <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+      <span data-i18n="app_name">АварКом</span>
+    </div>
     <div class="header-nav">
       <div class="nav-item" onclick="showScreen('screenHome')" data-i18n="nav_home">Главная</div>
       <div class="nav-item" onclick="showScreen('screenRecommendations')" data-i18n="nav_recs">Рекомендации</div>
@@ -883,7 +1275,7 @@ body {
       </div>
     </div>
 
-    <h3 style="font-size:13px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;" data-i18n="lk_docs">Мои документы</h3>
+    <h3 style="font-size:13px; color:#8b92a0; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;" data-i18n="lk_docs">Мои документы</h3>
     <div id="docsContainer">
       <div class="lk-empty" data-i18n="lk_docs_empty">📭 Документов пока нет<br><span style="font-size:12px; color:#4b5563; margin-top:6px; display:block;">Появятся после оформления европротокола</span></div>
     </div>
@@ -895,7 +1287,10 @@ body {
 <!-- ============ ЭКРАН: ВЫЗОВ ============ -->
 <div class="screen" id="screenCall">
   <div class="header">
-    <div class="logo" onclick="showScreen('screenHome')">🚨 <span data-i18n="app_name">АварКом</span></div>
+    <div class="logo" onclick="showScreen('screenHome')">
+      <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+      <span data-i18n="app_name">АварКом</span>
+    </div>
     <div style="font-size:13px; color:#8b92a0;" data-i18n="call_header">Вызов комиссара</div>
     <button class="btn" style="margin-left:auto; padding:8px 16px; font-size:13px;" onclick="cancelCall()" data-i18n="btn_cancel">Отменить</button>
   </div>
@@ -912,7 +1307,7 @@ body {
         <div><span data-i18n="call_type">Тип ДТП:</span> <b id="callType">—</b></div>
         <div><span data-i18n="call_addr">Адрес:</span> <b id="callAddress">—</b></div>
         <div id="callCommentRow" style="display:none;"><span data-i18n="call_comment">Комментарий:</span> <b id="callComment">—</b></div>
-        <div id="callCoordsRow" style="display:none; font-family:monospace; font-size:12px; margin-top:6px;">
+        <div id="callCoordsRow" style="display:none; font-family: monospace; font-size:12px; margin-top:6px;">
           <span data-i18n="geo_coords">Координаты:</span> <span id="callCoords" style="color:#4ade80;">—</span>
         </div>
       </div>
@@ -936,7 +1331,7 @@ body {
 <!-- ============ МОДАЛКА: ВЫЗОВ ============ -->
 <div class="modal-bg" id="confirmCallModal">
   <div class="modal">
-    <h2 data-i18n="modal_call_title">Вызов комиссара</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="modal_call_title">Вызов комиссара</span></h2>
 
     <div class="field">
       <label data-i18n="field_dtp_type">Тип ДТП</label>
@@ -969,15 +1364,15 @@ body {
     <div class="field">
       <label data-i18n="field_photos">Фото с места (до 5 штук, необязательно)</label>
       <div class="photo-upload" id="photoUpload">
-        <div class="photo-item" onclick="addPhoto(this)">+</div>
-        <div class="photo-item" onclick="addPhoto(this)">+</div>
-        <div class="photo-item" onclick="addPhoto(this)">+</div>
-        <div class="photo-item" onclick="addPhoto(this)">+</div>
-        <div class="photo-item" onclick="addPhoto(this)">+</div>
+        <div class="photo-item" onclick="addPhoto(this, 'call')">+</div>
+        <div class="photo-item" onclick="addPhoto(this, 'call')">+</div>
+        <div class="photo-item" onclick="addPhoto(this, 'call')">+</div>
+        <div class="photo-item" onclick="addPhoto(this, 'call')">+</div>
+        <div class="photo-item" onclick="addPhoto(this, 'call')">+</div>
       </div>
     </div>
 
-    <div style="background:#0a0c10; border-radius:12px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0; margin-top:16px;">
+    <div style="background: rgba(0,0,0,0.3); border-radius:14px; padding:16px; font-size:13px; line-height:1.8; color:#8b92a0; margin-top:16px;">
       <div><span data-i18n="cost">Стоимость:</span> <span style="color:#f59e0b; font-weight:700;">2 500 ₽</span></div>
       <div><span data-i18n="payment_before">Оплата:</span> <span style="color:#e8eaed;" data-i18n="payment_before_val">до прибытия комиссара</span></div>
       <div><span data-i18n="arrival">Прибытие:</span> <span style="color:#e8eaed;">15–25 <span data-i18n="minutes">минут</span></span></div>
@@ -993,7 +1388,7 @@ body {
 <!-- ============ МОДАЛКА: ЕВРОПРОТОКОЛ (форма) ============ -->
 <div class="modal-bg" id="euroModal">
   <div class="modal wide">
-    <h2 data-i18n="euro_title">📋 Европротокол</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="euro_title">📋 Европротокол</span></h2>
     <p style="font-size:13px; color:#8b92a0; margin-bottom:16px;" data-i18n="euro_sub">Заполните поля — мы сформируем документ. Можно сохранить в PDF и распечатать.</p>
 
     <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
@@ -1104,6 +1499,18 @@ body {
       <textarea id="euroCirc" placeholder="Опишите ситуацию: кто двигался, как произошло столкновение..." style="min-height:100px;"></textarea>
     </div>
 
+    <div class="euro-section-title">📷 <span data-i18n="euro_photos_title">Фото с места ДТП (до 5 штук)</span></div>
+    <div class="photo-upload" id="euroPhotoUpload">
+      <div class="photo-item" onclick="addPhoto(this, 'euro')">+</div>
+      <div class="photo-item" onclick="addPhoto(this, 'euro')">+</div>
+      <div class="photo-item" onclick="addPhoto(this, 'euro')">+</div>
+      <div class="photo-item" onclick="addPhoto(this, 'euro')">+</div>
+      <div class="photo-item" onclick="addPhoto(this, 'euro')">+</div>
+    </div>
+    <div style="font-size:11px; color:#6b7280; margin-top:6px;" data-i18n="euro_photos_hint">
+      Фото автоматически добавятся в документ
+    </div>
+
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('euroModal')" data-i18n="btn_close">Закрыть</button>
       <button class="btn btn-primary" onclick="generateEuroDoc()" data-i18n="euro_generate">📋 Сформировать документ</button>
@@ -1113,9 +1520,9 @@ body {
 
 <!-- ============ МОДАЛКА: ЕВРОПРОТОКОЛ (готовый документ) ============ -->
 <div class="modal-bg" id="euroDocModal">
-  <div class="modal wide" style="padding:16px; background:#2a2f3a;">
-    <div id="euroDocContent" style="background:#fff; border-radius:8px; overflow:hidden;"></div>
-    <div class="modal-actions" style="background:#12151c; padding:16px; border-radius:12px; margin-top:12px;">
+  <div class="modal wide" style="padding:16px;">
+    <div id="euroDocContent" style="background:#fff; border-radius:12px; overflow:hidden;"></div>
+    <div class="modal-actions" style="padding:16px; border-radius:12px; margin-top:12px; background: rgba(0,0,0,0.3);">
       <button class="btn" onclick="closeModal('euroDocModal')" data-i18n="btn_close">Закрыть</button>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <button class="btn" onclick="printEuro()" data-i18n="btn_print">🖨 Печать</button>
@@ -1129,7 +1536,7 @@ body {
 <!-- ============ МОДАЛКА: ЖАЛОБА ============ -->
 <div class="modal-bg" id="complaintModal">
   <div class="modal">
-    <h2 data-i18n="complaint_title">🚨 Жалоба на комиссара</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="complaint_title">🚨 Жалоба на комиссара</span></h2>
     <p style="font-size:13px; color:#8b92a0; margin-bottom:16px;" data-i18n="complaint_sub">Расскажите, что произошло. Разберёмся в течение 48 часов.</p>
 
     <div class="field">
@@ -1173,7 +1580,7 @@ body {
 <!-- ============ МОДАЛКА: ОПЛАТА ============ -->
 <div class="modal-bg" id="paymentModal">
   <div class="modal">
-    <h2 data-i18n="payment_title">💳 Пополнение баланса</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="payment_title">💳 Пополнение баланса</span></h2>
     <div class="field">
       <label data-i18n="payment_amount">Сумма</label>
       <input type="number" id="payAmount" value="2500" style="font-size:20px; font-weight:700; text-align:center;">
@@ -1210,7 +1617,7 @@ body {
 <!-- ============ МОДАЛКА: НАСТРОЙКИ ============ -->
 <div class="modal-bg" id="settingsModal">
   <div class="modal">
-    <h2 data-i18n="settings_title">⚙️ Настройки</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="settings_title">⚙️ Настройки</span></h2>
     <div class="field">
       <label data-i18n="settings_lang">Язык интерфейса</label>
       <select id="settingsLang" onchange="changeLang(this.value)"></select>
@@ -1232,7 +1639,7 @@ body {
 <!-- ============ МОДАЛКА: УВЕДОМЛЕНИЯ ============ -->
 <div class="modal-bg" id="notifModal">
   <div class="modal">
-    <h2 data-i18n="notif_title">🔔 Уведомления</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="notif_title">🔔 Уведомления</span></h2>
     <div class="notif-list">
       <div class="notif-item">
         <div class="notif-icon">⚡</div>
@@ -1260,7 +1667,7 @@ body {
 <!-- ============ МОДАЛКА: ОЦЕНКА ============ -->
 <div class="modal-bg" id="ratingModal">
   <div class="modal">
-    <h2 data-i18n="rating_title">Оцените комиссара</h2>
+    <h2><img src="logo.png" alt="" onerror="this.style.display='none'"><span data-i18n="rating_title">Оцените комиссара</span></h2>
     <p style="font-size:13px; color:#8b92a0; text-align:center;" data-i18n="rating_sub">Как всё прошло?</p>
     <div class="stars" id="ratingStars">
       <span data-v="1">★</span>
@@ -1286,7 +1693,7 @@ body {
   'use strict';
 
   // ============================================
-  // ПЕРЕВОДЫ (сокращённые ключи для краткости, но полные)
+  // ПЕРЕВОДЫ: RU, EN, BE
   // ============================================
   const TRANSLATIONS = {
     ru: {
@@ -1355,6 +1762,8 @@ body {
       field_car: "Марка и модель", field_gosnomer: "Гос. номер", field_osago: "Полис ОСАГО",
       field_damage_a: "Повреждения вашего авто", field_damage_b: "Повреждения авто B",
       euro_circumstances: "Обстоятельства ДТП",
+      euro_photos_title: "Фото с места ДТП (до 5 штук)",
+      euro_photos_hint: "Фото автоматически добавятся в документ",
       btn_close: "Закрыть", btn_print: "🖨 Печать", btn_pdf: "📄 PDF", btn_save: "💾 Сохранить в ЛК",
       complaint_title: "🚨 Жалоба на комиссара", complaint_sub: "Расскажите, что произошло. Разберёмся в течение 48 часов.",
       complaint_comm_name: "Имя комиссара (если известно)", complaint_date: "Дата вызова",
@@ -1439,6 +1848,8 @@ body {
       field_car: "Make and model", field_gosnomer: "License plate", field_osago: "OSAGO policy",
       field_damage_a: "Damage to your car", field_damage_b: "Damage to car B",
       euro_circumstances: "Accident circumstances",
+      euro_photos_title: "Accident photos (up to 5)",
+      euro_photos_hint: "Photos will be added to the document automatically",
       btn_close: "Close", btn_print: "🖨 Print", btn_pdf: "📄 PDF", btn_save: "💾 Save to dashboard",
       complaint_title: "🚨 Commissioner complaint", complaint_sub: "Tell us what happened. We'll investigate within 48 hours.",
       complaint_comm_name: "Commissioner name (if known)", complaint_date: "Call date",
@@ -1456,35 +1867,105 @@ body {
       btn_ok: "Got it",
       rating_title: "Rate the commissioner", rating_sub: "How did it go?", btn_skip: "Skip",
       chat_dev: "Chat (in development)"
+    },
+    be: {
+      app_name: "АварКом", auth_sub: "Аварыйны камісар анлайн",
+      tab_login: "Уваход", tab_register: "Рэгістрацыя",
+      field_phone: "Тэлефон", field_pass: "Пароль", field_name: "Імя",
+      btn_login: "Увайсці", btn_register: "Стварыць акаўнт",
+      nav_home: "Галоўная", nav_recs: "Рэкамендацыі", nav_support: "Падтрымка",
+      home_title: "Што здарылася?", home_sub: "Выберыце дзеянне — мы дапаможам",
+      act_call_title: "Выклікаць камісара", act_call_desc: "Прыедзе на месца ДТЗ, аформіць дакументы, дапаможа са страхавой",
+      act_euro_title: "Еўрапратакол без камісара", act_euro_desc: "Аформіце ДТЗ самастойна з нашай дапамогай",
+      act_112_title: "Выклікаць спецслужбы", act_112_desc: "Адзіны нумар экстраных службаў — 112",
+      act_recs_title: "Рэкамендацыі пры ДТЗ", act_recs_desc: "Пакрокавая інструкцыя, што рабіць на месцы аварыі",
+      act_support_title: "Падтрымка і скаргі", act_support_desc: "Звяжыцеся з намі або паскардзіцеся на камісара",
+      tip_title: "⚡ Парада:", tip_text: "з 2025 года ліміт еўрапратакола з рознагалоссямі — 200 000 ₽, без — 400 000 ₽.",
+      recs_title: "Што рабіць пры ДТЗ", recs_sub: "Пакрокавая інструкцыя",
+      rec1_t: "Спыніцеся і не рухайце машыну", rec1_d: "Неадкладна спыніцеся, выключыце рухавік, уключыце аварыйку.",
+      rec2_t: "Пастаўце знак аварыйнай прыпынку", rec2_d: "У населеным пункце — 15 м, звонку — 30 м.",
+      rec3_t: "Праверце, ці ёсць пацярпелыя", rec3_d: "Калі ёсць параненыя — выклічце хуткую (103) і паліцыю (102).",
+      rec4_t: "Выклічце ДАІ, калі гэта неабходна", rec4_d: "ДАІ абавязкова: пацярпелыя, 3+ удзельнікі, рознагалоссі, шкода больш ліміту.",
+      rec5_t: "Зафіксуйце ўсё на фота і відэа", rec5_d: "Агульны план, становішча машын, сляды тармажэння, пашкоджанні, нумары.",
+      rec6_t: "Запішыце сведкаў", rec6_d: "ПІБ і кантакты відавочцаў.",
+      rec7_t: "Аформіце еўрапратакол або дачакайцеся ДАІ", rec7_d: "Тэрмін перадачы ў страхавую — да 5 рабочых дзён.",
+      rec8_t: "Не пакідайце месца ДТЗ", rec8_d: "Пакіданне месца — пазбаўленне правоў ад 1 да 1.5 гадоў.",
+      rec9_t: "Паведаміце страхавой", rec9_d: "Пры еўрапратаколе — да 5 рабочых дзён.",
+      rec10_t: "Не рамантуйце машыну да агляду", rec10_d: "15 каляндарных дзён.",
+      rec_warn_t: "🚫 Катэгарычна нельга:", rec_warn_d: "• Ужываць алкаголь пасля ДТЗ<br>• Пакідаць месца здарэння<br>• Падпісваць пустыя бланкі",
+      support_title: "Падтрымка", support_sub: "Звяжыцеся з намі або знойдзіце адказ у FAQ",
+      sup_write: "📧 Напісаць нам", sup_write_sub: "Адказваем на працягу 24 гадзін у працоўныя дні",
+      sup_complaint: "🚨 Скарга на камісара", sup_complaint_sub: "Калі нешта пайшло не так — раскажыце. Разбяромся на працягу 48 гадзін.",
+      btn_complaint: "Падаць скаргу", sup_faq: "💬 Частыя пытанні",
+      faq1_q: "Колькі каштуе выклік камісара?", faq1_a: "Кошт фіксаваны — ад 2 500 ₽. Дакладная цана паказваецца перад пацверджаннем.",
+      faq2_q: "Ці можна аформіць без ДАІ?", faq2_a: "Так, калі няма пацярпелых, удзельнікаў не больш за двух і шкода ў межах ліміту.",
+      faq3_q: "Як аплаціць?", faq3_a: "Картай, праз СБП або ЮMoney.",
+      faq4_q: "Што з маімі дадзенымі?", faq4_a: "Усё па 152-ФЗ. Дакументы захоўваюцца ў вашым ЛК.",
+      sup_emergency: "🆘 Экстраныя службы", sup_emergency_sub: "Калі сітуацыя пагражае жыццю — тэлефануйце напрамую",
+      copy: "📋 Капіяваць",
+      lk_title: "Асабісты кабінет", lk_greeting: "Сардэчна запрашаем!",
+      lk_calls: "Усяго выклікаў", lk_spent: "Патрачана", lk_balance: "Баланс",
+      lk_topup: "Папоўніць баланс", lk_topup_sub: "Аплата картай або СБП",
+      lk_complaint: "Падаць скаргу", lk_complaint_sub: "На камісара або сэрвіс",
+      lk_settings: "Налады", lk_settings_sub: "Профіль, мова, апавяшчэнні",
+      lk_support: "Падтрымка", lk_support_sub: "FAQ і кантакты",
+      lk_docs: "Мае дакументы", lk_docs_empty: "📭 Дакументаў пакуль няма<br><span style='font-size:12px;color:#4b5563;margin-top:6px;display:block;'>З'явяцца пасля афармлення еўрапратакола</span>",
+      btn_logout: "Выйсці з акаўнта",
+      call_header: "Выклік камісара", btn_cancel: "Адмена",
+      call_searching: "Шукаем камісара...", call_searching_sub: "Звычайна займае 1–2 хвіліны",
+      call_type: "Тып ДТЗ:", call_addr: "Адрас:", call_comment: "Каментар:",
+      geo_coords: "Каардынаты:",
+      btn_emergency: "Экстраная дапамога — 112", btn_chat: "💬 Чат", btn_support: "📞 Падтрымка",
+      notes_title: "📋 Што далей:", notes_text: "• Не пакідайце месца ДТЗ<br>• Сфатаграфуйце пашкоджанні<br>• Запішыце сведкаў<br>• Камісар дапаможа з дакументамі",
+      modal_call_title: "Выклік камісара",
+      field_dtp_type: "Тып ДТЗ", field_address: "Адрас", field_comment: "Каментар (неабавязкова)",
+      field_photos: "Фота з месца (да 5 штук, неабавязкова)",
+      dtp_simple: "2 машыны, без пацярпелых", dtp_complex: "Складанае (3+ удзельнікі / рознагалоссі)",
+      dtp_solo: "Адзін удзельнік (наезд на перашкоду)", dtp_parking: "Паркоўка / двор",
+      cost: "Кошт:", payment_before: "Аплата:", payment_before_val: "да прыезду камісара",
+      arrival: "Прыбыццё:", minutes: "хвілін", btn_call: "Выклікаць",
+      euro_title: "📋 Еўрапратакол", euro_sub: "Запоўніце палі — мы сфарміруем дакумент. Можна захаваць у PDF і раздрукаваць.",
+      euro_demo: "🎲 Дэма-дадзеныя", euro_clear: "🗑 Ачысціць",
+      euro_general: "Агульныя звесткі",
+      euro_generate: "📋 Сфарміраваць дакумент", euro_date: "Дата і час ДТЗ",
+      euro_location: "Месца ДТЗ", euro_count: "Колькасць удзельнікаў",
+      euro_driver_a: "Кіроўца A (вы)", euro_driver_b: "Кіроўца B (другі ўдзельнік)",
+      field_fio: "ПІБ", field_license: "Пасведчанне кіроўцы", field_sts: "СТС",
+      field_car: "Марка і мадэль", field_gosnomer: "Дзярж. нумар", field_osago: "Поліс АСАГА",
+      field_damage_a: "Пашкоджанні вашага аўто", field_damage_b: "Пашкоджанні аўто B",
+      euro_circumstances: "Абставіны ДТЗ",
+      euro_photos_title: "Фота з месца ДТЗ (да 5 штук)",
+      euro_photos_hint: "Фота аўтаматычна дададуцца ў дакумент",
+      btn_close: "Зачыніць", btn_print: "🖨 Друк", btn_pdf: "📄 PDF", btn_save: "💾 Захаваць у ЛК",
+      complaint_title: "🚨 Скарга на камісара", complaint_sub: "Раскажыце, што здарылася. Разбяромся на працягу 48 гадзін.",
+      complaint_comm_name: "Імя камісара (калі вядома)", complaint_date: "Дата выкліку",
+      complaint_type: "Тып праблемы",
+      complaint_t1: "Спазніўся / не прыехаў", complaint_t2: "Грубае стаўленне",
+      complaint_t3: "Памылкі ў дакументах", complaint_t4: "Спрабаваў навязаць паслугі", complaint_t5: "Іншае",
+      complaint_desc: "Падрабязнасці", btn_send: "Адправіць",
+      payment_title: "💳 Папаўненне балансу", payment_amount: "Сума", payment_method: "Спосаб аплаты",
+      pay_card: "Карта", pay_sbp: "СБП", payment_commission: "Камісія", payment_total: "Разам", btn_pay: "Аплаціць",
+      settings_title: "⚙️ Налады", settings_lang: "Мова інтэрфейсу", settings_notif: "Апавяшчэнні",
+      settings_notif_all: "Усе", settings_notif_imp: "Толькі важныя", settings_notif_none: "Адключыць", btn_done: "Гатова",
+      notif_title: "🔔 Апавяшчэнні",
+      notif1_t: "Абнаўленне лімітаў еўрапратакола", notif1_d: "З 2025 года ліміты павялічаны: да 200 000 ₽ з рознагалоссямі, да 400 000 ₽ без.", notif1_time: "2 дні таму",
+      notif2_t: "Сардэчна запрашаем у АварКом", notif2_d: "Дзякуй, што выбралі нас.", notif2_time: "толькі што",
+      btn_ok: "Зразумела",
+      rating_title: "Ацаніце камісара", rating_sub: "Як усё прайшло?", btn_skip: "Прапусціць",
+      chat_dev: "Чат (у распрацоўцы)"
     }
   };
-
-  // Для остальных языков — упрощённый fallback на английский
-  // (полные переводы BE, UZ, KK, UK, DE, FR, ES, TR можно добавить позже)
-  TRANSLATIONS.be = Object.assign({}, TRANSLATIONS.en, { app_name: "АварКом", nav_home: "Галоўная", home_title: "Што здарылася?", tab_login: "Уваход", tab_register: "Рэгістрацыя" });
-  TRANSLATIONS.uz = Object.assign({}, TRANSLATIONS.en, { app_name: "AvarKom", nav_home: "Asosiy", home_title: "Nima bo'ldi?", tab_login: "Kirish", tab_register: "Ro'yxatdan o'tish" });
-  TRANSLATIONS.kk = Object.assign({}, TRANSLATIONS.en, { app_name: "АварКом", nav_home: "Басты", home_title: "Не болды?", tab_login: "Кіру", tab_register: "Тіркелу" });
-  TRANSLATIONS.uk = Object.assign({}, TRANSLATIONS.en, { app_name: "АварКом", nav_home: "Головна", home_title: "Що сталося?", tab_login: "Вхід", tab_register: "Реєстрація" });
-  TRANSLATIONS.de = Object.assign({}, TRANSLATIONS.en, { app_name: "AvarKom", nav_home: "Startseite", home_title: "Was ist passiert?", tab_login: "Anmelden", tab_register: "Registrieren" });
-  TRANSLATIONS.fr = Object.assign({}, TRANSLATIONS.en, { app_name: "AvarKom", nav_home: "Accueil", home_title: "Que s'est-il passé ?", tab_login: "Connexion", tab_register: "Inscription" });
-  TRANSLATIONS.es = Object.assign({}, TRANSLATIONS.en, { app_name: "AvarKom", nav_home: "Inicio", home_title: "¿Qué pasó?", tab_login: "Iniciar sesión", tab_register: "Registrarse" });
-  TRANSLATIONS.tr = Object.assign({}, TRANSLATIONS.en, { app_name: "AvarKom", nav_home: "Ana sayfa", home_title: "Ne oldu?", tab_login: "Giriş", tab_register: "Kayıt" });
 
   const LANGS = [
     { code: 'ru', name: 'Русский', flag: '🇷🇺' },
     { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'be', name: 'Беларуская', flag: '🇧🇾' },
-    { code: 'uz', name: 'O\'zbekcha', flag: '🇺🇿' },
-    { code: 'kk', name: 'Қазақша', flag: '🇰🇿' },
-    { code: 'uk', name: 'Українська', flag: '🇺🇦' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'tr', name: 'Türkçe', flag: '🇹🇷' }
+    { code: 'be', name: 'Беларуская', flag: '🇧🇾' }
   ];
 
   let currentLang = localStorage.getItem('avarkom_lang') || 'ru';
   let currentUser = JSON.parse(localStorage.getItem('avarkom_user') || 'null');
+  let lastCoords = null;
+  let euroPhotos = []; // base64 фото для европротокола
 
   function t(key) {
     return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key])
@@ -1627,8 +2108,6 @@ body {
   // ============================================
   // CALL
   // ============================================
-  let lastCoords = null;
-
   window.startCall = function() {
     document.getElementById('modalAddress').value = '';
     document.getElementById('modalComment').value = '';
@@ -1637,89 +2116,146 @@ body {
     document.querySelectorAll('#photoUpload .photo-item').forEach(p => {
       p.classList.remove('filled');
       p.innerHTML = '+';
-      p.onclick = () => addPhoto(p);
+      p.onclick = () => addPhoto(p, 'call');
     });
     document.getElementById('confirmCallModal').classList.add('active');
   };
 
+  // ============================================
+  // ГЕОЛОКАЦИЯ — все способы
+  // ============================================
   window.detectLocation = function() {
     const btn = document.getElementById('gpsBtn');
-    const coordsBlock = document.getElementById('gpsCoords');
     if (!navigator.geolocation) {
-      toast('Геолокация недоступна');
+      // Fallback на IP
+      getLocationByIP();
       return;
     }
     btn.disabled = true;
     btn.textContent = '⏳';
     toast('Определяем...');
 
+    // Сначала пробуем высокоточный GPS
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        lastCoords = { lat: latitude, lng: longitude };
-
-        // Показываем координаты
-        document.getElementById('gpsLat').textContent = latitude.toFixed(6);
-        document.getElementById('gpsLng').textContent = longitude.toFixed(6);
-        if (accuracy) {
-          document.getElementById('gpsAccRow').style.display = 'block';
-          document.getElementById('gpsAcc').textContent = '±' + Math.round(accuracy) + ' м';
-        }
-        coordsBlock.classList.add('active');
-
-        // Обратное геокодирование
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${currentLang}`)
-          .then(r => r.json())
-          .then(data => {
-            const addr = data.display_name || (latitude.toFixed(5) + ', ' + longitude.toFixed(5));
-            document.getElementById('modalAddress').value = addr;
-            toast('Адрес определён');
-          })
-          .catch(() => {
-            document.getElementById('modalAddress').value = latitude.toFixed(5) + ', ' + longitude.toFixed(5);
-            toast('Используем координаты');
-          })
-          .finally(() => {
-            btn.disabled = false; btn.textContent = '📍';
-          });
-      },
+      pos => handleGeoSuccess(pos, btn, 'gps'),
       err => {
-        btn.disabled = false; btn.textContent = '📍';
-        let msg = 'Не удалось определить';
-        if (err.code === 1) msg = 'Доступ к геолокации запрещён';
-        else if (err.code === 2) msg = 'Позиция недоступна';
-        else if (err.code === 3) msg = 'Превышено время ожидания';
-        toast(msg);
+        console.warn('GPS failed, trying IP:', err);
+        // Fallback: пробуем с меньшей точностью
+        navigator.geolocation.getCurrentPosition(
+          pos => handleGeoSuccess(pos, btn, 'network'),
+          err2 => {
+            console.warn('Network geo failed, trying IP:', err2);
+            // Fallback: IP-геолокация
+            getLocationByIP(btn);
+          },
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+        );
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
+
+  function handleGeoSuccess(pos, btn, source) {
+    const { latitude, longitude, accuracy } = pos.coords;
+    lastCoords = { lat: latitude, lng: longitude };
+
+    document.getElementById('gpsLat').textContent = latitude.toFixed(6);
+    document.getElementById('gpsLng').textContent = longitude.toFixed(6);
+    if (accuracy) {
+      document.getElementById('gpsAccRow').style.display = 'block';
+      document.getElementById('gpsAcc').textContent = '±' + Math.round(accuracy) + ' м' + (source === 'gps' ? ' (GPS)' : ' (сеть)');
+    }
+    document.getElementById('gpsCoords').classList.add('active');
+
+    reverseGeocode(latitude, longitude, 'modalAddress', btn);
+  }
+
+  function getLocationByIP(btn) {
+    if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+    toast('Определяем по IP...');
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        if (data.latitude && data.longitude) {
+          lastCoords = { lat: data.latitude, lng: data.longitude };
+          document.getElementById('gpsLat').textContent = data.latitude.toFixed(6);
+          document.getElementById('gpsLng').textContent = data.longitude.toFixed(6);
+          document.getElementById('gpsAccRow').style.display = 'block';
+          document.getElementById('gpsAcc').textContent = 'по IP (город)';
+          document.getElementById('gpsCoords').classList.add('active');
+          reverseGeocode(data.latitude, data.longitude, 'modalAddress', btn);
+        } else {
+          throw new Error('no coords');
+        }
+      })
+      .catch(() => {
+        if (btn) { btn.disabled = false; btn.textContent = '📍'; }
+        toast('Не удалось определить. Введите адрес вручную.');
+      });
+  }
+
+  function reverseGeocode(lat, lng, targetInputId, btn) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=${currentLang}`)
+      .then(r => r.json())
+      .then(data => {
+        const addr = data.display_name || (lat.toFixed(5) + ', ' + lng.toFixed(5));
+        document.getElementById(targetInputId).value = addr;
+        toast('Адрес определён');
+      })
+      .catch(() => {
+        document.getElementById(targetInputId).value = lat.toFixed(5) + ', ' + lng.toFixed(5);
+        toast('Используем координаты');
+      })
+      .finally(() => {
+        if (btn) { btn.disabled = false; btn.textContent = '📍'; }
+      });
+  }
 
   window.detectEuroLocation = function() {
-    if (!navigator.geolocation) { toast('Геолокация недоступна'); return; }
+    if (!navigator.geolocation) { getEuroLocationByIP(); return; }
     toast('Определяем...');
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        const { latitude, longitude } = pos.coords;
-        document.getElementById('euroGpsLat').textContent = latitude.toFixed(6);
-        document.getElementById('euroGpsLng').textContent = longitude.toFixed(6);
-        document.getElementById('euroGpsCoords').classList.add('active');
-
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${currentLang}`)
-          .then(r => r.json())
-          .then(data => {
-            document.getElementById('euroLocation').value = data.display_name || (latitude.toFixed(5) + ', ' + longitude.toFixed(5));
-            toast('Адрес определён');
-          })
-          .catch(() => {
-            document.getElementById('euroLocation').value = latitude.toFixed(5) + ', ' + longitude.toFixed(5);
-          });
+      pos => handleEuroGeoSuccess(pos),
+      () => {
+        navigator.geolocation.getCurrentPosition(
+          pos => handleEuroGeoSuccess(pos),
+          () => getEuroLocationByIP(),
+          { enableHighAccuracy: false, timeout: 8000 }
+        );
       },
-      () => toast('Не удалось определить')
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
-  window.addPhoto = function(el) {
+  function handleEuroGeoSuccess(pos) {
+    const { latitude, longitude } = pos.coords;
+    document.getElementById('euroGpsLat').textContent = latitude.toFixed(6);
+    document.getElementById('euroGpsLng').textContent = longitude.toFixed(6);
+    document.getElementById('euroGpsCoords').classList.add('active');
+    reverseGeocode(latitude, longitude, 'euroLocation', null);
+  }
+
+  function getEuroLocationByIP() {
+    toast('Определяем по IP...');
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        if (data.latitude && data.longitude) {
+          document.getElementById('euroGpsLat').textContent = data.latitude.toFixed(6);
+          document.getElementById('euroGpsLng').textContent = data.longitude.toFixed(6);
+          document.getElementById('euroGpsCoords').classList.add('active');
+          reverseGeocode(data.latitude, data.longitude, 'euroLocation', null);
+        } else {
+          toast('Введите адрес вручную');
+        }
+      })
+      .catch(() => toast('Введите адрес вручную'));
+  }
+
+  // ============================================
+  // ФОТО (универсальная функция для вызова и европротокола)
+  // ============================================
+  window.addPhoto = function(el, context) {
     if (el.classList.contains('filled')) return;
     const input = document.createElement('input');
     input.type = 'file';
@@ -1729,25 +2265,40 @@ body {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
+        const base64 = ev.target.result;
         el.classList.add('filled');
-        el.innerHTML = '<img src="' + ev.target.result + '"><span class="remove" onclick="removePhoto(event, this)">×</span>';
+        el.innerHTML = '<img src="' + base64 + '"><span class="remove" onclick="removePhoto(event, this, \'' + context + '\')">×</span>';
         el.onclick = null;
+        // Сохраняем фото для европротокола
+        if (context === 'euro') {
+          euroPhotos.push(base64);
+        }
       };
       reader.readAsDataURL(file);
     };
     input.click();
   };
 
-  window.removePhoto = function(e, el) {
+  window.removePhoto = function(e, el, context) {
     e.stopPropagation();
     const parent = el.parentElement;
+    const img = parent.querySelector('img');
+    if (img && context === 'euro') {
+      const src = img.src;
+      const idx = euroPhotos.indexOf(src);
+      if (idx > -1) euroPhotos.splice(idx, 1);
+    }
     parent.classList.remove('filled');
     parent.innerHTML = '+';
-    parent.onclick = () => addPhoto(parent);
+    parent.onclick = () => addPhoto(parent, context);
   };
 
+  // ============================================
+  // CALL FLOW
+  // ============================================
   let callTimerInterval = null;
   let callSeconds = 0;
+  let currentCallState = 'idle'; // idle | active | cancelled
 
   window.confirmCallSubmit = function() {
     const addr = document.getElementById('modalAddress').value.trim();
@@ -1771,15 +2322,18 @@ body {
       document.getElementById('callCoordsRow').style.display = 'none';
     }
     showScreen('screenCall');
+    currentCallState = 'active';
     startCallFlow();
   };
 
   window.cancelCall = function() {
     if (!confirm('Отменить вызов?')) return;
+    currentCallState = 'cancelled';
     if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
     callSeconds = 0;
     showScreen('screenHome');
     toast('Вызов отменён');
+    // ВАЖНО: НЕ открываем оценку при отмене
   };
 
   function startCallFlow() {
@@ -1792,6 +2346,11 @@ body {
 
     if (callTimerInterval) clearInterval(callTimerInterval);
     callTimerInterval = setInterval(() => {
+      // Если вызов отменён — таймер останавливаем
+      if (currentCallState === 'cancelled') {
+        clearInterval(callTimerInterval);
+        return;
+      }
       callSeconds++;
       const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
       const s = String(callSeconds % 60).padStart(2, '0');
@@ -1807,13 +2366,17 @@ body {
 
     stages.forEach(s => {
       setTimeout(() => {
+        // Если вызов отменён — не показываем этапы
+        if (currentCallState === 'cancelled') return;
         document.getElementById('callIcon').textContent = s.icon;
         document.getElementById('callTitle').textContent = s.title;
         document.getElementById('callSub').textContent = s.sub;
         document.getElementById('progressFill').style.width = s.progress + '%';
         if (s.progress === 100) {
           if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
+          // Оценка только если НЕ отменён
           setTimeout(() => {
+            if (currentCallState === 'cancelled') return;
             if (confirm('Оформление завершено. Оценить комиссара?')) openRating();
           }, 3000);
         }
@@ -1830,6 +2393,18 @@ body {
       const el = document.getElementById(id);
       if (el && saved[id]) el.value = saved[id];
     });
+    // Восстанавливаем фото
+    if (saved.photos && Array.isArray(saved.photos)) {
+      euroPhotos = saved.photos.slice();
+      const items = document.querySelectorAll('#euroPhotoUpload .photo-item');
+      saved.photos.forEach((photo, i) => {
+        if (items[i] && !items[i].classList.contains('filled')) {
+          items[i].classList.add('filled');
+          items[i].innerHTML = '<img src="' + photo + '"><span class="remove" onclick="removePhoto(event, this, \'euro\')">×</span>';
+          items[i].onclick = null;
+        }
+      });
+    }
     document.getElementById('euroModal').classList.add('active');
   };
 
@@ -1866,6 +2441,13 @@ body {
     });
     document.getElementById('euroCount').value = '2';
     document.getElementById('euroGpsCoords').classList.remove('active');
+    // Очищаем фото
+    euroPhotos = [];
+    document.querySelectorAll('#euroPhotoUpload .photo-item').forEach(p => {
+      p.classList.remove('filled');
+      p.innerHTML = '+';
+      p.onclick = () => addPhoto(p, 'euro');
+    });
     localStorage.removeItem('avarkom_euro_draft');
     toast('Очищено');
   };
@@ -1895,7 +2477,8 @@ body {
         osago: document.getElementById('driverBOsago').value,
         damage: document.getElementById('driverBDamage').value
       },
-      circ: document.getElementById('euroCirc').value
+      circ: document.getElementById('euroCirc').value,
+      photos: euroPhotos.slice()
     };
   }
 
@@ -1904,12 +2487,28 @@ body {
     const dateStr = data.date ? new Date(data.date).toLocaleString('ru-RU') : now.toLocaleString('ru-RU');
     const docNum = Math.floor(Math.random() * 900000) + 100000;
 
+    // Блок с фото
+    let photosBlock = '';
+    if (data.photos && data.photos.length) {
+      photosBlock = `
+        <div class="euro-section">
+          <h3>5. Фотофиксация места ДТП</h3>
+          <div class="euro-photos-grid">
+            ${data.photos.map(p => '<img src="' + p + '" alt="Фото ДТП">').join('')}
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="euro-doc" id="euroDocPrintable">
         <div class="euro-header">
-          <div>
-            <div class="euro-logo">🚨 АварКом</div>
-            <div style="font-size:7px; color:#666;">avarkom.ru · support@avarkom.ru</div>
+          <div class="euro-header-left">
+            <img src="logo.png" alt="" class="euro-logo-img" onerror="this.style.display='none'">
+            <div>
+              <div class="euro-logo">АварКом</div>
+              <div style="font-size:7px; color:#666;">avarkom.ru · support@avarkom.ru</div>
+            </div>
           </div>
           <div style="text-align:right; font-size:7px; line-height:1.4;">
             <div><b>Документ № ${docNum}</b></div>
@@ -2039,15 +2638,17 @@ body {
           <div class="euro-field-value" style="min-height:32px; border:none;">${data.circ || '—'}</div>
         </div>
 
+        ${photosBlock}
+
         <div class="euro-section">
-          <h3>5. Схема ДТП</h3>
+          <h3>${photosBlock ? '6' : '5'}. Схема ДТП</h3>
           <div class="euro-scheme-box">
             [Схема ДТП — нарисуйте от руки или приложите отдельно]
           </div>
         </div>
 
         <div class="euro-section">
-          <h3>6. Подписи сторон</h3>
+          <h3>${photosBlock ? '7' : '6'}. Подписи сторон</h3>
           <div style="font-size:7px; color:#333; margin-bottom:4px;">
             Подписывая извещение, оба водителя подтверждают достоверность сведений и отсутствие разногласий.
           </div>
@@ -2089,6 +2690,8 @@ body {
       .euro-doc h2 { text-align:center; font-size:13px; margin-bottom:2px; text-transform:uppercase; }
       .euro-doc .euro-sub { text-align:center; font-size:7.5px; margin-bottom:6px; color:#444; }
       .euro-doc .euro-header { display:flex; justify-content:space-between; border-bottom:1px solid #000; padding-bottom:4px; margin-bottom:6px; font-size:7px; align-items:center; }
+      .euro-doc .euro-header-left { display:flex; align-items:center; gap:6px; }
+      .euro-doc .euro-logo-img { width:28px; height:28px; object-fit:contain; }
       .euro-doc .euro-logo { font-weight:800; font-size:10px; color:#d97706; }
       .euro-section { margin-bottom:5px; border:0.7px solid #000; padding:4px 6px; page-break-inside:avoid; }
       .euro-section h3 { font-size:8px; text-transform:uppercase; background:#f0f0f0; padding:2px 6px; margin:-4px -6px 4px -6px; border-bottom:0.7px solid #000; font-weight:700; }
@@ -2101,6 +2704,8 @@ body {
       .euro-sign { border-top:0.7px solid #000; padding-top:2px; font-size:7px; text-align:center; }
       .euro-footer { font-size:6px; color:#666; text-align:center; margin-top:5px; border-top:0.5px dashed #999; padding-top:3px; line-height:1.3; }
       .euro-scheme-box { height:45px; border:0.5px dashed #999; display:flex; align-items:center; justify-content:center; color:#999; font-size:7px; }
+      .euro-photos-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:3px; margin-top:4px; }
+      .euro-photos-grid img { width:100%; aspect-ratio:1; object-fit:cover; border:0.5px solid #333; }
     </style></head><body>${content}</body></html>`);
     win.document.close();
     setTimeout(() => { win.print(); }, 400);
